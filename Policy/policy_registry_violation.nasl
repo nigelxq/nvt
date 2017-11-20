@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: policy_registry_violation.nasl 4928 2017-01-03 09:00:28Z cfi $
+# $Id: policy_registry_violation.nasl 7811 2017-11-17 11:52:16Z cfischer $
 #
 # Windows Registry Check: Violations
 #
@@ -25,20 +25,34 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+# kb: Keep above the description part as it is used there
+include("gos_funcs.inc");
+include("version_func.inc");
+gos_version = get_local_gos_version();
+if( strlen( gos_version ) > 0 &&
+    version_is_greater_equal( version:gos_version, test_version:"4.2.4" ) ) {
+  use_severity = TRUE;
+}
+
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105990");
-  script_version("$Revision: 4928 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-01-03 10:00:28 +0100 (Tue, 03 Jan 2017) $");
+  script_version("$Revision: 7811 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-11-17 12:52:16 +0100 (Fri, 17 Nov 2017) $");
   script_tag(name:"creation_date", value:"2015-05-22 12:45:52 +0700 (Fri, 22 May 2015)");
-  script_tag(name:"cvss_base", value:"0.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  if( use_severity ) {
+    script_tag(name:"cvss_base", value:"10.0");
+    script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  } else {
+    script_tag(name:"cvss_base", value:"0.0");
+    script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  }
   script_name("Windows Registry Check: Violations");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2015 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("policy_registry.nasl");
-  script_mandatory_keys("policy/registry_violation");
+  script_mandatory_keys("policy/registry/started");
 
   script_tag(name:"summary", value:"List registry entries which didn't pass the registry
   policy check.");
@@ -48,12 +62,23 @@ if(description)
   exit(0);
 }
 
-violations = get_kb_item("policy/registry_violation");
+violations = get_kb_list( "policy/registry/violation_list" );
 
-if (violations) {
-  report = 'The following registry entries did not pass the registry policy check:\n\n';
-  report += 'Registry entry | Present | Value checked against | Value set in registry\n' + violations;
-  log_message(data:report, port:0);
+if( violations ) {
+
+  # Sort to not report changes on delta reports if just the order is different
+  violations = sort( violations );
+
+  report  = 'The following registry entries did not pass the registry policy check:\n\n';
+  report += 'Registry entry | Present | Value checked against | Value set in registry\n';
+
+  foreach violation( violations ) {
+    report += violation + '\n';
+  }
+  if( use_severity )
+    security_message( port:0, data:report );
+  else
+    log_message( port:0, data:report );
 }
 
-exit(0);
+exit( 0 );

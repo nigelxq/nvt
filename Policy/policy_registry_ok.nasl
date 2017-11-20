@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: policy_registry_ok.nasl 4928 2017-01-03 09:00:28Z cfi $
+# $Id: policy_registry_ok.nasl 7811 2017-11-17 11:52:16Z cfischer $
 #
 # Windows Registry Check: OK 
 #
@@ -9,7 +9,6 @@
 #
 # Copyright:
 # Copyright (c) 2013 Greenbone Networks GmbH, http://www.greenbone.net
-#
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -28,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105989");
-  script_version("$Revision: 4928 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-01-03 10:00:28 +0100 (Tue, 03 Jan 2017) $");
+  script_version("$Revision: 7811 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-11-17 12:52:16 +0100 (Fri, 17 Nov 2017) $");
   script_tag(name:"creation_date", value:"2015-05-22 12:45:19 +0700 (Fri, 22 May 2015)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -38,7 +37,7 @@ if(description)
   script_copyright("Copyright (c) 2015 Greenbone Networks GmbH");
   script_family("Policy");
   script_dependencies("policy_registry.nasl");
-  script_mandatory_keys("policy/registry_ok");
+  script_mandatory_keys("policy/registry/started");
 
   script_tag(name:"summary", value:"List registry entries which pass the registry
   policy check.");
@@ -48,12 +47,20 @@ if(description)
   exit(0);
 }
 
-passes = get_kb_item("policy/registry_ok");
+passes = get_kb_list( "policy/registry/ok_list" );
 
-if (passes) {
-  report = 'The following registry entries are correct:\n\n';
-  report += 'Registry entry | Present | Value checked | Value set\n' + passes;
-  log_message(data:report, port:0);
+if( passes ) {
+
+  # Sort to not report changes on delta reports if just the order is different
+  passes = sort( passes );
+
+  report  = 'The following registry entries are correct:\n\n';
+  report += 'Registry entry | Present | Value checked | Value set\n';
+
+  foreach pass( passes ) {
+    report += pass + '\n';
+  }
+  log_message( port:0, data:report );
 }
 
-exit(0);
+exit( 0 );
