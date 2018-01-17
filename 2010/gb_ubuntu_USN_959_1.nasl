@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_ubuntu_USN_959_1.nasl 8258 2017-12-29 07:28:57Z teissa $
 #
 # Ubuntu Update for pam vulnerability USN-959-1
 #
@@ -36,10 +37,10 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "https://lists.ubuntu.com/archives/ubuntu-security-announce/2010-July/001117.html");
-  script_id(840458);
-  script_version("$Revision: 6641 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 12:59:00 +0200 (Mon, 10 Jul 2017) $");
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-959-1/");
+  script_oid("1.3.6.1.4.1.25623.1.0.840458");
+  script_version("$Revision: 8258 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-29 08:28:57 +0100 (Fri, 29 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-07-12 11:56:20 +0200 (Mon, 12 Jul 2010)");
   script_xref(name: "USN", value: "959-1");
   script_tag(name:"cvss_base", value:"6.9");

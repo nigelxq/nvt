@@ -45,9 +45,9 @@ tag_affected = "pulseaudio on Mandriva Linux 2008.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-06/msg00030.php");
-  script_id(831089);
-  script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831089");
+  script_version("$Revision: 8356 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-10 09:00:39 +0100 (Wed, 10 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-06-25 12:25:26 +0200 (Fri, 25 Jun 2010)");
   script_tag(name:"cvss_base", value:"6.9");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:M/Au:N/C:C/I:C/A:C");
@@ -55,7 +55,7 @@ if(description)
   script_cve_id("CVE-2009-1299");
   script_name("Mandriva Update for pulseaudio MDVSA-2010:124 (pulseaudio)");
 
-  script_summary("Check for the Version of pulseaudio");
+  script_tag(name: "summary" , value: "Check for the Version of pulseaudio");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

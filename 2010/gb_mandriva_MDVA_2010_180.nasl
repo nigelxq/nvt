@@ -33,16 +33,16 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-07/msg00005.php");
-  script_id(831104);
-  script_version("$Revision: 6564 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 14:55:29 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831104");
+  script_version("$Revision: 8438 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-16 18:38:23 +0100 (Tue, 16 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-07-12 11:56:20 +0200 (Mon, 12 Jul 2010)");
   script_tag(name:"cvss_base", value:"5.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:P");
   script_xref(name: "MDVA", value: "2010:180");
   script_name("Mandriva Update for nss_ldap MDVA-2010:180 (nss_ldap)");
 
-  script_summary("Check for the Version of nss_ldap");
+  script_tag(name: "summary" , value: "Check for the Version of nss_ldap");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

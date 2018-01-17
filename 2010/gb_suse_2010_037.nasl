@@ -41,10 +41,9 @@ tag_affected = "acroread on openSUSE 11.1, openSUSE 11.2";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://www.novell.com/linux/security/advisories/2010_37_acroread.html");
-  script_id(850141);
-  script_version("$Revision: 6670 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:40:38 +0200 (Tue, 11 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.850141");
+  script_version("$Revision: 8356 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-10 09:00:39 +0100 (Wed, 10 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-09-10 14:21:00 +0200 (Fri, 10 Sep 2010)");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
@@ -52,7 +51,7 @@ if(description)
   script_cve_id("CVE-2010-0209", "CVE-2010-1240", "CVE-2010-2188", "CVE-2010-2213", "CVE-2010-2214", "CVE-2010-2215", "CVE-2010-2216", "CVE-2010-2862");
   script_name("SuSE Update for acroread SUSE-SA:2010:037");
 
-  script_summary("Check for the Version of acroread");
+  script_tag(name: "summary" , value: "Check for the Version of acroread");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

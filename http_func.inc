@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: http_func.inc 7805 2017-11-17 08:42:10Z cfischer $
+# $Id: http_func.inc 8150 2017-12-15 17:08:06Z cfischer $
 #
 # Methods to handle HTTP
 #
@@ -24,7 +24,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 7805 $
+# $Revision: 8150 $
 #
 ###############################################################################
 
@@ -140,9 +140,9 @@ function get_http_port( default, ignore_broken, ignore_cgi_disabled ) {
   port = get_kb_item( "Services/www" );
   if( port ) default = port;
 
-  # PJL ports printing everything sent to them
-  # so exit for such a port here
-  if( http_is_pjl_port( port:default ) ) exit( 0 );
+  # Includes e.g. PJL ports which are printing everything
+  # sent to them so exit for such a port here
+  if( http_is_fragile_port( port:default ) ) exit( 0 );
 
   if( ! ignore_cgi_disabled ) {
     if( get_kb_item( "Settings/disable_cgi_scanning" ) ) {
@@ -472,7 +472,7 @@ function cgi_dirs( port ) {
   usercgis = get_kb_list( "/user/cgis" );
   if( isnull( usercgis ) ) usercgis = "/";
   if( isnull( kb ) ) {
-    kb = make_list( usercgis, "/cgi-bin", "/scripts", "/" );
+    kb = make_list( usercgis, "/" );
   } else {
     kb = make_list( usercgis, kb, "/" );
   }
@@ -482,96 +482,98 @@ function cgi_dirs( port ) {
 
 function can_host_php( port ) {
 
-  local_var port, banner, sig, files;
+  local_var port, banner, files, srv_pattern;
 
   if( ! port ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#can_host_php" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#can_host_php" );
     return;
   }
 
   if( get_kb_item( "www/" + port + "/PHP" ) ) return TRUE;
 
   files = get_kb_list( "www/" + port + "/content/extensions/php*" );
-  if( ! isnull( files ) ) {
-    #display( get_host_ip(), " hosts PHP - ", files[0], "\n" );
-    return TRUE; # Hosting .php+ files
-  }
+  if( ! isnull( files ) ) return TRUE; # Hosting .php* files
+
+  if( get_kb_item( "greenbone/gos/http/" + port + "/detected" ) ) return FALSE;
+  if( get_kb_item( "gsa_or_gsa_ng/" + port + "/detected" ) ) return FALSE;
 
   banner = get_http_banner( port:port );
-
   if( ! banner ) {
-    return FALSE;
+    return FALSE; # Broken Web Server
   } else {
 
-    if( tolower( banner ) =~ 'powered.*php' || tolower( banner ) =~ "server.*php.*" ) return TRUE;
+    banner = tolower( banner );
 
-    if( egrep( pattern:"^Server:.*apache|nginx|thttpd|aolserver|pi3web|zeus|iis|icewarp|lighttpd|hiawatha|litespeed|caddy", string:banner, icase:TRUE ) ) {
-      #display( get_host_ip(), " may host PHP\n" );
+    if( banner =~ 'powered.*php' ||
+        banner =~ "server.*php.*" ||
+        banner =~ "^set-cookie:.*phpsessid" ||
+        "content-type: application/x-appweb-php" >< banner )
+      return TRUE;
+
+    # TODO: Find more possible web server to add
+    srv_pattern  = "(apache|nginx|thttpd|aolserver|pi3web|zeus|iis|icewarp|lighttpd|";
+    srv_pattern += "hiawatha|litespeed|caddy|panweb|embedthis-http|embedthis-appweb|mbedthis-appweb)";
+
+    if( egrep( pattern:"^Server:.*" + srv_pattern, string:banner, icase:TRUE ) ) {
       return TRUE;
     }
   }
 
-  # TBD: This looks wrong... (See if( ! banner ) above)
-  sig = banner;
-  if( ! sig ) {
-    return TRUE; # Unknown web server - might be able to host a PHP website
-  }
-
-  if( egrep( pattern:"apache|thttpd|aolserver|pi3web|zeus|iis", string:sig, icase:TRUE ) ) {
-    #display( get_host_ip(), " may be PHP site (sig)\n" );
-    return TRUE;
+  if( egrep( pattern:"^Server:.*", string:banner, icase:TRUE ) ) {
+    return FALSE; # Unknown web server, should be added above if we know that it can host a PHP website
   } else {
-    #display( get_host_ip(), " is definitely NOT a PHP site (sig) - ", sig, "\n" );
-    return FALSE;
+    if( "user-agent: loolwsd wopi" >< banner || "x-powered-by: express" >< banner ) {
+      return FALSE; # We know that this can't host a PHP website
+    } else {
+      return TRUE; # Server: banner hidden - might be able to host a PHP website
+    }
   }
 }
 
 function can_host_asp( port ) {
 
-  local_var port, banner, sig, files;
+  local_var port, banner, files, srv_pattern;
 
   if( ! port ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#can_host_asp" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#can_host_asp" );
     return;
   }
 
   files = get_kb_list( "www/" + port + "/content/extensions/asp*" );
-  if( ! isnull( files ) ) {
-    #display( get_host_ip(), " hosts ASP - ", files[0], "\n" );
-    return TRUE; # Hosting .asp files
-  }
+  if( ! isnull( files ) ) return TRUE; # Hosting .asp / .aspx files
+
+  if( get_kb_item( "greenbone/gos/http/" + port + "/detected" ) ) return FALSE;
+  if( get_kb_item( "gsa_or_gsa_ng/" + port + "/detected" ) ) return FALSE;
 
   banner = get_http_banner( port:port );
   if( ! banner ) {
-    return FALSE;
+    return FALSE; # Broken Web Server
   } else {
-    if( egrep( pattern:"^Server:.*IIS", string:banner, icase:TRUE ) ) {
-      #display( get_host_ip(), " may host ASP\n" );
+
+    banner = tolower( banner );
+
+    if( banner =~ 'powered.*asp' ||
+        banner =~ "server.*asp.*" ||
+        banner =~ "^set-cookie:.*asp\.net_sessionid" ||
+        banner =~ "^set-cookie:.*aspsessionid" ||
+        "x-aspnet-version" >< banner )
+      return TRUE;
+
+    srv_pattern = "(iis|goahead-webs)"; # TODO: Find more possible web server to add
+
+    if( egrep( pattern:"^Server:.*" + srv_pattern, string:banner, icase:TRUE ) ) {
       return TRUE;
     }
   }
 
-  if( tolower( banner ) =~ 'powered.*asp' || tolower( banner ) =~  "server.*asp.*" ) return TRUE;
-
-  # TBD: This looks wrong... (See if( ! banner ) above)
-  sig = banner;
-  if( ! sig ) {
-    #display( get_host_ip(), " has no sig\n" );
-    # Could not fingerprint it, even though we know that IIS fingerprint
-    # is quite reliable
-    if( egrep( pattern:"^Server:.*", string:banner, icase:TRUE ) ) {
-      return FALSE;
-    } else {
-      return TRUE; # Unknown web server - might be able to host a ASP website
-    }
-  }
-
-  if( egrep( pattern:"iis", string:sig, icase:TRUE ) ) {
-    #display( get_host_ip(), " may be ASP site (sig)\n" );
-    return TRUE;
+  if( egrep( pattern:"^Server:.*", string:banner, icase:TRUE ) ) {
+    return FALSE; # Unknown web server, should be added above if we know that it can host a ASP/ASP.NET website
   } else {
-    #display( get_host_ip(), " is definitely NOT a ASP site (sig) - ", sig, "\n" );
-    return FALSE;
+    if( "user-agent: loolwsd wopi" >< banner || "x-powered-by: express" >< banner ) {
+      return FALSE; # We know that this can't host a ASP/ASP.NET website
+    } else {
+      return TRUE; # Server: banner hidden - might be able to host a ASP/ASP.NET website
+    }
   }
 }
 
@@ -724,20 +726,20 @@ function make_list_unique( ) {
 }
 
 # Duplicated from misc_func.inc
-function http_is_pjl_port( port ) {
+function http_is_fragile_port( port ) {
 
-  local_var port, pjl_ports, pjl_port;
+  local_var port, fragile_ports, fragile_port;
 
   if( ! port ) {
-    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_is_pjl_port" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_is_fragile_port" );
     return;
   }
 
-  pjl_ports = get_kb_list( 'Services/PJL' );
-  if( ! pjl_ports ) return;
+  fragile_ports = get_kb_list( "Services/fragile_port" );
+  if( ! fragile_ports ) return;
 
-  foreach pjl_port( pjl_ports ) {
-    if( port == pjl_port ) return TRUE;
+  foreach fragile_port( fragile_ports ) {
+    if( port == fragile_port ) return TRUE;
   }
 
   return;

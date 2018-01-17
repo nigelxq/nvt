@@ -71,10 +71,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://www.novell.com/linux/security/advisories/2010_10_kernel.html");
-  script_id(850124);
-  script_version("$Revision: 6670 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:40:38 +0200 (Tue, 11 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.850124");
+  script_version("$Revision: 8246 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-26 08:29:20 +0100 (Tue, 26 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-02-19 13:38:15 +0100 (Fri, 19 Feb 2010)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -82,7 +81,7 @@ if(description)
   script_cve_id("CVE-2009-3939", "CVE-2009-4141", "CVE-2009-4536", "CVE-2009-4538", "CVE-2010-0003", "CVE-2010-0006", "CVE-2010-0007", "CVE-2010-0299");
   script_name("SuSE Update for kernel SUSE-SA:2010:010");
 
-  script_summary("Check for the Version of kernel");
+  script_tag(name: "summary" , value: "Check for the Version of kernel");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

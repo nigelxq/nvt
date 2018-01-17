@@ -56,9 +56,9 @@ tag_affected = "mysql on CentOS 4";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.centos.org/pipermail/centos-announce/2010-November/017142.html");
-  script_id(880452);
-  script_version("$Revision: 6652 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:46:00 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.880452");
+  script_version("$Revision: 8296 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-05 08:28:01 +0100 (Fri, 05 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-11-16 14:49:48 +0100 (Tue, 16 Nov 2010)");
   script_tag(name:"cvss_base", value:"6.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:P/I:P/A:P");
@@ -66,7 +66,7 @@ if(description)
   script_cve_id("CVE-2010-1848", "CVE-2010-3681", "CVE-2010-3840");
   script_name("CentOS Update for mysql CESA-2010:0824 centos4 i386");
 
-  script_summary("Check for the Version of mysql");
+  script_tag(name: "summary" , value: "Check for the Version of mysql");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

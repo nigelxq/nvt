@@ -34,16 +34,16 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-10/msg00016.php");
-  script_id(831206);
-  script_version("$Revision: 6564 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 14:55:29 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831206");
+  script_version("$Revision: 8266 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-01 08:28:32 +0100 (Mon, 01 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-10-19 15:54:15 +0200 (Tue, 19 Oct 2010)");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
   script_xref(name: "MDVA", value: "2010:209");
   script_name("Mandriva Update for mandriva-doc MDVA-2010:209 (mandriva-doc)");
 
-  script_summary("Check for the Version of mandriva-doc");
+  script_tag(name: "summary" , value: "Check for the Version of mandriva-doc");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

@@ -60,9 +60,9 @@ tag_affected = "cabextract on Mandriva Linux 2008.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-08/msg00012.php");
-  script_id(831129);
-  script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831129");
+  script_version("$Revision: 8187 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-20 08:30:09 +0100 (Wed, 20 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-08-20 14:57:11 +0200 (Fri, 20 Aug 2010)");
   script_tag(name:"cvss_base", value:"5.1");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:H/Au:N/C:P/I:P/A:P");
@@ -70,7 +70,7 @@ if(description)
   script_cve_id("CVE-2010-2800", "CVE-2010-2801");
   script_name("Mandriva Update for cabextract MDVSA-2010:154 (cabextract)");
 
-  script_summary("Check for the Version of cabextract");
+  script_tag(name: "summary" , value: "Check for the Version of cabextract");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

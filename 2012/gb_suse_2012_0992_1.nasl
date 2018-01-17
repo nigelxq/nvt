@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_0992_1.nasl 8265 2018-01-01 06:29:23Z teissa $
 #
 # SuSE Update for opera openSUSE-SU-2012:0992-1 (opera)
 #
@@ -92,17 +93,16 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-08/msg00008.html");
   script_id(850311);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8265 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-01 07:29:23 +0100 (Mon, 01 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:01:16 +0530 (Thu, 13 Dec 2012)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_xref(name: "openSUSE-SU", value: "2012:0992_1");
   script_name("SuSE Update for opera openSUSE-SU-2012:0992-1 (opera)");
 
-  script_summary("Check for the Version of opera");
+  script_tag(name: "summary" , value: "Check for the Version of opera");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

@@ -51,9 +51,9 @@ tag_affected = "ghostscript on Mandriva Linux 2008.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-05/msg00028.php");
-  script_id(831059);
-  script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831059");
+  script_version("$Revision: 8338 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-09 09:00:38 +0100 (Tue, 09 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-05-28 10:00:59 +0200 (Fri, 28 May 2010)");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
@@ -61,7 +61,7 @@ if(description)
   script_cve_id("CVE-2010-1869");
   script_name("Mandriva Update for ghostscript MDVSA-2010:102 (ghostscript)");
 
-  script_summary("Check for the Version of ghostscript");
+  script_tag(name: "summary" , value: "Check for the Version of ghostscript");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

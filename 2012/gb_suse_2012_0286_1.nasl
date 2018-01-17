@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_0286_1.nasl 8267 2018-01-02 06:29:17Z teissa $
 #
 # SuSE Update for horde3 openSUSE-SU-2012:0286-1 (horde3)
 #
@@ -34,10 +35,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-02/msg00017.html");
   script_id(850220);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8267 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-02 07:29:17 +0100 (Tue, 02 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-08-02 21:03:22 +0530 (Thu, 02 Aug 2012)");
   script_cve_id("CVE-2012-0909");
   script_tag(name:"cvss_base", value:"4.3");
@@ -45,7 +45,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:0286_1");
   script_name("SuSE Update for horde3 openSUSE-SU-2012:0286-1 (horde3)");
 
-  script_summary("Check for the Version of horde");
+  script_tag(name: "summary" , value: "Check for the Version of horde");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

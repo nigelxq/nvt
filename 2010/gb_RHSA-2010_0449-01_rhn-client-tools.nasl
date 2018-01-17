@@ -44,9 +44,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "https://www.redhat.com/archives/rhsa-announce/2010-June/msg00000.html");
-  script_id(870273);
-  script_version("$Revision: 6684 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:43:49 +0200 (Wed, 12 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.870273");
+  script_version("$Revision: 8207 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-21 08:30:12 +0100 (Thu, 21 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-06-07 15:46:00 +0200 (Mon, 07 Jun 2010)");
   script_xref(name: "RHSA", value: "2010:0449-01");
   script_tag(name:"cvss_base", value:"3.6");
@@ -54,7 +54,7 @@ if(description)
  script_cve_id("CVE-2010-1439");
   script_name("RedHat Update for rhn-client-tools RHSA-2010:0449-01");
 
-  script_summary("Check for the Version of rhn-client-tools");
+  script_tag(name: "summary" , value: "Check for the Version of rhn-client-tools");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Red Hat Local Security Checks");

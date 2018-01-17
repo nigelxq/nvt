@@ -48,9 +48,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.centos.org/pipermail/centos-announce/2010-March/016566.html");
-  script_id(880376);
-  script_version("$Revision: 6652 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:46:00 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.880376");
+  script_version("$Revision: 8266 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-01 08:28:32 +0100 (Mon, 01 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-03-22 11:34:53 +0100 (Mon, 22 Mar 2010)");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:N/A:P");
@@ -58,7 +58,7 @@ if(description)
   script_cve_id("CVE-2010-0421");
   script_name("CentOS Update for pango CESA-2010:0140 centos3 i386");
 
-  script_summary("Check for the Version of pango");
+  script_tag(name: "summary" , value: "Check for the Version of pango");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

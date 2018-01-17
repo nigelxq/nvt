@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_0722_1.nasl 8352 2018-01-10 07:01:57Z teissa $
 #
 # SuSE Update for bind openSUSE-SU-2012:0722-1 (bind)
 #
@@ -33,10 +34,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-06/msg00005.html");
   script_id(850243);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8352 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-10 08:01:57 +0100 (Wed, 10 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:01:27 +0530 (Thu, 13 Dec 2012)");
   script_cve_id("CVE-2012-1667");
   script_tag(name:"cvss_base", value:"8.5");
@@ -44,7 +44,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:0722_1");
   script_name("SuSE Update for bind openSUSE-SU-2012:0722-1 (bind)");
 
-  script_summary("Check for the Version of bind");
+  script_tag(name: "summary" , value: "Check for the Version of bind");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

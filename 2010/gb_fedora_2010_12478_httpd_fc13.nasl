@@ -33,9 +33,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.fedoraproject.org/pipermail/package-announce/2010-August/045455.html");
-  script_id(862314);
-  script_version("$Revision: 6625 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 08:29:16 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.862314");
+  script_version("$Revision: 8187 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-20 08:30:09 +0100 (Wed, 20 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-08-16 14:28:27 +0200 (Mon, 16 Aug 2010)");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
@@ -43,7 +43,7 @@ if(description)
   script_cve_id("CVE-2010-1452");
   script_name("Fedora Update for httpd FEDORA-2010-12478");
 
-  script_summary("Check for the Version of httpd");
+  script_tag(name: "summary" , value: "Check for the Version of httpd");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Fedora Local Security Checks");

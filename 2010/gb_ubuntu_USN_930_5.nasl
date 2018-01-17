@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_ubuntu_USN_930_5.nasl 8438 2018-01-16 17:38:23Z teissa $
 #
 # Ubuntu Update for ant, apturl, Epiphany, gluezilla, gnome-python-extras, liferea, mozvoikko, OpenJDK, packagekit, ubufox, webfav, yelp update USN-930-5
 #
@@ -84,10 +85,10 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "https://lists.ubuntu.com/archives/ubuntu-security-announce/2010-July/001128.html");
-  script_id(840465);
-  script_version("$Revision: 6641 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 12:59:00 +0200 (Mon, 10 Jul 2017) $");
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-930-5/");
+  script_oid("1.3.6.1.4.1.25623.1.0.840465");
+  script_version("$Revision: 8438 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-16 18:38:23 +0100 (Tue, 16 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-07-26 16:14:51 +0200 (Mon, 26 Jul 2010)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");

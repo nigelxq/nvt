@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: DDI_Directory_Scanner.nasl 7268 2017-09-26 08:43:43Z cfischer $
+# $Id: DDI_Directory_Scanner.nasl 8414 2018-01-13 11:55:11Z cfischer $
 #
 # Directory Scanner
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.11032");
-  script_version("$Revision: 7268 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-26 10:43:43 +0200 (Tue, 26 Sep 2017) $");
+  script_version("$Revision: 8414 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-13 12:55:11 +0100 (Sat, 13 Jan 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -63,8 +63,8 @@ debug = 0;
 discoveredDirList = make_list();
 authDirList = make_list();
 
-cgi_dirs_exclude_pattern = get_kb_item( "Settings/cgi_dirs_exclude_pattern" );
-use_cgi_dirs_exclude_pattern = get_kb_item( "Settings/use_cgi_dirs_exclude_pattern" );
+cgi_dirs_exclude_pattern = get_kb_item( "global_settings/cgi_dirs_exclude_pattern" );
+use_cgi_dirs_exclude_pattern = get_kb_item( "global_settings/use_cgi_dirs_exclude_pattern" );
 
 function check_cgi_dir( dir, port ) {
 
@@ -117,7 +117,7 @@ function add_auth_dir_list( dir, port ) {
     }
 
     dir_key = "www/" + port + "/content/auth_required";
-    replace_kb_item( name:"www/content/auth_required", value:TRUE );
+    set_kb_item( name:"www/content/auth_required", value:TRUE );
     if( debug ) display( "Setting KB key: ", dir_key, " to '", dir, "'\n" );
     set_kb_item( name:dir_key, value:dir );
   }
@@ -234,6 +234,7 @@ testDirList = make_list(
 "admisapi",
 "agentes",
 "analog",
+"analytics",
 "anthill",
 "apache",
 "app",
@@ -568,6 +569,7 @@ testDirList = make_list(
 "manage",
 "manual",
 "marketing",
+"matomo",
 "member",
 "members",
 "mercuryboard",
@@ -587,6 +589,7 @@ testDirList = make_list(
 "ncadmin",
 "nchelp",
 "ncsample",
+"nds",
 "netbasic",
 "netcat",
 "netmagstats",
@@ -633,6 +636,7 @@ testDirList = make_list(
 "php_classes",
 "phpclassifieds",
 "phpimageview",
+"phpldapadmin",
 "phpmyadmin",
 "phpMyAdmin",
 "phpnuke",
@@ -646,6 +650,7 @@ testDirList = make_list(
 "pma",
 "poll",
 "polls",
+"portal",
 "postgres",
 "ppwb",
 "printers",
@@ -744,6 +749,7 @@ testDirList = make_list(
 "srchadm",
 "ssi",
 "ssl",
+"ssp",
 "sslkeys",
 "staff",
 "stat",

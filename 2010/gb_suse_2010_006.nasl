@@ -41,10 +41,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://www.novell.com/linux/security/advisories/2010_06_krb5.html");
   script_id(850122);
-  script_version("$Revision: 6670 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:40:38 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8226 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-22 07:30:26 +0100 (Fri, 22 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-01-25 13:25:54 +0100 (Mon, 25 Jan 2010)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -52,7 +51,7 @@ if(description)
   script_cve_id("CVE-2009-3295", "CVE-2009-4212");
   script_name("SuSE Update for krb5 SUSE-SA:2010:006");
 
-  script_summary("Check for the Version of krb5");
+  script_tag(name: "summary" , value: "Check for the Version of krb5");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

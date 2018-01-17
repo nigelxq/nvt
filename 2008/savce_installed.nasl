@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: savce_installed.nasl 7293 2017-09-27 08:49:48Z cfischer $
+# $Id: savce_installed.nasl 8374 2018-01-11 10:55:51Z cfischer $
 # Description: Symantec Anti Virus Corporate Edition Check
 #
 # Authors:
@@ -38,16 +38,15 @@ VDEFS.";
 if(description)
 {
  script_id(80040);
- script_version("$Revision: 7293 $");
+ script_version("$Revision: 8374 $");
  script_tag(name:"deprecated", value:TRUE);
- script_tag(name:"last_modification", value:"$Date: 2017-09-27 10:49:48 +0200 (Wed, 27 Sep 2017) $");
+ script_tag(name:"last_modification", value:"$Date: 2018-01-11 11:55:51 +0100 (Thu, 11 Jan 2018) $");
  script_tag(name:"creation_date", value:"2008-10-24 20:38:19 +0200 (Fri, 24 Oct 2008)");
  script_tag(name:"cvss_base", value:"7.5");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
  name = "Symantec Anti Virus Corporate Edition Check";
 
  script_name(name);
- summary = "Checks that SAVCE installed and then makes sure the latest Vdefs are loaded."; 
  script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"registry");
  script_copyright("This script is Copyright (C) 2004-2005 Jeff Adams / Tenable Network Security"); 
@@ -336,7 +335,7 @@ if (warning)
   report += "As a result, the remote host might be infected by viruses received by
 email or other means.";
 
-  security_message(port:port, data:report);
+  security_message(port:0, data:report);
 }
 else
 {

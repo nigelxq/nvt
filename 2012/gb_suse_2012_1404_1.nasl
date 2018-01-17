@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_1404_1.nasl 8267 2018-01-02 06:29:17Z teissa $
 #
 # SuSE Update for exim openSUSE-SU-2012:1404-1 (exim)
 #
@@ -33,10 +34,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-10/msg00018.html");
   script_id(850355);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8267 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-02 07:29:17 +0100 (Tue, 02 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:02:12 +0530 (Thu, 13 Dec 2012)");
   script_cve_id("CVE-2011-1764", "CVE-2012-5671");
   script_tag(name:"cvss_base", value:"7.5");
@@ -44,7 +44,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:1404_1");
   script_name("SuSE Update for exim openSUSE-SU-2012:1404-1 (exim)");
 
-  script_summary("Check for the Version of exim");
+  script_tag(name: "summary" , value: "Check for the Version of exim");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

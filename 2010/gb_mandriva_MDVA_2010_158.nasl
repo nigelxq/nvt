@@ -34,16 +34,16 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-06/msg00000.php");
-  script_id(831064);
-  script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831064");
+  script_version("$Revision: 8438 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-16 18:38:23 +0100 (Tue, 16 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-06-07 15:46:00 +0200 (Mon, 07 Jun 2010)");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
   script_xref(name: "MDVA", value: "2010:158");
   script_name("Mandriva Update for gdcm MDVA-2010:158 (gdcm)");
 
-  script_summary("Check for the Version of gdcm");
+  script_tag(name: "summary" , value: "Check for the Version of gdcm");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

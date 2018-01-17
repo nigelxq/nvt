@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ssh_authentication_info.nasl 7822 2017-11-20 08:46:09Z cfischer $
+# $Id: gb_ssh_authentication_info.nasl 8324 2018-01-08 14:59:58Z cfischer $
 #
 # SSH Authenticated Scan Info Consolidation
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108162");
-  script_version("$Revision: 7822 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-11-20 09:46:09 +0100 (Mon, 20 Nov 2017) $");
+  script_version("$Revision: 8324 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-08 15:59:58 +0100 (Mon, 08 Jan 2018) $");
   script_tag(name:"creation_date", value:"2017-10-17 10:31:0 +0200 (Tue, 17 Oct 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -67,18 +67,29 @@ kb_array = make_array( "ssh/login/uname", "Response to 'uname -a' command",
                        "ssh/lsc/descend_ofs", "Descend directories on other filesystem enabled within 'Options for Local Security Checks'",
                        "ssh/login/release", "Operating System Key used",
                        "ssh/cisco/broken_autocommand", "Misconfigured CISCO device. No autocommand should be configured for the scanning user.",
+                       "ssh/lsc/find_timeout", "Amount of timeouts the 'find' command has reached.",
                        "ssh/restricted_shell", "Login on a system with a restricted shell" );
 
 foreach kb_item( keys( kb_array ) ) {
   if( kb = get_kb_item( kb_item ) ) {
-    if( kb == TRUE ) kb = "TRUE";
+    # Special handling as a timeout of 1 would also evaluate to TRUE
+    if( kb == TRUE && kb_item != "ssh/lsc/find_timeout" )
+      kb = "TRUE";
+
     if( kb_item == "ssh/send_extra_cmd" ) {
       kb = str_replace( string:kb, find:'\n', replace:"\newline" );
     }
-    info_array[kb_array[kb_item] + " (" + kb_item + ")"] = kb;
+
+    if( kb_item == "ssh/lsc/find_timeout" && kb >= 3 ) {
+      info_array[kb_array[kb_item] + " To try to workaround this 'ssh/lsc/descend_ofs' was automatically set to 'no'. (" + kb_item + ")"] = kb;
+    } else {
+      info_array[kb_array[kb_item] + " (" + kb_item + ")"] = kb;
+    }
   } else {
     if( kb_item == "ssh/login/release" ) {
       info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "None/Empty";
+    } else if( kb_item == "ssh/lsc/find_timeout" ) {
+      info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "None";
     } else {
       info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "FALSE";
       if( kb_item == "ssh/locate/available" ) {

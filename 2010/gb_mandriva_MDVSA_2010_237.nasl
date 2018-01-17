@@ -50,17 +50,17 @@ tag_affected = "perl-CGI on Mandriva Linux 2009.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-11/msg00031.php");
-  script_id(831256);
+  script_oid("1.3.6.1.4.1.25623.1.0.831256");
   script_cve_id("CVE-2010-2761","CVE-2010-4410");
  script_tag(name:"cvss_base", value:"4.3");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
- script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+ script_version("$Revision: 8274 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-03 08:28:17 +0100 (Wed, 03 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-11-23 15:30:07 +0100 (Tue, 23 Nov 2010)");
   script_xref(name: "MDVSA", value: "2010:237");
   script_name("Mandriva Update for perl-CGI MDVSA-2010:237 (perl-CGI)");
 
-  script_summary("Check for the Version of perl-CGI");
+  script_tag(name: "summary" , value: "Check for the Version of perl-CGI");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

@@ -35,16 +35,16 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.fedoraproject.org/pipermail/package-announce/2010-June/043453.html");
-  script_id(862206);
-  script_version("$Revision: 6625 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 08:29:16 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.862206");
+  script_version("$Revision: 8187 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-20 08:30:09 +0100 (Wed, 20 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-06-28 09:16:14 +0200 (Mon, 28 Jun 2010)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_xref(name: "FEDORA", value: "2010-10400");
   script_name("Fedora Update for python-paste FEDORA-2010-10400");
 
-  script_summary("Check for the Version of python-paste");
+  script_tag(name: "summary" , value: "Check for the Version of python-paste");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Fedora Local Security Checks");

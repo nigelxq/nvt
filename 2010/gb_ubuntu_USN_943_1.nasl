@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_ubuntu_USN_943_1.nasl 8296 2018-01-05 07:28:01Z teissa $
 #
 # Ubuntu Update for thunderbird vulnerabilities USN-943-1
 #
@@ -52,10 +53,10 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "https://lists.ubuntu.com/archives/ubuntu-security-announce/2010-July/001116.html");
-  script_id(840457);
-  script_version("$Revision: 6641 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 12:59:00 +0200 (Mon, 10 Jul 2017) $");
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-943-1/");
+  script_oid("1.3.6.1.4.1.25623.1.0.840457");
+  script_version("$Revision: 8296 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-05 08:28:01 +0100 (Fri, 05 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-07-12 11:56:20 +0200 (Mon, 12 Jul 2010)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");

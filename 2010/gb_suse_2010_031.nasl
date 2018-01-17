@@ -78,10 +78,9 @@ tag_affected = "kernel on openSUSE 11.1";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://www.novell.com/linux/security/advisories/2010_31_kernel.html");
-  script_id(850137);
-  script_version("$Revision: 6670 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:40:38 +0200 (Tue, 11 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.850137");
+  script_version("$Revision: 8338 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-09 09:00:38 +0100 (Tue, 09 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-07-23 16:10:25 +0200 (Fri, 23 Jul 2010)");
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
@@ -89,7 +88,7 @@ if(description)
   script_cve_id("CVE-2009-1389", "CVE-2009-4537", "CVE-2010-1087", "CVE-2010-1162", "CVE-2010-1437", "CVE-2010-1446", "CVE-2010-1641", "CVE-2010-1643");
   script_name("SuSE Update for kernel SUSE-SA:2010:031");
 
-  script_summary("Check for the Version of kernel");
+  script_tag(name: "summary" , value: "Check for the Version of kernel");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

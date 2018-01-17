@@ -36,17 +36,17 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-04/msg00010.php");
-  script_id(830977);
-  script_version("$Revision: 6569 $");
+  script_oid("1.3.6.1.4.1.25623.1.0.830977");
+  script_version("$Revision: 8244 $");
   script_cve_id("CVE-2010-2092");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-25 08:29:28 +0100 (Mon, 25 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-04-16 17:02:11 +0200 (Fri, 16 Apr 2010)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
   script_xref(name: "MDVA", value: "2010:117");
   script_name("Mandriva Update for flashplayer MDVA-2010:117 (flashplayer)");
 
-  script_summary("Check for the Version of flashplayer");
+  script_tag(name: "summary" , value: "Check for the Version of flashplayer");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

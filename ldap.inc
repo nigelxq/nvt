@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: ldap.inc 5773 2017-03-29 16:57:00Z mime $
+# $Id: ldap.inc 8148 2017-12-15 14:56:57Z cfischer $
 #
 # Functions for LDAP
 #
@@ -25,7 +25,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
 # USA.
 #
-# $Revision: 5773 $
+# $Revision: 8148 $
 #
 ###############################################################################
 
@@ -120,12 +120,18 @@ function get_ber_size( buf, offset ) {
 
 function is_ldapv3( port ) {
 
-  local_var port, offset, lm_length, messageId_length, bindResponse_length, resultCode_length, resultCode, i, soc, buf;
+  local_var port, is_ldapv3, offset, lm_length, messageId_length, bindResponse_length, resultCode_length, resultCode, i, soc, buf;
 
   if( ! port ) {
     set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#is_ldapv3" );
     return;
   }
+
+  is_ldapv3 = get_kb_item( name:"ldap/" + port + "/is_ldapv3" );
+  if( is_ldapv3 == "yes" )
+    return TRUE;
+  else if( is_ldapv3 == "no" )
+    return FALSE;
 
   soc = open_sock_tcp( port );
   if( ! soc ) return FALSE;
@@ -136,34 +142,54 @@ function is_ldapv3( port ) {
 
   buf = recv( socket:soc, length:128 );
   close( soc );
-
   if( ! buf ) return FALSE;
 
   # decode ldapMessage length (encoded as BER)
   offset = 0;
-  if( ord( buf[offset++] ) != 48 ) return FALSE; # (0x30)
+  if( ord( buf[offset++] ) != 48 ) {
+    replace_kb_item( name:"ldap/" + port + "/is_ldapv3", value:"no" );
+    return FALSE; # (0x30)
+  }
+
   lm_length = get_ber_size( buf, offset );
   if( strlen( buf ) < lm_length + offset ) return FALSE; # whoops, we have not enough data (should never happen since bindResponse is a short message)
 
   # we are not at offset = message id, we skip it
-  if( ord( buf[offset++] ) != 2 ) return FALSE; # messageId is an INT
+  if( ord( buf[offset++] ) != 2 ) {
+    replace_kb_item( name:"ldap/" + port + "/is_ldapv3", value:"no" );
+    return FALSE; # messageId is an INT
+  }
+
   messageId_length = get_ber_size( buf, offset );
   offset += messageId_length;
 
   # now enter the bindResponse
-  if( ord( buf[offset++] ) != 97 ) return FALSE; # (0x61)
+  if( ord( buf[offset++] ) != 97 ) {
+    replace_kb_item( name:"ldap/" + port + "/is_ldapv3", value:"no" );
+    return FALSE; # (0x61)
+  }
+
   bindResponse_length = get_ber_size( buf, offset );
 
   # now dig into response code
-  if( ord( buf[offset++] ) != 10 ) return FALSE; # (0x0A)
+  if( ord( buf[offset++] ) != 10 ) {
+    replace_kb_item( name:"ldap/" + port + "/is_ldapv3", value:"no" );
+    return FALSE; # (0x0A)
+  }
+
   resultCode_length = get_ber_size( buf, offset );
   resultCode = 0;
   for( i = 0; i < resultCode_length; i++ ) {
     resultCode = ( resultCode << 8 ) | ord( buf[offset++] );
   }
-  if( resultCode == 0 ) return TRUE; # server has accepted the v3 bind
 
-  return FALSE;
+  if( resultCode == 0 ) {
+    replace_kb_item( name:"ldap/" + port + "/is_ldapv3", value:"yes" );
+    return TRUE; # server has accepted the v3 bind
+  } else {
+    replace_kb_item( name:"ldap/" + port + "/is_ldapv3", value:"no" );
+    return FALSE;
+  }
 }
 
 function get_ldap_port( default ) {
@@ -175,9 +201,9 @@ function get_ldap_port( default ) {
   port = get_kb_item( "Services/ldap" );
   if( port ) default = port;
 
-  # PJL ports printing everything sent to them
-  # so exit for such a port here
-  if( ldap_is_pjl_port( port:default ) ) exit( 0 );
+  # Includes e.g. PJL ports which are printing everything
+  # sent to them so exit for such a port here
+  if( ldap_is_fragile_port( port:default ) ) exit( 0 );
 
   if( ! get_port_state( default ) ) exit( 0 );
 
@@ -185,20 +211,20 @@ function get_ldap_port( default ) {
 }
 
 # Duplicated from misc_func.inc
-function ldap_is_pjl_port( port ) {
+function ldap_is_fragile_port( port ) {
 
-  local_var port, pjl_ports, pjl_port;
+  local_var port, fragile_ports, fragile_port;
 
   if( ! port ) {
-    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#ldap_is_pjl_port" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#ldap_is_fragile_port" );
     return;
   }
 
-  pjl_ports = get_kb_list( 'Services/PJL' );
-  if( ! pjl_ports ) return;
+  fragile_ports = get_kb_list( "Services/fragile_port" );
+  if( ! fragile_ports ) return;
 
-  foreach pjl_port( pjl_ports ) {
-    if( port == pjl_port ) return TRUE;
+  foreach fragile_port( fragile_ports ) {
+    if( port == fragile_port ) return TRUE;
   }
 
   return;

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_eyesofnetwork_detect.nasl 6209 2017-05-24 14:42:39Z cfi $
+# $Id: gb_eyesofnetwork_detect.nasl 8078 2017-12-11 14:28:55Z cfischer $
 #
 # Eyes Of Network (EON) Detection (Version)
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108167");
-  script_version("$Revision: 6209 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-24 16:42:39 +0200 (Wed, 24 May 2017) $");
+  script_version("$Revision: 8078 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-11 15:28:55 +0100 (Mon, 11 Dec 2017) $");
   script_tag(name:"creation_date", value:"2017-05-22 09:21:05 +0200 (Mon, 22 May 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -49,7 +49,6 @@ if(description)
   exit(0);
 }
 
-include("cpe.inc");
 include("host_details.inc");
 
 if( ! get_kb_item( "eyesofnetwork/detected" ) ) exit( 0 );
@@ -92,7 +91,10 @@ if( ssh_port = get_kb_list( "eyesofnetwork/ssh/port" ) ) {
   foreach port( ssh_port ) {
     concluded = get_kb_item( "eyesofnetwork/ssh/" + port + "/concluded" );
     concludedFile = get_kb_item( "eyesofnetwork/ssh/" + port + "/concludedFile" );
-    extra += "SSH on port " + port + '/tcp\nConcluded: ' + concluded + ' from file: ' + concludedFile + '\n';
+    extra += "SSH on port " + port + '/tcp';
+    if( concluded && concludedFile ) {
+      extra += '\nConcluded: ' + concluded + ' from file: ' + concludedFile + '\n';
+    }
     register_product( cpe:cpe, location:location, port:port, service:"ssh" );
   }
 }
@@ -101,7 +103,10 @@ if( snmp_port = get_kb_list( "eyesofnetwork/snmp/port" ) ) {
   foreach port( snmp_port ) {
     concluded = get_kb_item( "eyesofnetwork/snmp/" + port + "/concluded" );
     concludedOID = get_kb_item( "eyesofnetwork/snmp/" + port + "/concludedOID" );
-    extra += "SNMP on port " + port + '/udp via OID: ' + concludedOID + '\nConcluded from installed package: ' + concluded + '\n';
+    extra += "SNMP on port " + port + '/udp';
+    if( concluded && concludedOID ) {
+      extra += 'via OID: ' + concludedOID + '\nConcluded from installed package: ' + concluded + '\n';
+    }
     register_product( cpe:cpe, location:location, port:port, service:"snmp", proto:"udp" );
   }
 }

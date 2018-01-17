@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_get_http_banner.nasl 7852 2017-11-21 14:55:38Z cfischer $
+# $Id: gb_get_http_banner.nasl 8423 2018-01-15 10:43:49Z ckuersteiner $
 #
 # HTTP Banner
 #
@@ -30,8 +30,8 @@ if (description)
  script_oid("1.3.6.1.4.1.25623.1.0.140170");
  script_tag(name:"cvss_base", value:"0.0");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version ("$Revision: 7852 $");
- script_tag(name:"last_modification", value:"$Date: 2017-11-21 15:55:38 +0100 (Tue, 21 Nov 2017) $");
+ script_version ("$Revision: 8423 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-01-15 11:43:49 +0100 (Mon, 15 Jan 2018) $");
  script_tag(name:"creation_date", value:"2017-02-21 11:53:19 +0100 (Tue, 21 Feb 2017)");
  script_name("HTTP Banner");
 
@@ -372,5 +372,9 @@ set_mandatory_key( key:"akka", regex: "Server: akka-http/", banner:banner );
 set_mandatory_key( key:"voipnow", regex: "Server: voipnow", banner:banner );
 set_mandatory_key( key:"D-LinkDNS", regex: "Server: (lighttpd/|GoAhead-Webs)", banner:banner );
 set_mandatory_key( key:"D-LinkDIR", regex: "Server: (Linux, ((HTTP/1\.1)|(WEBACCESS/1\.0)), DIR|Mathopd/|WebServer)", banner:banner );
+set_mandatory_key( key:"Cohu", regex: "Server: Cohu Camera", banner:banner );
+set_mandatory_key( key:"HTTPserv", regex: "Server: .*HTTPserv:", banner:banner );
+set_mandatory_key( key:"ABwww", regex: "Server: A-B WWW", banner:banner );
+set_mandatory_key( key:"yawcam", regex: "Server: yawcam", banner:banner );
 
 exit( 0 );

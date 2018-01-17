@@ -41,9 +41,9 @@ tag_affected = "bzip2 on Fedora 13";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.fedoraproject.org/pipermail/package-announce/2010-September/048294.html");
-  script_id(862434);
-  script_version("$Revision: 6625 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 08:29:16 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.862434");
+  script_version("$Revision: 8338 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-09 09:00:38 +0100 (Tue, 09 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-10-01 08:16:52 +0200 (Fri, 01 Oct 2010)");
   script_xref(name: "FEDORA", value: "2010-15120");
   script_tag(name:"cvss_base", value:"5.1");
@@ -51,7 +51,7 @@ if(description)
   script_cve_id("CVE-2010-0405");
   script_name("Fedora Update for bzip2 FEDORA-2010-15120");
 
-  script_summary("Check for the Version of bzip2");
+  script_tag(name: "summary" , value: "Check for the Version of bzip2");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Fedora Local Security Checks");

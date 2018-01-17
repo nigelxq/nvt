@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_ubuntu_USN_1002_2.nasl 8228 2017-12-22 07:29:52Z teissa $
 #
 # Ubuntu Update for postgresql-8.4 vulnerability USN-1002-2
 #
@@ -42,10 +43,10 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "https://lists.ubuntu.com/archives/ubuntu-security-announce/2010-October/001177.html");
-  script_id(840537);
-  script_version("$Revision: 6641 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 12:59:00 +0200 (Mon, 10 Jul 2017) $");
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1002-2/");
+  script_oid("1.3.6.1.4.1.25623.1.0.840537");
+  script_version("$Revision: 8228 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-22 08:29:52 +0100 (Fri, 22 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-11-23 15:30:07 +0100 (Tue, 23 Nov 2010)");
   script_tag(name:"cvss_base", value:"6.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:S/C:P/I:P/A:P");

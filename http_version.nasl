@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: http_version.nasl 6760 2017-07-19 14:00:26Z cfischer $
+# $Id: http_version.nasl 8370 2018-01-11 09:44:52Z cfischer $
 #
 # HTTP Server type and version
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.10107");
-  script_version("$Revision: 6760 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-19 16:00:26 +0200 (Wed, 19 Jul 2017) $");
+  script_version("$Revision: 8370 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-11 10:44:52 +0100 (Thu, 11 Jan 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -40,6 +40,7 @@ if(description)
                       "embedded_web_server_detect.nasl");
   script_require_ports("Services/www", 80);
   script_exclude_keys("Settings/disable_cgi_scanning");
+  script_add_preference(name:"Show full HTTP headers in output", type:"checkbox", value:"no");
 
   script_tag(name:"solution", value:"Configure your server to use an alternate name like
   'Wintendo httpD w/Dotmatrix display'
@@ -60,9 +61,9 @@ include("http_func.inc");
 include("http_keepalive.inc");
 
 # TODO: Move to secpod_apache_detect.nasl
-function get_apache_version() {
+function get_apache_version(port) {
 
-  local_var req, soc, r, v;
+  local_var port,req, soc, r, v;
 
   req = http_get( item:"/nonexistent_please_dont_exist", port:port );
   res = http_keepalive_send_recv( port:port, data:req );
@@ -79,9 +80,9 @@ function get_apache_version() {
 }
 
 # TODO: Move to gb_lotus_domino_detect.nasl
-function get_domino_version() {
+function get_domino_version(port) {
 
-  local_var req, soc, r, v;
+  local_var port, req, soc, r, v;
 
   req = http_get( item:"/nonexistentdb.nsf", port:port );
   res = http_keepalive_send_recv( port:port, data:req );
@@ -111,6 +112,8 @@ function get_domino_version() {
   }
 }
 
+show_headers = script_get_preference("Show full HTTP headers in output");
+
 port = get_http_port( default:80 );
 
 soc = http_open_socket( port );
@@ -121,9 +124,11 @@ if( soc ) {
   resultsend = send( socket:soc, data:data );
   resultrecv = http_recv_headers2( socket:soc );
   close( soc );
+  if( ! resultrecv ) exit( 0 );
 
   if( "Server: " >< resultrecv ) {
 
+    found_server_line = TRUE;
     svrline = egrep( pattern:"^(DAAP-)?Server:", string:resultrecv ) ;
     svr = ereg_replace( pattern:".*Server: (.*)$", string:svrline, replace:"\1" );
     report = 'The remote web server type is :\n\n';
@@ -132,7 +137,7 @@ if( soc ) {
       if( "Apache/" >< svr ) {
         report = report + svr + '\n\nSolution : You can set the directive "ServerTokens Prod" to limit\nthe information emanating from the server in its response headers.';
       } else {
-        svr2 = get_apache_version();
+        svr2 = get_apache_version(port:port);
         if( svr2 != NULL ) {
           report = report + svr2 + '\n\nThe "ServerTokens" directive is set to ProductOnly\n' +
                                    'however we could determine that the version of the remote\n' +
@@ -151,7 +156,7 @@ if( soc ) {
           if( egrep( pattern:"Lotus-Domino/[1-9]\.[0-9]", string:svr ) ) {
           report = report + svr;
         } else {
-          svr2 = get_domino_version();
+          svr2 = get_domino_version(port:port);
         }
         if( svr2 != NULL ) {
           report = report + svr2 + '\n\nThe product version is hidden but we could determine it by\n' +
@@ -168,8 +173,6 @@ if( soc ) {
         report = report + svr;
       }
     }
-
-    log_message( port:port, data:report );
 
     #
     # put the name of the web server in the KB
@@ -203,12 +206,12 @@ if( soc ) {
 
     if( egrep( pattern:"^Server:.*Netscape-Enterprise.*", string:svrline ) ) {
       set_kb_item( name:"www/iplanet", value:TRUE );
-      replace_kb_item( name:"www/netscape_servers", value:TRUE );
+      set_kb_item( name:"www/netscape_servers", value:TRUE );
     }
 
     if( egrep( pattern:"^Server:.*Netscape-Administrator.*", string:svrline ) ) {
       set_kb_item( name:"www/iplanet", value:TRUE );
-      replace_kb_item( name:"www/netscape_servers", value:TRUE );
+      set_kb_item( name:"www/netscape_servers", value:TRUE );
     }
 
     if( egrep( pattern:"^Server:.*thttpd/.*", string:svrline ) )
@@ -330,7 +333,7 @@ if( soc ) {
 
     if( egrep( pattern:"^Server:.*Netscape-FastTrack.*", string:svrline ) ) {
       set_kb_item( name:"www/netscape-fasttrack", value:TRUE );
-      replace_kb_item( name:"www/netscape_servers", value:TRUE );
+      set_kb_item( name:"www/netscape_servers", value:TRUE );
     }
 
     if( egrep( pattern:"^Server:.*AkamaiGHost.*", string:svrline ) )
@@ -344,7 +347,7 @@ if( soc ) {
 
     if( egrep( pattern:"^Server:.*Netscape-Commerce.*", string:svrline ) ) {
       set_kb_item( name:"www/netscape-commerce", value:TRUE );
-      replace_kb_item( name:"www/netscape_servers", value:TRUE );
+      set_kb_item( name:"www/netscape_servers", value:TRUE );
     }
 
     if( egrep( pattern:"^Server:.*Oracle_Web_listener.*", string:svrline ) )
@@ -415,7 +418,11 @@ if( soc ) {
 
     #if(!egrep(pattern:"^Server:.*", string:svrline ) )
     #  set_kb_item( name:"www/none", value:TRUE );
+  }
 
+  if( found_server_line || show_headers == "yes" ) {
+    if( show_headers == "yes" ) report += '\n\nFull HTTP headers:\n\n' + resultrecv;
+    log_message( port:port, data:report );
   }
 }
 

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: ssh_func.inc 7822 2017-11-20 08:46:09Z cfischer $
+# $Id: ssh_func.inc 8144 2017-12-15 13:19:55Z cfischer $
 #
 # Methods for handling SSH
 #
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 7822 $
+# $Revision: 8144 $
 #
 ###############################################################################
 
@@ -2188,6 +2188,20 @@ function ssh_cmd_exec( cmd ) {
 # Workaround to get the server banner from a freshly opened socket.
 # This should be replaced as soon as we can switch to libssh 0.6 which
 # allows us to use ssh_get_server_banner.
+
+# Previous comment from ssh_detect.nasl:
+# The ssh_get_server_banner function will only be available after
+# we switch to libssh 0.6. Thus for the time being, we use a
+# workaround.
+
+# Previous comment from gb_greenbone_os_detect_ssh.nasl:
+# We do not need to login to get the banner. Until we can
+# switch to libssh 0.6 we use our hacked up version.
+# After the switch we may want to have a login function
+# which terminates the connection right before the KEX
+# protocol part. This will allows us to get the server
+# banner without a need to try a login.
+
 function ssh_hack_get_server_version( socket ) {
 
   local_var socket, buf;
@@ -2246,9 +2260,9 @@ function get_ssh_port( default ) {
   port = get_kb_item( "Services/ssh" );
   if( port ) default = port;
 
-  # PJL ports printing everything sent to them
-  # so exit for such a port here
-  if( ssh_is_pjl_port( port:default ) ) exit( 0 );
+  # Includes e.g. PJL ports which are printing everything
+  # sent to them so exit for such a port here
+  if( ssh_is_fragile_port( port:default ) ) exit( 0 );
 
   if( ! get_port_state( default ) ) exit( 0 );
 
@@ -2256,20 +2270,20 @@ function get_ssh_port( default ) {
 }
 
 # Duplicated from misc_func.inc
-function ssh_is_pjl_port( port ) {
+function ssh_is_fragile_port( port ) {
 
-  local_var port, pjl_ports, pjl_port;
+  local_var port, fragile_ports, fragile_port;
 
   if( ! port ) {
-    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#ssh_is_pjl_port" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#ssh_is_fragile_port" );
     return;
   }
 
-  pjl_ports = get_kb_list( 'Services/PJL' );
-  if( ! pjl_ports ) return;
+  fragile_ports = get_kb_list( "Services/fragile_port" );
+  if( ! fragile_ports ) return;
 
-  foreach pjl_port( pjl_ports ) {
-    if( port == pjl_port ) return TRUE;
+  foreach fragile_port( fragile_ports ) {
+    if( port == fragile_port ) return TRUE;
   }
 
   return;
@@ -2288,9 +2302,7 @@ function ssh_broken_random_login( port ) {
   if( get_kb_item( "SSH/" + port + "/broken/random_login" ) ) return TRUE;
   if( get_kb_item( "SSH/" + port + "/broken/random_login/checked" ) ) return;
 
-  if( ! soc = open_sock_tcp( port ) ) return;
-  banner = ssh_hack_get_server_version( socket:soc );
-  close( soc );
+  banner = get_ssh_server_banner( port:port );
 
   if( "cisco" >< tolower( banner ) ) {
     user = "Anonymous";
@@ -2304,10 +2316,10 @@ function ssh_broken_random_login( port ) {
   if( ! soc = open_sock_tcp( port ) ) return;
   login = ssh_login( socket:soc, login:user, password:pass, pub:NULL, priv:NULL, passphrase:NULL );
   close( soc );
-  replace_kb_item( name:"SSH/" + port + "/broken/random_login/checked", value:TRUE );
+  set_kb_item( name:"SSH/" + port + "/broken/random_login/checked", value:TRUE );
 
   if( login == 0 ) {
-    replace_kb_item( name:"SSH/" + port + "/broken/random_login", value:TRUE );
+    set_kb_item( name:"SSH/" + port + "/broken/random_login", value:TRUE );
     return TRUE;
   }
   return;
@@ -2373,7 +2385,7 @@ function find_bin( prog_name, sock ) {
 function find_file( file_name, file_path, useregex, regexpar, sock ) {
 
   local_var r, f, fname, lparam, cl, file_name, file_path, useregex, regexpar, sock;
-  local_var use_find, descend_directories, cmd;
+  local_var use_find, descend_directories, cmd, start, end, current_timeout;
 
   if( get_kb_item( "ssh/no_linux_shell" ) ) return;
 
@@ -2426,12 +2438,31 @@ function find_file( file_name, file_path, useregex, regexpar, sock ) {
           cmd += " -xdev";
         }
 
+        # nb: /run is excluded because it is a new storage of transient state files on Debian
+        # See https://wiki.debian.org/ReleaseGoals/RunDirectory for more info
         cmd += " -maxdepth 7 -mindepth 1";
-        cmd += ' \\( -path "*/proc" -o -path "/dev" -o -path "/sys" -o -path "/media" -o -path "/tmp" -o -path "/var" \\) -prune -o ';
+        cmd += ' \\( -path "*/proc" -o -path "/run" -o -path "/dev" -o -path "/sys" -o -path "/media" -o -path "/tmp" -o -path "/var" \\) -prune -o ';
         cmd += " -name " + raw_string( 0x22 );
         cmd += file_name + raw_string( 0x22 ) +" -a  -type f  -print 2>/dev/null";
 
+        start = unixtime();
         f = split( ssh_cmd( socket:sock, cmd:cmd, timeout:60 ) );
+        end = unixtime();
+
+        # A local find should take only a few seconds. If we're reaching more
+        # then this we can try to add the -xdev parameter to find to bring down
+        # the time if an network based file filesystem like NFS or AFS is mounted
+        # at the target host. To be safe we're counting the timeouts and only add
+        # the -xdev once we have reached the timeout three times.
+        # TBD: If this doesn't help maybe lower the -maxdepth 7 above?
+        current_timeout = get_kb_item( "ssh/lsc/find_timeout" );
+        if( end - start > 14 ) { #nb: OpenVAS 9 and below has a timeout of 15 seconds, current trunk has 30 seconds
+          current_timeout++;
+          replace_kb_item( name:"ssh/lsc/find_timeout", value:current_timeout );
+        }
+        if( "yes" >< descend_directories && current_timeout >= 3 ) {
+          replace_kb_item( name:"ssh/lsc/descend_ofs", value:"no" );
+        }
       }
     }
   }
@@ -2518,4 +2549,32 @@ function ssh_check_locate( sock ) {
   }
   set_kb_item( name:"ssh/locate/available", value:TRUE );
   return TRUE;
+}
+
+function get_ssh_server_banner( port ) {
+
+  local_var port, soc, banner;
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_ssh_server_banner" );
+    return;
+  }
+
+  if( ! get_port_state( port ) ) return;
+
+  banner = get_kb_item( "SSH/server_banner/" + port );
+  if( banner ) return banner;
+
+  soc = open_sock_tcp( port );
+  if( ! soc ) return;
+
+  banner = ssh_hack_get_server_version( socket:soc );
+  close( soc );
+
+  if( banner ) {
+    replace_kb_item( name:"SSH/server_banner/" + port, value:banner );
+    replace_kb_item( name:"SSH/banner/" + port, value:banner );
+  }
+
+  return banner;
 }

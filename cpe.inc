@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: cpe.inc 7580 2017-10-26 11:16:36Z cfischer $
+# $Id: cpe.inc 8211 2017-12-21 10:38:01Z cfischer $
 #
 # CPE Support Functions
 #
@@ -28,7 +28,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 7580 $
+# $Revision: 8211 $
 #
 ###############################################################################
 
@@ -66,52 +66,6 @@ function build_cpe( value, exp, base ) {
 }
 
 ## Function to Register Product and Build report
-function build_report(app, ver, concluded, cpe, base, exp, insloc, port, conclUrl, extra)
-{
-
-  ## setting location if location variable value is null
-  if(!insloc)
-   insloc = "Could not find the install location";
-  
-  if(base && exp)
-  {
-    cpe = build_cpe(value:ver, exp:exp, base:base);
-    if(isnull(cpe))
-      exit(0);
-  }
-
-  if(port)
-    register_product(cpe:cpe, location:insloc, port:port);
-  else
-    register_product(cpe:cpe, location:insloc);
-
-  if(!concluded){
-    concluded = ver;
-  }
-
-  log_message(data: build_detection_report(app:app,
-                                           version:ver,
-                                           install:insloc,
-                                           cpe:cpe,
-                                           extra: extra,
-                                           concluded:concluded,
-                                           concludedUrl:conclUrl),
-                                           port:port);
-}
-
-## Function to Register Product and Build report
-function register_cpe(tmpVers, tmpExpr, tmpBase, insloc, app, port, concluded)
-{
-  local_var cpe;
-
-  ## build cpe and store it as host_detail
-  cpe = build_cpe(value:tmpVers, exp:tmpExpr, base:tmpBase);
-  if(cpe){
-    build_report(app, ver:tmpVers, concluded:tmpVers, cpe, insloc, port);
-  }
-}
-
-## Function to Register Product and Build report
 function register_and_report_cpe( app, ver, concluded, cpename, base, expr, insloc, regPort, regService, regProto, conclUrl, extra ) {
 
   local_var app, ver, concluded, cpename, base, expr, insloc, regPort, regService, regProto, conclUrl, extra;
@@ -122,26 +76,24 @@ function register_and_report_cpe( app, ver, concluded, cpename, base, expr, insl
   }
 
   ## setting location if location variable value is null
-  if( ! insloc ) insloc = "undefined";
+  if( ! insloc ) insloc = "unknown";
 
   ## setting concluded if value is null
   if( ! concluded && ver ) concluded = ver;
 
-  ## setting Version unknown if not available
-  if( ! ver ) ver = "unknown";
+  ## setting version to unknown if not available
+  if( ! ver || ver == "" ) ver = "unknown";
 
   if( ! regProto ) regProto = "tcp";
 
-  ##Build CPE
   if( ! cpename && base ) {
     cpename = build_cpe( value:ver, exp:expr, base:base );
-    if(tolower(ver) == "unknown") {
-      cpename = base ;
+    if( ! cpename ) {
+      cpename = ereg_replace( pattern:":$", string:base, replace:"" );
     }
   }
 
-  if(cpename)
-  {
+  if( cpename ) {
     register_product( cpe:cpename, location:insloc, port:regPort, proto:regProto, service:regService );
 
     log_message( data:build_detection_report( app:app,

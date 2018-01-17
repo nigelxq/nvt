@@ -44,9 +44,9 @@ tag_affected = "wireshark on Mandriva Linux 2010.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-11/msg00043.php");
-  script_id(831267);
-  script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831267");
+  script_version("$Revision: 8246 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-26 08:29:20 +0100 (Tue, 26 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-12-02 08:39:14 +0100 (Thu, 02 Dec 2010)");
   script_xref(name: "MDVSA", value: "2010:242");
   script_tag(name:"cvss_base", value:"7.5");
@@ -54,7 +54,7 @@ if(description)
   script_cve_id("CVE-2010-4300");
   script_name("Mandriva Update for wireshark MDVSA-2010:242 (wireshark)");
 
-  script_summary("Check for the Version of wireshark");
+  script_tag(name: "summary" , value: "Check for the Version of wireshark");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

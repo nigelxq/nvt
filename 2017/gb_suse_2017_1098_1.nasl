@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2017_1098_1.nasl 8048 2017-12-08 09:05:48Z santu $
 #
 # SuSE Update for chromium openSUSE-SU-2017:1098-1 (chromium)
 #
@@ -26,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.851539");
-  script_version("$Revision: 6677 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:58:27 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8048 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-08 10:05:48 +0100 (Fri, 08 Dec 2017) $");
   script_tag(name:"creation_date", value:"2017-04-25 06:33:47 +0200 (Tue, 25 Apr 2017)");
   script_cve_id("CVE-2017-5057", "CVE-2017-5058", "CVE-2017-5059", "CVE-2017-5060",
                 "CVE-2017-5061", "CVE-2017-5062", "CVE-2017-5063", "CVE-2017-5064",
                 "CVE-2017-5065", "CVE-2017-5066", "CVE-2017-5067", "CVE-2017-5069");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"6.8");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
   script_tag(name:"qod_type", value:"package");
   script_name("SuSE Update for chromium openSUSE-SU-2017:1098-1 (chromium)");
   script_tag(name: "summary", value: "Check the version of chromium");
@@ -58,7 +59,6 @@ if(description)
   script_tag(name: "solution", value: "Please Install the Updated Packages.");
 
   script_xref(name: "openSUSE-SU", value: "2017:1098_1");
-  script_xref(name: "URL" , value: "http://lists.opensuse.org/opensuse-security-announce/2017-04/msg00028.html");
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");

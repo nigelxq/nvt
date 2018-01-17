@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: adaptbb_detect.nasl 5255 2017-02-10 08:56:42Z cfi $
+# $Id: adaptbb_detect.nasl 8078 2017-12-11 14:28:55Z cfischer $
 #
 # AdaptBB Detection
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.100127");
-  script_version("$Revision: 5255 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-02-10 09:56:42 +0100 (Fri, 10 Feb 2017) $");
+  script_version("$Revision: 8078 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-11 15:28:55 +0100 (Mon, 11 Dec 2017) $");
   script_tag(name:"creation_date", value:"2009-04-12 20:09:50 +0200 (Sun, 12 Apr 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -51,7 +51,6 @@ if(description)
 
 include("http_func.inc");
 include("http_keepalive.inc");
-include("cpe.inc");
 include("host_details.inc");
 
 port = get_http_port( default:80 );
@@ -66,28 +65,20 @@ foreach dir( make_list_unique( "/adaptbb", "/forum", "/board", cgi_dirs( port:po
   if( isnull( buf ) ) continue;
 
   if( egrep( pattern:'Powered by AdaptBB', string:buf, icase:TRUE ) ) {
-
     vers = "unknown";
 
-    # Atm i found no way to get Version.
-    #version = eregmatch(string: buf, pattern: "adaptbb version (XXX)",icase:TRUE);
-    #if( ! isnull( version[1] ) ) vers = chomp( version[1] );
+    cpe = "cpe:/a:adaptbb:adaptbb";
 
-    tmp_version = vers + " under " + install;
-    set_kb_item( name:"www/" + port + "/adaptbb", value: tmp_version );
-
-    ## build cpe and store it as host_detail
-    #cpe = build_cpe( value:tmp_version, exp:"^([0-9.]+)", base:"cpe:/a:adaptbb:adaptbb:" );
-    #if( isnull( cpe ) )
-      cpe = "cpe:/a:adaptbb:adaptbb";
+    set_kb_item(name: "adaptbb/installed", value: TRUE);
 
     register_product( cpe:cpe, location:install, port:port );
+
     log_message( data:build_detection_report( app:"AdaptBB",
                                               version:vers,
                                               install:install,
                                               cpe:cpe,
                                               concluded:version[0] ),
-                                              port:port );
+                 port:port );
     exit( 0 );
   }
 }

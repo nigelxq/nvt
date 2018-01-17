@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_0833_1.nasl 8295 2018-01-05 06:29:18Z teissa $
 #
 # SuSE Update for ClamAV openSUSE-SU-2012:0833-1 (ClamAV)
 #
@@ -34,10 +35,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-07/msg00002.html");
   script_id(850262);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8295 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-05 07:29:18 +0100 (Fri, 05 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:01:17 +0530 (Thu, 13 Dec 2012)");
   script_cve_id("CVE-2012-1457", "CVE-2012-1458", "CVE-2012-1459");
   script_tag(name:"cvss_base", value:"4.3");
@@ -45,7 +45,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:0833_1");
   script_name("SuSE Update for ClamAV openSUSE-SU-2012:0833-1 (ClamAV)");
 
-  script_summary("Check for the Version of ClamAV");
+  script_tag(name: "summary" , value: "Check for the Version of ClamAV");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

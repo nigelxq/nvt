@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_hp_printer_detect.nasl 7288 2017-09-27 07:21:24Z cfischer $
+# $Id: gb_hp_printer_detect.nasl 8146 2017-12-15 13:40:59Z cfischer $
 #
 # HP Printer Detection
 #
@@ -30,8 +30,8 @@ if(description)
   script_oid("1.3.6.1.4.1.25623.1.0.103675");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 7288 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-27 09:21:24 +0200 (Wed, 27 Sep 2017) $");
+  script_version("$Revision: 8146 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-15 14:40:59 +0100 (Fri, 15 Dec 2017) $");
   script_tag(name:"creation_date", value:"2013-03-07 14:31:24 +0100 (Thu, 07 Mar 2013)");
   script_name("HP Printer Detection");
   script_category(ACT_GATHER_INFO);
@@ -58,7 +58,6 @@ include("host_details.inc");
 include("misc_func.inc");
 
 port = get_http_port(default:80);
-
 urls = get_hp_detect_urls();
 
 foreach url (keys(urls)) {
@@ -82,11 +81,15 @@ foreach url (keys(urls)) {
 
     if(!model)exit(0);
 
-    chomp(model);
+    model = chomp(model);
 
-    if( "Server: HP HTTP Server" >< buf )
-    {
+    if( "Server: HP HTTP Server" >< buf )  {
       version = eregmatch( pattern:'Server: HP HTTP Server.*\\{([^},]+).*\\}[\r\n]+', string:buf );
+      if( ! isnull( version[1] ) ) fw_ver = version[1];
+    }
+
+    if( '<strong id="FirmwareRevision">' >< buf ) {
+      version = eregmatch( pattern:'<strong id="FirmwareRevision">([0-9_]*)', string:buf );
       if( ! isnull( version[1] ) ) fw_ver = version[1];
     }
 
@@ -95,13 +98,19 @@ foreach url (keys(urls)) {
     set_kb_item(name:"hp_printer/port", value: port);
     set_kb_item(name:"hp_model", value:model);
 
-    if( fw_ver )  set_kb_item( name:"hp_fw_ver", value:fw_ver );
+    if( fw_ver ) set_kb_item( name:"hp_fw_ver", value:fw_ver );
 
     cpe_model = tolower(model);
 
     cpe = 'cpe:/h:hp:' + cpe_model;
-    cpe = str_replace(string:cpe,find:" ", replace:":", count:1);
-    cpe = str_replace(string:cpe,find:" ", replace:"_");
+    # some special handling for Color LaserJet M651
+    if( "color laserjet" >< cpe_model ) {
+      cpe = str_replace(string:cpe, find:"color laserjet ", replace:"color laserjet:", count:1);
+      cpe = str_replace(string:cpe, find:" ", replace:"_");
+    } else {
+      cpe = str_replace(string:cpe, find:" ", replace:":", count:1);
+      cpe = str_replace(string:cpe, find:" ", replace:"_");
+    }
 
     register_product(cpe:cpe, location:port + '/tcp', port:port);
 
@@ -114,14 +123,11 @@ foreach url (keys(urls)) {
     log_message(data:report, port:port);
 
     pref = get_kb_item("global_settings/exclude_printers");
-    if( pref  == "yes" )
-    {
-        replace_kb_item( name:"Host/dead", value:TRUE );
-        log_message( port:port, data:'The remote host is a printer. The scan has been disabled against this host.\nIf you want to scan the remote host, uncheck the "Exclude printers from scan" option and re-scan it.');
+    if( pref  == "yes" ) {
+      set_kb_item( name:"Host/dead", value:TRUE );
+      log_message( port:port, data:'The remote host is a printer. The scan has been disabled against this host.\nIf you want to scan the remote host, uncheck the "Exclude printers from scan" option and re-scan it.');
     }
-
     exit(0);
-
   }
 }
 

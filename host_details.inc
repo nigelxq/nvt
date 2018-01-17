@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: host_details.inc 7749 2017-11-14 07:03:27Z cfischer $
+# $Id: host_details.inc 8402 2018-01-12 14:03:40Z cfischer $
 #
 # Centralized and organized host informations base
 #
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 7749 $
+# $Revision: 8402 $
 #
 ###############################################################################
 
@@ -97,7 +97,9 @@ OS_CPE_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.106513", # gb_cisco_asa_version_snmp.nasl
     "1.3.6.1.4.1.25623.1.0.105222", # gb_cisco_asa_version.nasl
     "1.3.6.1.4.1.25623.1.0.106494", # gb_arista_eos_snmp_detect.nasl
-    "1.3.6.1.4.1.25623.1.0.108163", # gb_netgear_prosafe_snmp_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.108307", # gb_netgear_prosafe_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.108311", # gb_hirschmann_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.810608", # gb_mikrotik_router_routeros_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.105144", # gb_xenserver_version.nasl
     "1.3.6.1.4.1.25623.1.0.105659", # gb_cisco_ios_xe_version.nasl
     "1.3.6.1.4.1.25623.1.0.105155", # gb_mcafee_email_gateway_version.nasl
@@ -166,7 +168,9 @@ OS_TXT_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.105222", # gb_cisco_asa_version.nasl
     "1.3.6.1.4.1.25623.1.0.106494", # gb_arista_eos_snmp_detect.nasl
     "1.3.6.1.4.1.25623.1.0.106875", # gb_aerohive_hiveos_detect.nasl
-    "1.3.6.1.4.1.25623.1.0.108163", # gb_netgear_prosafe_snmp_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.108307", # gb_netgear_prosafe_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.108311", # gb_hirschmann_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.810608", # gb_mikrotik_router_routeros_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.105144", # gb_xenserver_version.nasl
     "1.3.6.1.4.1.25623.1.0.105659", # gb_cisco_ios_xe_version.nasl
     "1.3.6.1.4.1.25623.1.0.105155", # gb_mcafee_email_gateway_version.nasl
@@ -677,7 +681,7 @@ function get_single_app_port_from_list( cpe_list, service ) {
 
 function get_all_app_port_from_list( cpe_list, service ) {
 
-  local_var cpe_list, service, cpe, base_cpe, port, ports, services, _service, infos, _infos, ret_arr;
+  local_var cpe_list, service, cpe, base_cpe, _port, _ports, services, _service, infos, _infos, ret_arr;
 
   if( ! cpe_list ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#cpe_list#-#get_all_app_port_from_list" );
 
@@ -686,17 +690,17 @@ function get_all_app_port_from_list( cpe_list, service ) {
     if( ! base_cpe = get_base_cpe( cpe:cpe ) )
       continue;
 
-    if( isnull( ports = get_kb_list( "get_app/ports/" + base_cpe ) ) )
+    if( isnull( _ports = get_kb_list( "get_app/ports/" + base_cpe ) ) )
       continue;
 
-    foreach port( ports ) {
+    foreach _port( _ports ) {
       if( service ) {
-        services = get_kb_list( "get_app/services/" + port + "/" + base_cpe );
+        services = get_kb_list( "get_app/services/" + _port + "/" + base_cpe );
         foreach _service( services ) {
-          if( port =~ '^[0-9]{1,5}$' && _service >< service ) set_kb_item( name:"get_app/" + get_script_oid() + "/port_cpe", value:cpe + "#-#" + port );
+          if( _port =~ '^[0-9]{1,5}$' && _service >< service ) set_kb_item( name:"get_app/" + get_script_oid() + "/port_cpe", value:cpe + "#-#" + _port );
         }
       } else {
-        if( port =~ '^[0-9]{1,5}$' ) set_kb_item( name:"get_app/" + get_script_oid() + "/port_cpe", value:cpe + "#-#" + port );
+        if( _port =~ '^[0-9]{1,5}$' ) set_kb_item( name:"get_app/" + get_script_oid() + "/port_cpe", value:cpe + "#-#" + _port );
       }
     }
   }
@@ -846,7 +850,7 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
   {
     version_list = make_list();
 
-    ap = get_kb_list("get_app/" + base_cpe);
+    ap = get_kb_list( "get_app/" + base_cpe );
     if( ! ap ) return;
     foreach dt ( ap )
     {
@@ -859,16 +863,16 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
       version_list = make_list( version_list, app_versions );
     }
 
-    register_host_detail(name:"detected_by", value:t[0]);
+    register_host_detail( name:"detected_by", value:t[0] );
     if( ! isnull( t[2] ) )
-      register_host_detail(name:"detected_at", value:t[2]);
+      register_host_detail( name:"detected_at", value:t[2] );
 
     return version_list;
 
   }
   else if( nofork && typ == 'version' ) # nofork is currently only valid for get_app_version() and get_app_location
   {
-    ap = get_kb_list("get_app/" + base_cpe);
+    ap = get_kb_list( "get_app/" + base_cpe );
     if( ! ap ) return;
     foreach dt ( ap )
     {
@@ -882,44 +886,45 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
       if( version_regex )
         if( ! ereg( pattern:version_regex, string:app_versions ) ) continue;
 
-      register_host_detail(name:"detected_by", value:t[0]);
+      register_host_detail( name:"detected_by", value:t[0] );
       if( ! isnull( t[2] ) )
-        register_host_detail(name:"detected_at", value:t[2]);
+        register_host_detail( name:"detected_at", value:t[2] );
 
       return app_versions;
     }
     return; # no version...
   } else if( nofork && typ == 'location' ) { # nofork is currently only valid for get_app_version() and get_app_location
-    ap = get_kb_list("get_app/" + base_cpe);
+    ap = get_kb_list( "get_app/" + base_cpe );
     if( ! ap ) return;
     app_locations = make_list();
     foreach dt ( ap ) {
       t = split( dt, sep:'#-#', keep:FALSE );
-      t_oid  = t[0];
-      t_loc  = t[2];
+      t_oid = t[0];
+      t_loc = t[2];
       if( isnull( t_oid ) && isnull( t_loc ) ) continue;
 
-      register_host_detail(name:"detected_by", value:t_oid);
+      register_host_detail( name:"detected_by", value:t_oid );
       if( ! isnull( t[2] ) )
-        register_host_detail(name:"detected_at", value:t_loc);
+        register_host_detail( name:"detected_at", value:t_loc );
 
       app_locations = make_list( app_locations, t_loc );
     }
     return app_locations;
   }
   else
-    app_details = get_kb_item("get_app/" + base_cpe); # this could fork
+    app_details = get_kb_item( "get_app/" + base_cpe ); # this could fork
 
   if( ! app_details ) return;
 
   x = split( app_details, sep:'#-#', keep:FALSE );
 
-  x_oid  = x[0];
-  x_cpe  = x[1];
-  x_loc  = x[2];
-  x_port = x[3];
-  x_proto = x[4];
-  if( x[5] ) x_service = x[5];
+  x_oid       = x[0];
+  x_cpe       = x[1];
+  x_loc       = x[2];
+  x_port      = x[3];
+  x_proto     = x[4];
+  if( x[5] )
+    x_service = x[5];
 
   if( service )
     if( x_service != service ) return;
@@ -934,8 +939,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     if( version_regex )
       if( ! ereg( pattern:version_regex, string:app_versions ) ) return;
 
-    register_host_detail(name:"detected_by", value:x_oid);
-    if( x_loc ) register_host_detail(name:"detected_at", value:x_loc);
+    register_host_detail( name:"detected_by", value:x_oid );
+    if( x_loc ) register_host_detail( name:"detected_at", value:x_loc );
 
     return app_versions;
   }
@@ -944,8 +949,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
   {
     if( x_loc )
     {
-      register_host_detail(name:"detected_by", value:x_oid);
-      if( x_loc ) register_host_detail(name:"detected_at", value:x_loc);
+      register_host_detail( name:"detected_by", value:x_oid );
+      if( x_loc ) register_host_detail( name:"detected_at", value:x_loc );
 
       return x_loc;
     }
@@ -956,8 +961,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
   {
     app_versions = get_version_from_cpe( cpe:x_cpe );
 
-    if( ! app_versions && ! x_loc ) return;
     if( ! app_versions && exit_no_version == TRUE ) exit( 0 );
+    if( ! app_versions && ! x_loc ) return;
 
     if( app_versions )
       ret_arr['version'] = app_versions;
@@ -969,8 +974,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     else
       ret_arr['location'] = '';
 
-    register_host_detail(name:"detected_by", value:x_oid);
-    if( x_loc ) register_host_detail(name:"detected_at", value:x_loc);
+    register_host_detail( name:"detected_by", value:x_oid );
+    if( x_loc ) register_host_detail( name:"detected_at", value:x_loc );
 
     return ret_arr;
   }
@@ -979,8 +984,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
   {
     app_versions = get_version_from_cpe( cpe:x_cpe );
 
-    if( ! app_versions && ! x_proto ) return;
     if( ! app_versions && exit_no_version == TRUE ) exit( 0 );
+    if( ! app_versions && ! x_proto ) return;
 
     if( app_versions )
       ret_arr['version'] = app_versions;
@@ -992,8 +997,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     else
        ret_arr['proto'] = 'tcp';
 
-    register_host_detail(name:"detected_by", value:x_oid);
-    if( x_proto && x_port ) register_host_detail(name:"detected_at", value: x_port + "/" + x_proto);
+    register_host_detail( name:"detected_by", value:x_oid );
+    if( x_proto && x_port ) register_host_detail( name:"detected_at", value: x_port + "/" + x_proto );
 
     return ret_arr;
   }
@@ -1011,8 +1016,8 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     else
       ret_arr['location'] = '';
 
-    register_host_detail(name:"detected_by", value:x_oid);
-    if( x_loc ) register_host_detail(name:"detected_at", value:x_loc);
+    register_host_detail( name:"detected_by", value:x_oid );
+    if( x_loc ) register_host_detail( name:"detected_at", value:x_loc );
 
     return ret_arr;
   }
@@ -1025,12 +1030,13 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     ret_arr['location']    = x_loc;
     ret_arr['full_cpe']    = x_cpe;
     ret_arr['port']        = x_port;
-    ret_arr['proto']        = x_proto;
-    if(x_service) ret_arr['service'] = x_service;
+    ret_arr['proto']       = x_proto;
+    if( x_service )
+      ret_arr['service']   = x_service;
     ret_arr['detected_by'] = x_oid;
 
-    register_host_detail(name:"detected_by", value:x_oid);
-    if( x_loc ) register_host_detail(name:"detected_at", value:x_loc);
+    register_host_detail( name:"detected_by", value:x_oid );
+    if( x_loc ) register_host_detail( name:"detected_at", value:x_loc );
 
     return ret_arr;
   }
@@ -1122,15 +1128,20 @@ function get_base_cpe( cpe ) {
   return base_cpe;
 }
 
-function build_detection_report( app, version, install, regpath, cpe, concluded, concludedUrl, extra ) {
+function build_detection_report( app, version, install, regpath, cpe, concluded, concludedUrl, extra, skip_version ) {
 
-  local_var app, version, install, regpath, cpe, concluded, concludedUrl, extra, report;
+  local_var app, version, install, regpath, cpe, concluded, concludedUrl, extra, skip_version, report;
 
-  if( ! version ) version = 'unknown';
+  if( isnull( app ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#app#-#build_detection_report" );
 
-  report = 'Detected ' + app + '\n' +
-           '\nVersion:  ' + version +
-           '\nLocation: ' + install;
+  report = 'Detected ' + app + '\n';
+
+  if( ! skip_version ) {
+    if( ! version ) version = 'unknown';
+    report += '\nVersion:  ' + version;
+  }
+
+  report += '\nLocation: ' + install;
 
   if( strlen( cpe ) > 0 ) {
     report += '\nCPE:      '+ cpe;
@@ -1259,12 +1270,19 @@ function register_unknown_os_banner( banner, banner_type_name, banner_type_short
       banner == "Server: Apache-Coyote/1.1" ||
       banner == "Server: HASP LM" || # Is running under windows and linux
       banner == "Server: Mbedthis-Appweb" || # Is running under various OS variants
+      banner == "Server: Embedthis-Appweb" || # Is running under various OS variants
+      banner == "Server: Embedthis-http" || # Is running under various OS variants
       banner == "Server: GoAhead-Webs" || # Is running under various OS variants
       banner == "Server: Mojolicious (Perl)" || # Cross-platform
       banner == "+OK POP3 ready" ||
       banner == "220 FTP server ready" ||
       banner == "Server: NessusWWW" || # Nessus could be running on Windows, Linux/Unix or MacOS
+      banner == "X-Powered-By: Express" || # Express Framework is supported on Windows, Linux/Unix etc.
       "erver: BBC " >< banner || # OV Communication Broker runs on various different OS variants
+      "Server: PanWeb Server/" >< banner || # Already covered by gb_palo_alto_webgui_detect.nasl
+      " FTP server (MikroTik " >< banner || # Already covered by gb_mikrotik_router_routeros_consolidation.nasl
+      egrep( pattern:"^Server: DHost/([0-9.]+) HttpStk/([0-9.]+)$", string:banner ) || # DHost/9.0 HttpStk/1.0 from Novell / NetIQ eDirectory, runs on various OS variants
+      egrep( pattern:"^MikroTik ", string:banner ) || # Already covered by gb_mikrotik_router_routeros_consolidation.nasl
       egrep( pattern:"^OS String: Unix; SMB String: Samba ([0-9.]+)a?$", string:banner ) || # e.g. OS String: Unix; SMB String: Samba 4.0.9 set by smb_nativelanman.nasl
       egrep( pattern:"^220 ([0-9a-zA-Z._\-]+) ESMTP$", string:banner ) || # e.g. 220 hostname ESMTP
       egrep( pattern:"ESMTP Exim ([0-9._]+) ", string:banner ) || # e.g. 220 host ESMTP Exim 4.84_2 Tue, 01 Aug 2017 13:01:18 +0200
@@ -1285,6 +1303,7 @@ function register_unknown_os_banner( banner, banner_type_name, banner_type_short
       egrep( pattern:"^Server: HASP LM/([0-9.]+)$", string:banner ) || # Is running under windows and linux
       egrep( pattern:"^Server: Mbedthis-Appweb/([0-9.]+)$", string:banner ) || # Is running under various OS variants
       egrep( pattern:"^Server: Embedthis-http/([0-9.]+)$", string:banner ) || # Is running under various OS variants, banner e.g. Server: Embedthis-http/4.0.0
+      egrep( pattern:"^Server: Embedthis-Appweb/([0-9.]+)$", string:banner ) || # Is running under various OS variants
       egrep( pattern:"^Server: GoAhead-Webs/([0-9.]+)$", string:banner ) || # Is running under various OS variants
       egrep( pattern:"^Server: Allegro-Software-RomPager/([0-9.]+)$", string:banner ) || # Vendor: "Works with any OS vendor and will function without an OS if needed"
       egrep( pattern:"^Server: CompaqHTTPServer/([0-9.]+) HPE System Management Homepage$", string:banner ) || # Is running under various OS variants

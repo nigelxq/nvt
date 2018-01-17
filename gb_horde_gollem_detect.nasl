@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_horde_gollem_detect.nasl 7000 2017-08-24 11:51:46Z teissa $
+# $Id: gb_horde_gollem_detect.nasl 8161 2017-12-18 16:10:24Z cfischer $
 #
 # Horde Gollem Version Detection
 #
@@ -28,8 +28,8 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.801869");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 7000 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-08-24 13:51:46 +0200 (Thu, 24 Aug 2017) $");
+  script_version("$Revision: 8161 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-18 17:10:24 +0100 (Mon, 18 Dec 2017) $");
   script_tag(name:"creation_date", value:"2011-04-11 14:40:00 +0200 (Mon, 11 Apr 2011)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Horde Gollem Version Detection");
@@ -88,9 +88,10 @@ foreach dir(make_list_unique( "/horde/gollem", "/gollem", cgi_dirs( port:port ) 
       version = ver[1];
     }
 
-    ## Set the KB value
+
     tmp_version = version + " under " + install;
     set_kb_item( name:"www/" + port + "/gollem", value:tmp_version );
+    set_kb_item( name:"horde/gollem/installed", value:TRUE );
 
     ## build cpe and store it as host_detail
     cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:horde:gollem:" );
@@ -104,9 +105,9 @@ foreach dir(make_list_unique( "/horde/gollem", "/gollem", cgi_dirs( port:port ) 
                                               version:version,
                                               install:install,
                                               cpe:cpe,
-                                              concluded:ver[0] ),
+                                              concluded:version ),
                                               port:port );
+    exit(0);
   }
 }
-
 exit( 0 );

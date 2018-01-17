@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_hp_printer_rce_vuln.nasl 6524 2017-07-05 03:19:48Z ckuersteiner $
+# $Id: gb_hp_printer_rce_vuln.nasl 7901 2017-11-24 10:49:33Z jschulte $
 #
 # HP Printers Arbitrary Code Execution Vulnerability
 #
@@ -28,8 +28,8 @@
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.106920");
-  script_version("$Revision: 6524 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-07-05 05:19:48 +0200 (Wed, 05 Jul 2017) $");
+  script_version("$Revision: 7901 $");
+  script_tag(name: "last_modification", value: "$Date: 2017-11-24 11:49:33 +0100 (Fri, 24 Nov 2017) $");
   script_tag(name: "creation_date", value: "2017-07-05 09:03:32 +0700 (Wed, 05 Jul 2017)");
   script_tag(name: "cvss_base", value: "10.0");
   script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:C/I:C/A:C");

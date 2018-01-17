@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_ubuntu_USN_967_1.nasl 8187 2017-12-20 07:30:09Z teissa $
 #
 # Ubuntu Update for w3m vulnerability USN-967-1
 #
@@ -41,10 +42,10 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "https://lists.ubuntu.com/archives/ubuntu-security-announce/2010-August/001137.html");
-  script_id(840477);
-  script_version("$Revision: 6641 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 12:59:00 +0200 (Mon, 10 Jul 2017) $");
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-967-1/");
+  script_oid("1.3.6.1.4.1.25623.1.0.840477");
+  script_version("$Revision: 8187 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-20 08:30:09 +0100 (Wed, 20 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-08-13 14:24:53 +0200 (Fri, 13 Aug 2010)");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");

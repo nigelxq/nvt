@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: remote-detect-Leap_CMS.nasl 6520 2017-07-04 14:28:49Z cfischer $
+# $Id: remote-detect-Leap_CMS.nasl 8168 2017-12-19 07:30:15Z teissa $
 # Description: This script ensure that the Leap CMS is installed and running
 #
 # remote-detect-Leap_CMS.nasl
@@ -31,16 +31,15 @@ or disable the service if not used.";
 
 if(description)
 {
-script_id(101025);
+script_oid("1.3.6.1.4.1.25623.1.0.101025");
 script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 6520 $");
-script_tag(name:"last_modification", value:"$Date: 2017-07-04 16:28:49 +0200 (Tue, 04 Jul 2017) $");
+ script_version("$Revision: 8168 $");
+script_tag(name:"last_modification", value:"$Date: 2017-12-19 08:30:15 +0100 (Tue, 19 Dec 2017) $");
 script_tag(name:"creation_date", value:"2009-04-30 23:11:17 +0200 (Thu, 30 Apr 2009)");
 script_tag(name:"cvss_base", value:"0.0");
 name = "Leap CMS service detection";
 script_name(name);
  
-summary = "Detect a running Leap CMS";
 
 script_category(ACT_GATHER_INFO);
 script_tag(name:"qod_type", value:"remote_banner");

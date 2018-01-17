@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: punBB_detect.nasl 5795 2017-03-30 14:04:00Z cfi $
+# $Id: punBB_detect.nasl 8146 2017-12-15 13:40:59Z cfischer $
 # Description: PunBB detection
 #
 # Authors:
@@ -34,10 +34,10 @@ PunBB is an open-source discussion board written in PHP.";
 
 if(description)
 {
-  script_id(15936);
+  script_oid("1.3.6.1.4.1.25623.1.0.15936");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_version("$Revision: 5795 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-30 16:04:00 +0200 (Thu, 30 Mar 2017) $");
+  script_version("$Revision: 8146 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-15 14:40:59 +0100 (Fri, 15 Dec 2017) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("PunBB detection");
@@ -90,7 +90,7 @@ foreach dir( make_list_unique( "/punbb", "/forum", "/forums", cgi_dirs( port:por
 
     tmp_version = version + " under " + install;
     set_kb_item(name:"www/" + port + "/punBB", value:tmp_version);
-    replace_kb_item(name:"punBB/installed", value:TRUE);
+    set_kb_item(name:"punBB/installed", value:TRUE);
    
     ## build cpe and store it as host_detail
     cpe = build_cpe(value:tmp_version, exp:"^([0-9.]+\.[0-9])\.?([a-z0-9]+)?", base:"cpe:/a:punbb:punbb:");

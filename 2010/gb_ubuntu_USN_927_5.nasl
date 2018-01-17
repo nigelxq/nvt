@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_ubuntu_USN_927_5.nasl 8228 2017-12-22 07:29:52Z teissa $
 #
 # Ubuntu Update for nspr update USN-927-5
 #
@@ -42,11 +43,11 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "https://lists.ubuntu.com/archives/ubuntu-security-announce/2010-June/001111.html");
-  script_id(840453);
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-927-5/");
+  script_oid("1.3.6.1.4.1.25623.1.0.840453");
   script_cve_id("CVE-2009-3555");
- script_version("$Revision: 6641 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 12:59:00 +0200 (Mon, 10 Jul 2017) $");
+ script_version("$Revision: 8228 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-22 08:29:52 +0100 (Fri, 22 Dec 2017) $");
   script_tag(name:"creation_date", value:"2010-07-02 14:26:21 +0200 (Fri, 02 Jul 2010)");
   script_tag(name:"cvss_base", value:"5.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:P");

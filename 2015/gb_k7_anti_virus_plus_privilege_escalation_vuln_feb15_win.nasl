@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_k7_anti_virus_plus_privilege_escalation_vuln_feb15_win.nasl 6486 2017-06-29 09:59:06Z teissa $
+# $Id: gb_k7_anti_virus_plus_privilege_escalation_vuln_feb15_win.nasl 8208 2017-12-21 07:33:41Z cfischer $
 #
 # K7 Anti-Virus Plus Privilege Escalation Vulnerability Feb15 (Windows)
 #
@@ -24,16 +24,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-CPE = "cpe:/a:k7computing:anti-virus_plus:";
+CPE = "cpe:/a:k7computing:anti-virus_plus";
 
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805455");
-  script_version("$Revision: 6486 $");
+  script_version("$Revision: 8208 $");
   script_cve_id("CVE-2014-9643");
   script_tag(name:"cvss_base", value:"7.2");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-29 11:59:06 +0200 (Thu, 29 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-21 08:33:41 +0100 (Thu, 21 Dec 2017) $");
   script_tag(name:"creation_date", value:"2015-01-27 17:11:51 +0530 (Tue, 27 Jan 2015)");
   script_tag(name:"qod_type", value:"registry");
   script_name("K7 Anti-Virus Plus Privilege Escalation Vulnerability Feb15 (Windows)");
@@ -67,7 +67,7 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_family("General");
   script_dependencies("gb_k7_anti_virus_plus_detect_win.nasl");
-  script_mandatory_keys("K7/AntiVirusPlus/Win/Ver");
+  script_mandatory_keys("K7/AntiVirusPlus/Win/Installed");
   exit(0);
 }
 

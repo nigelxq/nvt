@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_1376_1.nasl 8352 2018-01-10 07:01:57Z teissa $
 #
 # SuSE Update for update openSUSE-SU-2012:1376-1 (update)
 #
@@ -33,10 +34,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-10/msg00012.html");
   script_id(850351);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8352 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-10 08:01:57 +0100 (Wed, 10 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:01:29 +0530 (Thu, 13 Dec 2012)");
   script_cve_id("CVE-2012-2874", "CVE-2012-2876", "CVE-2012-2877", "CVE-2012-2878",
                 "CVE-2012-2879", "CVE-2012-2880", "CVE-2012-2881", "CVE-2012-2882",
@@ -48,7 +48,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:1376_1");
   script_name("SuSE Update for update openSUSE-SU-2012:1376-1 (update)");
 
-  script_summary("Check for the Version of update");
+  script_tag(name: "summary" , value: "Check for the Version of update");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

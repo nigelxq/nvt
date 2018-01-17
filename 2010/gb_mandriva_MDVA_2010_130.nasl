@@ -35,17 +35,17 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-04/msg00042.php");
-  script_id(831009);
-  script_version("$Revision: 6569 $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831009");
+  script_version("$Revision: 8287 $");
   script_cve_id("CVE-2010-1321");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-04 08:28:11 +0100 (Thu, 04 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-04-30 14:39:22 +0200 (Fri, 30 Apr 2010)");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:S/C:N/I:N/A:C");
   script_xref(name: "MDVA", value: "2010:130");
   script_name("Mandriva Update for rpm MDVA-2010:130 (rpm)");
 
-  script_summary("Check for the Version of rpm");
+  script_tag(name: "summary" , value: "Check for the Version of rpm");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

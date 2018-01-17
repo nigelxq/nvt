@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_0886_1.nasl 8249 2017-12-27 06:29:56Z teissa $
 #
 # SuSE Update for xen openSUSE-SU-2012:0886-1 (xen)
 #
@@ -35,10 +36,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-07/msg00008.html");
   script_id(850281);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8249 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-27 07:29:56 +0100 (Wed, 27 Dec 2017) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:02:09 +0530 (Thu, 13 Dec 2012)");
   script_cve_id("CVE-2012-0217", "CVE-2012-0218", "CVE-2012-2934");
   script_tag(name:"cvss_base", value:"7.2");
@@ -46,7 +46,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:0886_1");
   script_name("SuSE Update for xen openSUSE-SU-2012:0886-1 (xen)");
 
-  script_summary("Check for the Version of xen");
+  script_tag(name: "summary" , value: "Check for the Version of xen");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

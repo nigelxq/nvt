@@ -44,9 +44,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "https://www.redhat.com/archives/rhsa-announce/2010-July/msg00020.html");
-  script_id(870299);
-  script_version("$Revision: 6684 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:43:49 +0200 (Wed, 12 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.870299");
+  script_version("$Revision: 8338 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-09 09:00:38 +0100 (Tue, 09 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-07-30 15:25:34 +0200 (Fri, 30 Jul 2010)");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
@@ -54,7 +54,7 @@ if(description)
   script_cve_id("CVE-2010-2074");
   script_name("RedHat Update for w3m RHSA-2010:0565-01");
 
-  script_summary("Check for the Version of w3m");
+  script_tag(name: "summary" , value: "Check for the Version of w3m");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Red Hat Local Security Checks");

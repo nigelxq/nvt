@@ -43,9 +43,9 @@ tag_affected = "texlive on Fedora 12";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.fedoraproject.org/pipermail/package-announce/2010-May/041567.html");
-  script_id(861958);
-  script_version("$Revision: 6625 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 08:29:16 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.861958");
+  script_version("$Revision: 8438 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-16 18:38:23 +0100 (Tue, 16 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-05-28 10:00:59 +0200 (Fri, 28 May 2010)");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
@@ -53,7 +53,7 @@ if(description)
   script_cve_id("CVE-2010-0739", "CVE-2010-1440", "CVE-2010-0829");
   script_name("Fedora Update for texlive FEDORA-2010-8242");
 
-  script_summary("Check for the Version of texlive");
+  script_tag(name: "summary" , value: "Check for the Version of texlive");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Fedora Local Security Checks");

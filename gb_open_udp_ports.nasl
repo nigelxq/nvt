@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_open_udp_ports.nasl 7385 2017-10-09 12:02:13Z cfischer $
+# $Id: gb_open_udp_ports.nasl 8106 2017-12-13 14:42:54Z cfischer $
 #
 # Checks for open UDP ports
 #
@@ -29,8 +29,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.103978");
-  script_version("$Revision: 7385 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-09 14:02:13 +0200 (Mon, 09 Oct 2017) $");
+  script_version("$Revision: 8106 $");
+  script_tag(name:"last_modification", value:"$Date: 2017-12-13 15:42:54 +0100 (Wed, 13 Dec 2017) $");
   script_tag(name:"creation_date", value:"2012-02-08 21:19:00 +0200 (Wed, 08 Feb 2012)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -58,7 +58,7 @@ if( silent == 'yes' ) {
   be_silent = TRUE;
 }
 
-set_unknown = get_kb_item( "Settings/non-default_udp_service_discovery" );
+set_unknown = get_kb_item( "global_settings/non-default_udp_service_discovery" );
 
 ## Get all udp ports
 udp_ports = get_kb_list( "Ports/udp/*" );
@@ -74,7 +74,7 @@ foreach port( keys( udp_ports ) ) {
 
   ## Extract port number
   Port = eregmatch( string:port, pattern:"Ports/udp/([0-9]+)" );
-  if( ! Port && ! get_port_state( Port[1] ) ) {
+  if( ! Port && ! get_udp_port_state( Port[1] ) ) {
     continue;
   }
   set_kb_item( name:"UDP/PORTS", value:Port[1] );

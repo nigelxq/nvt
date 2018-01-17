@@ -1,5 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
+# $Id: gb_suse_2012_1170_1.nasl 8273 2018-01-03 06:29:19Z teissa $
 #
 # SuSE Update for qemu openSUSE-SU-2012:1170-1 (qemu)
 #
@@ -37,10 +38,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_xref(name : "URL" , value : "http://195.135.221.135/opensuse-security-announce/2012-09/msg00016.html");
   script_id(850332);
-  script_version("$Revision: 6672 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-11 15:43:53 +0200 (Tue, 11 Jul 2017) $");
+  script_version("$Revision: 8273 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-03 07:29:19 +0100 (Wed, 03 Jan 2018) $");
   script_tag(name:"creation_date", value:"2012-12-13 17:01:36 +0530 (Thu, 13 Dec 2012)");
   script_cve_id("CVE-2012-3515");
   script_tag(name:"cvss_base", value:"7.2");
@@ -48,7 +48,7 @@ if(description)
   script_xref(name: "openSUSE-SU", value: "2012:1170_1");
   script_name("SuSE Update for qemu openSUSE-SU-2012:1170-1 (qemu)");
 
-  script_summary("Check for the Version of qemu");
+  script_tag(name: "summary" , value: "Check for the Version of qemu");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

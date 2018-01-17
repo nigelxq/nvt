@@ -51,9 +51,9 @@ tag_affected = "samba on Mandriva Linux 2010.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2010-05/msg00011.php");
-  script_id(831038);
-  script_version("$Revision: 6569 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:05:37 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831038");
+  script_version("$Revision: 8314 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-08 09:01:01 +0100 (Mon, 08 Jan 2018) $");
   script_tag(name:"creation_date", value:"2010-05-17 16:00:10 +0200 (Mon, 17 May 2010)");
   script_tag(name:"cvss_base", value:"4.4");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:M/Au:N/C:P/I:P/A:P");
@@ -61,7 +61,7 @@ if(description)
   script_cve_id("CVE-2010-0547", "CVE-2010-0787");
   script_name("Mandriva Update for samba MDVSA-2010:090-1 (samba)");
 
-  script_summary("Check for the Version of samba");
+  script_tag(name: "summary" , value: "Check for the Version of samba");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");
