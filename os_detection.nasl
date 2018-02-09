@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: os_detection.nasl 8360 2018-01-10 14:47:00Z cfischer $
+# $Id: os_detection.nasl 8720 2018-02-08 13:20:07Z cfischer $
 #
 # OS Detection Consolidation and Reporting
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105937");
-  script_version("$Revision: 8360 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-10 15:47:00 +0100 (Wed, 10 Jan 2018) $");
+  script_version("$Revision: 8720 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-02-08 14:20:07 +0100 (Thu, 08 Feb 2018) $");
   script_tag(name:"creation_date", value:"2016-02-19 11:19:54 +0100 (Fri, 19 Feb 2016)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -38,7 +38,7 @@ if(description)
   script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Product detection");
   # Keep order the same as in host_details.inc. Also add NVTs registering an OS there if adding here.
-  # Keep in sync with gb_nmap_os_detection.nasl as well.
+  # Keep in sync with os_fingerprint.nasl as well.
   script_dependencies("gb_greenbone_os_detect.nasl", "gb_ami_megarac_sp_web_detect.nasl",
                       "gb_ros_detect.nasl", "gb_apple_mobile_detect.nasl",
                       "gb_vmware_esx_web_detect.nasl", "gb_vmware_esx_snmp_detect.nasl",
@@ -49,14 +49,17 @@ if(description)
                       "gb_cisco_csma_version.nasl", "gb_cisco_ip_phone_detect.nasl",
                       "gb_cisco_ios_xr_version.nasl", "gb_ssh_junos_get_version.nasl",
                       "gb_palo_alto_panOS_version.nasl", "gb_screenos_version.nasl",
-                      "gb_extremeos_snmp_detect.nasl", "gb_palo_alto_webgui_detect.nasl",
+                      "gb_extremeos_snmp_detect.nasl",
                       "gb_cisco_asa_version_snmp.nasl", "gb_cisco_asa_version.nasl",
                       "gb_arista_eos_snmp_detect.nasl", "gb_netgear_prosafe_consolidation.nasl",
                       "gb_hirschmann_consolidation.nasl", "gb_mikrotik_router_routeros_consolidation.nasl",
                       "gb_xenserver_version.nasl", "gb_cisco_ios_xe_version.nasl",
                       "gb_mcafee_email_gateway_version.nasl", "gb_brocade_netiron_snmp_detect.nasl",
                       "gb_arubaos_detect.nasl", "gb_cyberoam_umt_ngfw_detect.nasl",
-                      "gb_aerohive_hiveos_detect.nasl", "gb_windows_cpe_detect.nasl",
+                      "gb_aerohive_hiveos_detect.nasl", "gb_qnap_nas_detect.nasl",
+                      "gb_synology_dsm_detect.nasl", "gb_simatic_s7_version.nasl",
+                      "gb_simatic_cp_consolidation.nasl", "gb_simatic_scalance_snmp_detect.nasl",
+                      "gb_watchguard_fireware_detect.nasl", "gb_windows_cpe_detect.nasl",
                       "gather-package-list.nasl", "gb_cisco_pis_version.nasl",
                       "gb_checkpoint_fw_version.nasl", "gb_smb_windows_detect.nasl",
                       "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)

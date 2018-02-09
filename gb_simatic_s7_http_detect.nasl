@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_simatic_s7_http_detect.nasl 5877 2017-04-06 09:01:48Z teissa $
+# $Id: gb_simatic_s7_http_detect.nasl 8619 2018-02-01 10:03:52Z ckuersteiner $
 #
 # Siemens SIMATIC S7 Device Detection (HTTP)
 #
@@ -28,8 +28,8 @@
 if (description)
 {
  script_oid("1.3.6.1.4.1.25623.1.0.106098");
- script_version ("$Revision: 5877 $");
- script_tag(name: "last_modification", value: "$Date: 2017-04-06 11:01:48 +0200 (Thu, 06 Apr 2017) $");
+ script_version ("$Revision: 8619 $");
+ script_tag(name: "last_modification", value: "$Date: 2018-02-01 11:03:52 +0100 (Thu, 01 Feb 2018) $");
  script_tag(name: "creation_date", value: "2016-06-15 17:03:46 +0700 (Wed, 15 Jun 2016)");
  script_tag(name: "cvss_base", value: "0.0");
  script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -57,15 +57,13 @@ include("http_func.inc");
 include("http_keepalive.inc");
 
 port = get_http_port(default: 80);
-if (!get_port_state(port))
-  exit(0);
 
 url = '/Portal/Portal.mwsl?PriNav=Ident';
 req = http_get(item:url, port:port);
 res = http_keepalive_send_recv(port:port, data:req);
 
-if ('alt="Siemens"'>< res && 'alt="Simatic Controller"></td>' >< res) {
-  model = "unknown";
+if ('alt="Siemens"'>< res && ('alt="Simatic Controller"></td>' >< res || 'Title_Area_Name">S7' >< res ||
+                              "title>SIMATIC" >< res)) {
   mod = eregmatch(pattern: "<title>SIMATIC\&nbsp;([A-Z]+)?([0-9]+).*<\/title>", string: res);
   if (!isnull(mod[2]))
     model = mod[2];
@@ -75,20 +73,44 @@ if ('alt="Siemens"'>< res && 'alt="Simatic Controller"></td>' >< res) {
   lines = split(res);
 
   foreach line (lines) {
-    if ("Firmware:" >< line) {
+    if ("Firmware:" >< line ) {
       ver = eregmatch(pattern: ">V.([^<]+)<", string: lines[x+1]);
       if (!isnull(ver[1])) {
         version = ver[1];
+        break;
+      }
+      else {
+        ver = eregmatch(pattern: ">V.([^<]+)<", string: lines[x+5]);
+        if (!isnull(ver[1])) {
+          version = ver[1];
+          break;
+        }
+      }
+    }
+    x++;
+  }
+
+  x = 0;
+  foreach line (lines) {
+    if ("Order number" >< line) {
+      module = eregmatch(pattern: ">([^<]+)", string: lines[x+1]);
+      if (!isnull(module[1])) {
+        set_kb_item(name: "simatic_s7/http/module", value: module[1]);
         break;
       }
     }
     x++;
   }
 
+  module_type = eregmatch(pattern: 'moduleType">([^<]+)', string: res);
+  if (!isnull(module_type[1]))
+    set_kb_item(name: "simatic_s7/http/modtype", value: module_type[1]);
+
   set_kb_item(name: "simatic_s7/detected", value: TRUE);
-  set_kb_item(name: "simatic_s7/http/model", value: model);
+  if (model)
+    set_kb_item(name: "simatic_s7/http/model", value: model);
   if (version != "unknown")
-    set_kb_item(name: "simatic_s7/http/version", value: version);
+    set_kb_item(name: "simatic_s7/http/" + port + "/version", value: version);
   set_kb_item(name: "simatic_s7/http/port", value: port);
 }
 

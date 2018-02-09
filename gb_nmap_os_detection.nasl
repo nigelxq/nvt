@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_nmap_os_detection.nasl 8215 2017-12-21 11:46:59Z cfischer $
+# $Id: gb_nmap_os_detection.nasl 8574 2018-01-30 07:08:18Z cfischer $
 #
 # Nmap OS Identification (NASL wrapper)
 #
@@ -31,8 +31,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108021");
-  script_version("$Revision: 8215 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-21 12:46:59 +0100 (Thu, 21 Dec 2017) $");
+  script_version("$Revision: 8574 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-30 08:08:18 +0100 (Tue, 30 Jan 2018) $");
   script_tag(name:"creation_date", value:"2016-11-21 12:08:04 +0100 (Mon, 21 Nov 2016)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -40,40 +40,8 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_family("Product detection");
   script_copyright("Copyright (c) 2016 Greenbone Networks GmbH");
-  script_dependencies("gb_greenbone_os_detect.nasl", "gb_ami_megarac_sp_web_detect.nasl",  # Keep in sync with os_detection.nasl...
-                      "gb_ros_detect.nasl", "gb_apple_mobile_detect.nasl",
-                      "gb_vmware_esx_web_detect.nasl", "gb_vmware_esx_snmp_detect.nasl",
-                      "gb_ssh_cisco_ios_get_version.nasl", "gb_cisco_cucmim_version.nasl",
-                      "gb_cisco_cucm_version.nasl", "gb_cisco_nx_os_version.nasl",
-                      "gb_cyclades_detect.nasl", "gb_fortios_detect.nasl",
-                      "gb_cisco_esa_version.nasl", "gb_cisco_wsa_version.nasl",
-                      "gb_cisco_csma_version.nasl", "gb_cisco_ip_phone_detect.nasl",
-                      "gb_cisco_ios_xr_version.nasl", "gb_ssh_junos_get_version.nasl",
-                      "gb_palo_alto_panOS_version.nasl", "gb_screenos_version.nasl",
-                      "gb_extremeos_snmp_detect.nasl", "gb_palo_alto_webgui_detect.nasl",
-                      "gb_cisco_asa_version_snmp.nasl", "gb_cisco_asa_version.nasl",
-                      "gb_arista_eos_snmp_detect.nasl", "gb_netgear_prosafe_consolidation.nasl",
-                      "gb_hirschmann_consolidation.nasl", "gb_mikrotik_router_routeros_consolidation.nasl",
-                      "gb_xenserver_version.nasl", "gb_cisco_ios_xe_version.nasl",
-                      "gb_mcafee_email_gateway_version.nasl", "gb_brocade_netiron_snmp_detect.nasl",
-                      "gb_arubaos_detect.nasl", "gb_cyberoam_umt_ngfw_detect.nasl",
-                      "gb_aerohive_hiveos_detect.nasl", "gb_windows_cpe_detect.nasl",
-                      "gather-package-list.nasl", "gb_cisco_pis_version.nasl",
-                      "gb_checkpoint_fw_version.nasl", "gb_smb_windows_detect.nasl",
-                      "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)
-                      "gb_junos_snmp_version.nasl", "gb_snmp_os_detection.nasl",
-                      "gb_dns_os_detection.nasl", "gb_ftp_os_detection.nasl",
-                      "smb_nativelanman.nasl", "gb_ucs_detect.nasl",
-                      "sw_http_os_detection.nasl", "sw_mail_os_detection.nasl",
-                      "sw_telnet_os_detection.nasl", "gb_mysql_mariadb_os_detection.nasl",
-                      "ntp_open.nasl", "remote-detect-MDNS.nasl",
-                      "mssqlserver_detect.nasl", "gb_apple_tv_version.nasl",
-                      "gb_apple_tv_detect.nasl", "gb_upnp_os_detection.nasl",
-                      "gb_sip_os_detection.nasl", "gb_check_mk_agent_detect.nasl",
-                      "ms_rdp_detect.nasl", "gb_apache_activemq_detect.nasl",
-                      "dcetest.nasl", "gb_hnap_os_detection.nasl",
-                      "ident_process_owner.nasl",
-                      "os_fingerprint.nasl"); # but without the gb_nmap_os_detection.nasl
+  # This should run after os_fingerprint.nasl so we're only running it if its really required
+  script_dependencies("secpod_open_tcp_ports.nasl", "toolcheck.nasl", "os_fingerprint.nasl");
   script_mandatory_keys("TCP/PORTS", "Tools/Present/nmap");
 
   script_xref(name:"URL", value:"https://nmap.org/book/man-os-detection.html");
@@ -209,8 +177,6 @@ foreach port( openPorts ) {
   # non_simult_ports so ignoring these here. Also removing 27960 which is known to crash (see find_service.nasl)
   if( port == "139" || port == "445" || port == "27960" ) continue;
 
-  # Includes e.g. PJL ports which are printing everything
-  # sent to them so continue for such a port here
   if( is_fragile_port( port:port ) ) continue;
 
   if( isnull ( portList ) ) {
@@ -222,6 +188,9 @@ foreach port( openPorts ) {
 
 # Also add a few low-ports as nmap OS detection behaves strange with only closed/filtered high ports
 foreach port( make_list( "21", "22", "25", "80", "135", "443" ) ) {
+
+  if( is_fragile_port( port:port ) ) continue;
+
   if( ! in_array( search:port, array:openPorts ) ) {
     # openPorts = get_all_tcp_ports_list(); above might be an empty list in some special cases causing
     # portList to be NULL. So make sure to create a valid portList in this case.
@@ -243,8 +212,10 @@ for( j = 1; j <= numClosedPorts; j++ ) {
 
   closedPort = rand_str( length:( 4 ), charset:'0123456789' );
 
-  # Choose the closed port in the range of i0000 - i9999 and make sure its not already in the list
-  while( j + closedPort >< portList ) {
+  # Choose the closed port in the range of i0000 - i9999 and make sure its not already in the list.
+  # nb: This might break if someone is specifying all ports in the range of e.g. 10000-19999 as fragile
+  # but this is quite unlikely...
+  while( j + closedPort >< portList || is_fragile_port( port:j + closedPort ) ) {
     closedPort = rand_str( length:( 4 ), charset:'0123456789' );
   }
   portList += "," + j + closedPort;

