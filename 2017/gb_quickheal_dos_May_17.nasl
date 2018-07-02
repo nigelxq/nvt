@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_quickheal_dos_May_17.nasl 8160 2017-12-18 15:33:57Z cfischer $
+# $Id: gb_quickheal_dos_May_17.nasl 9380 2018-04-06 11:04:51Z asteins $
 #
 # QuickHeal CVE-2015-8285 Denial of Service Vulnerability
 #
@@ -29,8 +29,8 @@ CPE = "cpe:/a:quickheal:antivirus_pro";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107160");
-  script_version("$Revision: 8160 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-18 16:33:57 +0100 (Mon, 18 Dec 2017) $");
+  script_version("$Revision: 9380 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 13:04:51 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2017-05-02 10:28:58 +0200 (Tue, 02 May 2017)");
   script_cve_id("CVE-2015-8285");
   script_bugtraq_id(97996);
@@ -39,11 +39,11 @@ if(description)
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
 
   script_tag(name:"qod_type", value:"registry");
-  script_name(" QuickHeal CVE-2015-8285 Denial of Service Vulnerability");
+  script_name("QuickHeal CVE-2015-8285 Denial of Service Vulnerability");
   script_tag(name: "summary", value: "QuickHeal is prone to a denial-of-service vulnerability.");
-  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if the version is vulnerable or not.");
-  script_tag(name: "insight", value: "The vulnerability is existed in the driver webssx.sys.");
-  script_tag(name: "impact" , value: "Attacker can exploit this issue to cause denial-of-service condition.");
+  script_tag(name: "vuldetect", value: "Get the installed version with the help of the detection NVT and check if the version is vulnerable or not.");
+  script_tag(name: "insight", value: "The vulnerability exists in the driver webssx.sys.");
+  script_tag(name: "impact" , value: "An attacker can exploit this issue to cause denial-of-service condition.");
   script_tag(name: "affected", value: "QuickHeal 16.00 is vulnerable");
   script_tag(name: "solution", value: "Updates are available. Please see the references or vendor advisory for more information.");
 
@@ -71,7 +71,7 @@ if(!Ver = get_app_version(cpe:CPE)){
 
 if(version_is_equal(version: Ver, test_version:"16.00"))
 {
-  report =  report_fixed_ver(installed_version:Ver, fixed_version:"See Vendor");
+  report =  report_fixed_ver(installed_version:Ver, fixed_version:"See information supplied by the vendor");
   security_message(data:report);
   exit( 0 );
 }

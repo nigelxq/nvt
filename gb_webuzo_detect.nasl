@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_webuzo_detect.nasl 7076 2017-09-07 11:53:47Z teissa $
+# $Id: gb_webuzo_detect.nasl 9996 2018-05-29 07:18:44Z cfischer $
 #
 # Webuzo Detection
 #
@@ -25,25 +25,19 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.103830";   
-
 if (description)
 {
- script_oid(SCRIPT_OID);
- script_version ("$Revision: 7076 $");
+ script_oid("1.3.6.1.4.1.25623.1.0.103830");
+ script_version ("$Revision: 9996 $");
  script_tag(name:"cvss_base", value:"0.0");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
  script_tag(name:"qod_type", value:"remote_banner");
- script_tag(name:"last_modification", value:"$Date: 2017-09-07 13:53:47 +0200 (Thu, 07 Sep 2017) $");
+ script_tag(name:"last_modification", value:"$Date: 2018-05-29 09:18:44 +0200 (Tue, 29 May 2018) $");
  script_tag(name:"creation_date", value:"2013-11-13 18:05:10 +0100 (Wed, 13 Nov 2013)");
  script_name("Webuzo Detection");
 
-tag_summary =
-"The script sends a connection request to the server and attempts to
-extract the version number from the reply.";
-
-
-  script_tag(name : "summary" , value : tag_summary);
+ script_tag(name : "summary" , value : "The script sends a connection request to the server and attempts to
+extract the version number from the reply.");
 
  script_category(ACT_GATHER_INFO);
  script_family("Product detection");
@@ -60,8 +54,6 @@ include("cpe.inc");
 include("host_details.inc");
 
 port = get_http_port(default:2004);
-
-if(!get_port_state(port))exit(0);
 if(!can_host_php(port:port))exit(0);
 
 url = "/index.php?act=login";
@@ -82,13 +74,11 @@ if("<title>Login" >< buf && "Powered By Webuzo" >< buf && "SOFTCookies" >< buf) 
    if(isnull(cpe))
      cpe = 'cpe:/a:softaculous:webuzo';
 
-   register_product(cpe:cpe, location:url, nvt:SCRIPT_OID, port:port);
+   register_product(cpe:cpe, location:url, port:port);
 
    log_message(data: build_detection_report(app:"Webuzo", version:vers, install:url, cpe:cpe, concluded: version[0]),
                port:port);
 
-}  
+}
 
 exit(0);
-
-

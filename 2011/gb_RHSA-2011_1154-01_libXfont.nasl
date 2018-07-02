@@ -44,9 +44,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "https://www.redhat.com/archives/rhsa-announce/2011-August/msg00007.html");
-  script_id(870465);
-  script_version("$Revision: 6685 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:44:46 +0200 (Wed, 12 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.870465");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-08-12 15:49:01 +0200 (Fri, 12 Aug 2011)");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
@@ -54,7 +54,7 @@ if(description)
   script_cve_id("CVE-2011-2895");
   script_name("RedHat Update for libXfont RHSA-2011:1154-01");
 
-  script_summary("Check for the Version of libXfont");
+  script_tag(name:"summary", value:"Check for the Version of libXfont");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("Red Hat Local Security Checks");

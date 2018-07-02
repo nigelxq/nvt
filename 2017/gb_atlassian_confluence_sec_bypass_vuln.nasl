@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_atlassian_confluence_sec_bypass_vuln.nasl 6585 2017-07-07 05:33:18Z cfischer $
+# $Id: gb_atlassian_confluence_sec_bypass_vuln.nasl 9300 2018-04-04 11:55:01Z cfischer $
 #
 # Atlassian Confluence CVE-2017-9505 Security Bypass Vulnerability
 #
@@ -29,8 +29,8 @@ CPE = "cpe:/a:atlassian:confluence";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107224");
-  script_version("$Revision: 6585 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-07 07:33:18 +0200 (Fri, 07 Jul 2017) $");
+  script_version("$Revision: 9300 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-04 13:55:01 +0200 (Wed, 04 Apr 2018) $");
   script_tag(name:"creation_date", value:"2017-06-19 17:36:44 +0200 (Mon, 19 Jun 2017)");
   script_cve_id("CVE-2017-9505");
 
@@ -39,18 +39,21 @@ if(description)
 
   script_tag(name:"qod_type", value:"remote_banner");
  
-  script_name(" Atlassian Confluence CVE-2017-9505 Security Bypass Vulnerability");
+  script_name("Atlassian Confluence CVE-2017-9505 Security Bypass Vulnerability");
  
   script_tag(name: "summary", value: "Atlassian Confluence is prone to a security-bypass vulnerability.");
  
-  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if the version is vulnerable or not.");
+  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if
+  the version is vulnerable or not.");
 
   # Already covered in 2017/gb_atlassian_confluence_bypass_vuln.nasl
   script_tag(name:"deprecated", value:TRUE);
 
-  script_tag(name: "insight", value: "The flaw is due to the watch functionality provided for the user to subscrite to specific content.");
+  script_tag(name: "insight", value: "The flaw is due to the watch functionality provided for the user to
+  subscrite to specific content.");
 
-  script_tag(name: "impact" , value: "An attacker can exploit this issue to bypass certain security restrictions and perform unauthorized actions.");
+  script_tag(name: "impact" , value: "An attacker can exploit this issue to bypass certain security
+  restrictions and perform unauthorized actions.");
 
   script_tag(name: "affected", value: "Atlassian Confluence 4.3.0 and later are vulnerable");
   script_tag(name: "solution", value: "Update to Atlassian Confluence 6.2.1.");
@@ -76,22 +79,20 @@ exit(66);
 include("host_details.inc");
 include("version_func.inc");
 
-
-if (!Port = get_app_port(cpe:CPE)){
+if(!Port = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-if (!Ver = get_app_version(cpe:CPE, port:Port)){
+if(!Ver = get_app_version(cpe:CPE, port:Port)){
   exit(0);
 }
 
-if ((Ver =~ "4\.") || (Ver =~ "5\.") || (Ver =~ "6\.")) {
-    if(version_is_less(version: Ver, test_version:"6.2.1")) Vuln = TRUE;
-    {
-        report =  report_fixed_ver(installed_version:Ver, fixed_version:"6.2.1");
-        security_message(data:report);
-        exit( 0 );
-    }
+if((Ver =~ "4\.") || (Ver =~ "5\.") || (Ver =~ "6\.")){
+  if(version_is_less(version: Ver, test_version:"6.2.1")){
+    report = report_fixed_ver(installed_version:Ver, fixed_version:"6.2.1");
+    security_message(port:Port, data:report);
+    exit(0);
+  }
 }
 
-exit ( 99 );
+exit(99);

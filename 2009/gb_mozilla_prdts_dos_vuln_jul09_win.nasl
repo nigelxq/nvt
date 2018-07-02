@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mozilla_prdts_dos_vuln_jul09_win.nasl 6467 2017-06-28 13:51:19Z cfischer $
+# $Id: gb_mozilla_prdts_dos_vuln_jul09_win.nasl 10135 2018-06-08 11:42:28Z asteins $
 #
 # Mozilla Products 'select()' Denial Of Service Vulnerability (Windows)
 #
@@ -24,34 +24,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_solution = "Upgrade to Firefox version 2.0.0.19 or 3.0.5 or later
-  http://www.mozilla.com/en-US/firefox/all.html
-  Upgrade to Seamonkey version 1.1.17 or later
-  http://www.seamonkey-project.org/releases/
-  Apply patch for Thunderbird through above mozilla engine update
-  http://www.mozillamessaging.com/
-
-  *****
-  NOTE: Ignore this warning if above mentioned patch is already applied.
-  *****";
-
-tag_impact = "Successful exploitation will let attackers to cause application crash by
-  consuming the memory.
-  Impact Level: Application";
-tag_affected = "Seamonkey version prior to 1.1.17
-  Thunderbird version 2.0.0.22 and prior
-  Firefox version before 2.0.0.19 and 3.x before 3.0.5 on Windows.";
-tag_insight = "A null pointer dereference error occurs while calling the 'select' method with
-  a large integer, that results in continuous allocation of x+n bytes of memory
-  exhausting memory after a while.";
-tag_summary = "The host is installed with Mozilla Firefox/Seamonkey/Thunderbird and is prone
-  to Denial of Service vulnerability.";
-
 if(description)
 {
-  script_id(800848);
-  script_version("$Revision: 6467 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-28 15:51:19 +0200 (Wed, 28 Jun 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.800848");
+  script_version("$Revision: 10135 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-08 13:42:28 +0200 (Fri, 08 Jun 2018) $");
   script_tag(name:"creation_date", value:"2009-07-22 21:36:53 +0200 (Wed, 22 Jul 2009)");
   script_tag(name:"cvss_base", value:"7.1");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:N/A:C");
@@ -65,13 +42,29 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 Greenbone Networks GmbH");
   script_family("Denial of Service");
-  script_dependencies("gb_firefox_detect_win.nasl", "gb_seamonkey_detect_win.nasl", "gb_thunderbird_detect_win.nasl");
+  script_dependencies("gb_firefox_detect_portable_win.nasl", "gb_seamonkey_detect_win.nasl", "gb_thunderbird_detect_portable_win.nasl");
   script_mandatory_keys("Mozilla/Firefox_or_Seamonkey_or_Thunderbird/Installed");
-  script_tag(name : "impact" , value : tag_impact);
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "solution" , value : tag_solution);
+  script_tag(name : "impact" , value : "Successful exploitation will let attackers to cause application crash by
+  consuming the memory.
+  Impact Level: Application");
+  script_tag(name : "affected" , value : "Seamonkey version prior to 1.1.17
+  Thunderbird version 2.0.0.22 and prior
+  Firefox version before 2.0.0.19 and 3.x before 3.0.5 on Windows.");
+  script_tag(name : "insight" , value : "A null pointer dereference error occurs while calling the 'select' method with
+  a large integer, that results in continuous allocation of x+n bytes of memory
+  exhausting memory after a while.");
+  script_tag(name : "summary" , value : "The host is installed with Mozilla Firefox/Seamonkey/Thunderbird and is prone
+  to Denial of Service vulnerability.");
+  script_tag(name : "solution" , value : "Upgrade to Firefox version 2.0.0.19 or 3.0.5 or later
+  http://www.mozilla.com/en-US/firefox/all.html
+  Upgrade to Seamonkey version 1.1.17 or later
+  http://www.seamonkey-project.org/releases/
+  Apply patch for Thunderbird through above mozilla engine update
+  http://www.mozillamessaging.com/
+
+  *****
+  NOTE: Ignore this warning if above mentioned patch is already applied.
+  *****");
   script_tag(name:"qod_type", value:"registry");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -80,15 +73,14 @@ if(description)
 
 include("version_func.inc");
 
-# Firefox Check
+
 ffVer = get_kb_item("Firefox/Win/Ver");
 if(ffVer)
 {
-  # Grep for Firefox version < 2.0.0.19 and < 3.5.1
   if(version_is_less(version:ffVer, test_version:"2.0.0.19")||
      version_in_range(version:ffVer, test_version:"3.0", test_version2:"3.0.4"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }
@@ -97,10 +89,9 @@ if(ffVer)
 smVer = get_kb_item("Seamonkey/Win/Ver");
 if(smVer != NULL)
 {
-  # Grep for Seamonkey version < 1.1.17
   if(version_is_less(version:smVer, test_version:"1.1.17"))
   {
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
     exit(0);
   }
 }
@@ -109,8 +100,7 @@ if(smVer != NULL)
 tbVer = get_kb_item("Thunderbird/Win/Ver");
 if(tbVer != NULL)
 {
-  # Grep for Thunderbird version <= 2.0.0.22
   if(version_is_less_equal(version:tbVer, test_version:"2.0.0.22")){
-    security_message(0);
+    security_message( port: 0, data: "The target host was found to be vulnerable" );
   }
 }

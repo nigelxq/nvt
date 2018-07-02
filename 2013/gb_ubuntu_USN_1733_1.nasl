@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_1733_1.nasl 7958 2017-12-01 06:47:47Z santu $
+# $Id: gb_ubuntu_USN_1733_1.nasl 9650 2018-04-27 08:51:00Z cfischer $
 #
 # Ubuntu Update for ruby1.9.1 USN-1733-1
 #
@@ -25,7 +25,32 @@
 ###############################################################################
 
 include("revisions-lib.inc");
-tag_insight = "Jean-Philippe Aumasson discovered that Ruby incorrectly generated
+
+
+
+if(description)
+{
+  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1733-1/");
+  script_oid("1.3.6.1.4.1.25623.1.0.841320");
+  script_version("$Revision: 9650 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:51:00 +0200 (Fri, 27 Apr 2018) $");
+  script_tag(name:"creation_date", value:"2013-02-22 10:12:12 +0530 (Fri, 22 Feb 2013)");
+  script_cve_id("CVE-2012-5371", "CVE-2013-0256", "CVE-2013-0269");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_xref(name: "USN", value: "1733-1");
+  script_name("Ubuntu Update for ruby1.9.1 USN-1733-1");
+
+  script_tag(name:"summary", value:"Check for the Version of ruby1.9.1");
+  script_category(ACT_GATHER_INFO);
+  script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
+  script_family("Ubuntu Local Security Checks");
+  script_dependencies("gather-package-list.nasl");
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU(12\.04 LTS|12\.10)");
+  script_tag(name : "affected" , value : "ruby1.9.1 on Ubuntu 12.10 ,
+  Ubuntu 12.04 LTS");
+  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
+  script_tag(name : "insight" , value : "Jean-Philippe Aumasson discovered that Ruby incorrectly generated
   predictable hash values. An attacker could use this issue to generate hash
   collisions and cause a denial of service. (CVE-2012-5371)
 
@@ -34,41 +59,11 @@ tag_insight = "Jean-Philippe Aumasson discovered that Ruby incorrectly generated
   vulnerabilities, if a user were tricked into viewing a specially crafted
   page, a remote attacker could exploit this to modify the contents, or steal
   confidential data, within the same domain. (CVE-2013-0256)
-  
+
   Thomas Hollstegge and Ben Murphy discovered that the JSON implementation
   in Ruby incorrectly handled certain crafted documents. An attacker could
   use this issue to cause a denial of service or bypass certain protection
-  mechanisms. (CVE-2013-0269)";
-
-
-tag_affected = "ruby1.9.1 on Ubuntu 12.10 ,
-  Ubuntu 12.04 LTS";
-tag_solution = "Please Install the Updated Packages.";
-
-
-
-if(description)
-{
-  script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1733-1/");
-  script_id(841320);
-  script_version("$Revision: 7958 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-01 07:47:47 +0100 (Fri, 01 Dec 2017) $");
-  script_tag(name:"creation_date", value:"2013-02-22 10:12:12 +0530 (Fri, 22 Feb 2013)");
-  script_cve_id("CVE-2012-5371", "CVE-2013-0256", "CVE-2013-0269");
-  script_tag(name:"cvss_base", value:"7.5");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_xref(name: "USN", value: "1733-1");
-  script_name("Ubuntu Update for ruby1.9.1 USN-1733-1");
-
-  script_summary("Check for the Version of ruby1.9.1");
-  script_category(ACT_GATHER_INFO);
-  script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
-  script_family("Ubuntu Local Security Checks");
-  script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "solution" , value : tag_solution);
-  script_tag(name : "insight" , value : tag_insight);
+  mechanisms. (CVE-2013-0269)");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -99,7 +94,7 @@ if(release == "UBUNTU12.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }
 
@@ -119,6 +114,6 @@ if(release == "UBUNTU12.10")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

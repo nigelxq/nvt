@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_oracle_glassfish_unspecified_vuln02_july16.nasl 7174 2017-09-18 11:48:08Z asteins $
+# $Id: gb_oracle_glassfish_unspecified_vuln02_july16.nasl 9993 2018-05-29 06:02:50Z cfischer $
 #
 # Oracle GlassFish Server Unspecified Vulnerability -02 July16
 #
@@ -29,22 +29,21 @@ CPE = "cpe:/a:oracle:glassfish_server";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.808706");
-  script_version("$Revision: 7174 $");
+  script_version("$Revision: 9993 $");
   script_cve_id("CVE-2016-5477");
   script_bugtraq_id(92032);
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-18 13:48:08 +0200 (Mon, 18 Sep 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-29 08:02:50 +0200 (Tue, 29 May 2018) $");
   script_tag(name:"creation_date", value:"2016-07-22 12:27:52 +0530 (Fri, 22 Jul 2016)");
   script_name("Oracle GlassFish Server Unspecified Vulnerability -02 July16");
 
   script_tag(name:"summary", value:"This host is running Oracle GlassFish Server
   and is prone to unspecified vulnerability.");
 
-  script_tag(name:"vuldetect", value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Checks if a vulnerable version is present on the target host.");
 
-  script_tag(name:"insight", value:"The flaw exists due to an error in the Administration 
+  script_tag(name:"insight", value:"The flaw exists due to an error in the Administration
   sub-component.");
 
   script_tag(name:"impact", value:"Successfully exploitation will allow remote
@@ -56,40 +55,35 @@ if(description)
   and 3.0.1");
 
   script_tag(name:"solution", value:"Apply patches from below link,
+
   http://www.oracle.com/technetwork/security-advisory/cpujul2016-2881720.html");
 
   script_tag(name:"solution_type", value:"VendorFix");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
-  script_xref(name : "URL" , value : "http://www.oracle.com/technetwork/security-advisory/cpujul2016-2881720.html");
+  script_xref(name: "URL", value: "http://www.oracle.com/technetwork/security-advisory/cpujul2016-2881720.html");
+
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_category(ACT_GATHER_INFO);
-  script_family("Databases");
+  script_family("Web application abuses");
   script_dependencies("GlassFish_detect.nasl");
   script_mandatory_keys("GlassFish/installed");
+
   exit(0);
 }
 
 include("version_func.inc");
 include("host_details.inc");
-include("global_settings.inc");
 
-## Variable Initialization
-dbPort = "";
-dbVer = "";
-
-## Get port
-if(!dbport = get_app_port(cpe:CPE)){
+if (!dbPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Get the version
-if(!dbVer = get_app_version(cpe:CPE, port:dbPort)){
+if (!dbVer = get_app_version(cpe:CPE, port:dbPort)){
   exit(0);
 }
 
-## Check for vulnerable version
 if(version_is_equal(version:dbVer, test_version:"2.1.1") ||
    version_is_equal(version:dbVer, test_version:"3.0.1"))
 {
@@ -97,3 +91,5 @@ if(version_is_equal(version:dbVer, test_version:"2.1.1") ||
   security_message(data:report, port:dbPort);
   exit(0);
 }
+
+exit(99);

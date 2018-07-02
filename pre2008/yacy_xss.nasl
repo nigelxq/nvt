@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: yacy_xss.nasl 6702 2017-07-12 13:49:41Z cfischer $
+# $Id: yacy_xss.nasl 9348 2018-04-06 07:01:19Z cfischer $
 # Description: YaCy Peer-To-Peer Search Engine XSS
 #
 # Authors:
@@ -43,9 +43,9 @@ tag_solution = "Upgrade to YaCy 0.32 or later.";
 
 if(description)
 {
-  script_id(16058);
-  script_version("$Revision: 6702 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 15:49:41 +0200 (Wed, 12 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.16058");
+  script_version("$Revision: 9348 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:01:19 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
 
   script_cve_id("CVE-2004-2651");
@@ -56,7 +56,7 @@ if(description)
   
   script_name("YaCy Peer-To-Peer Search Engine XSS");
 
-  script_category(ACT_GATHER_INFO);
+  script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
   script_copyright("This script is Copyright (C) 2004 David Maciejak");
   script_family("Web application abuses");

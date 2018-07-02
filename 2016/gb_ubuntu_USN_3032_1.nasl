@@ -26,16 +26,16 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.842834");
-  script_version("$Revision: 6647 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:04:05 +0200 (Mon, 10 Jul 2017) $");
+  script_version("$Revision: 9653 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 11:15:50 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2016-07-15 05:27:46 +0200 (Fri, 15 Jul 2016)");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"2.1");
+  script_tag(name:"cvss_base_vector", value:"AV:L/AC:L/Au:N/C:P/I:N/A:N");
   script_tag(name:"qod_type", value:"package");
+  script_cve_id("CVE-2016-6224");
   script_name("Ubuntu Update for ecryptfs-utils USN-3032-1");
   script_tag(name: "summary", value: "Check the version of ecryptfs-utils");
-  script_tag(name: "vuldetect", value: "Get the installed version with the help
-  of detect NVT and check if the version is vulnerable or not.");
+  script_tag(name: "vuldetect", value: "Checks if a vulnerable version is present on the target host.");
   script_tag(name: "insight", value: "It was discovered that eCryptfs incorrectly
   configured the encrypted swap partition for certain drive types. An attacker
   could use this issue to discover sensitive information.");
@@ -50,7 +50,7 @@ if(description)
   script_copyright("Copyright (C) 2016 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU(16\.04 LTS|15\.10)");
   exit(0);
 }
 
@@ -73,7 +73,7 @@ if(release == "UBUNTU16.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }
 
@@ -87,6 +87,6 @@ if(release == "UBUNTU15.10")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

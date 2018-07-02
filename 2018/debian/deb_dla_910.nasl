@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: deb_dla_910.nasl 8525 2018-01-25 03:27:12Z ckuersteiner $
+# $Id: deb_dla_910.nasl 10219 2018-06-15 12:00:55Z cfischer $
 #
 # Auto-generated from advisory DLA 910-1 using nvtgen 1.0
 # Script version:1.0
@@ -31,10 +31,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.890910");
-  script_version("$Revision: 8525 $");
+  script_version("$Revision: 10219 $");
   script_cve_id("CVE-2017-3157", "CVE-2017-7870");
-  script_name("Debian Lts Announce DLA 910-1 ([SECURITY] [DLA 910-1] libreoffice security update)");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-25 04:27:12 +0100 (Thu, 25 Jan 2018) $");
+  script_name("Debian LTS Advisory ([SECURITY] [DLA 910-1] libreoffice security update)");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-15 14:00:55 +0200 (Fri, 15 Jun 2018) $");
   script_tag(name:"creation_date", value:"2018-01-17 00:00:00 +0100 (Wed, 17 Jan 2018)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
@@ -48,7 +48,7 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH http://greenbone.net");
   script_family("Debian Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages", re:"ssh/login/release=DEB7\.[0-9]+");
   script_tag(name:"affected", value:"libreoffice on Debian Linux");
   script_tag(name:"insight", value:"LibreOffice is a full-featured office productivity suite that provides
 a near drop-in replacement for Microsoft(R) Office.");
@@ -78,9 +78,6 @@ include("pkg-lib-deb.inc");
 
 res = "";
 report = "";
-if ((res = isdpkgvuln(pkg:"fonts-opensymbol", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
 if ((res = isdpkgvuln(pkg:"libreoffice", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
@@ -498,25 +495,10 @@ if ((res = isdpkgvuln(pkg:"libreoffice-l10n-zu", ver:"1:3.5.4+dfsg2-0+deb7u9", r
 if ((res = isdpkgvuln(pkg:"libreoffice-math", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
-if ((res = isdpkgvuln(pkg:"libreoffice-mysql-connector", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
 if ((res = isdpkgvuln(pkg:"libreoffice-officebean", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
 if ((res = isdpkgvuln(pkg:"libreoffice-ogltrans", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
-if ((res = isdpkgvuln(pkg:"libreoffice-pdfimport", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
-if ((res = isdpkgvuln(pkg:"libreoffice-presentation-minimizer", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
-if ((res = isdpkgvuln(pkg:"libreoffice-presenter-console", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
-if ((res = isdpkgvuln(pkg:"libreoffice-report-builder", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
 if ((res = isdpkgvuln(pkg:"libreoffice-report-builder-bin", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
@@ -549,22 +531,13 @@ if ((res = isdpkgvuln(pkg:"libreoffice-style-oxygen", ver:"1:3.5.4+dfsg2-0+deb7u
 if ((res = isdpkgvuln(pkg:"libreoffice-style-tango", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
-if ((res = isdpkgvuln(pkg:"libreoffice-wiki-publisher", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
 if ((res = isdpkgvuln(pkg:"libreoffice-writer", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
-if ((res = isdpkgvuln(pkg:"openoffice.org-dtd-officedocument1.0", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
 if ((res = isdpkgvuln(pkg:"python-uno", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
 if ((res = isdpkgvuln(pkg:"python3-uno", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
-    report += res;
-}
-if ((res = isdpkgvuln(pkg:"ttf-opensymbol", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
     report += res;
 }
 if ((res = isdpkgvuln(pkg:"uno-libs3", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
@@ -580,8 +553,37 @@ if ((res = isdpkgvuln(pkg:"ure-dbg", ver:"1:3.5.4+dfsg2-0+deb7u9", rls_regex:"DE
     report += res;
 }
 
+# nb: Those are using a different version scheme, take care of this when overwriting this LSC...
+if ((res = isdpkgvuln(pkg:"fonts-opensymbol", ver:"2:102.2+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"ttf-opensymbol", ver:"2:102.2+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"openoffice.org-dtd-officedocument1.0", ver:"2:1.0+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"libreoffice-wiki-publisher", ver:"1.1.1+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"libreoffice-report-builder", ver:"1:1.2.1+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"libreoffice-presenter-console", ver:"1.1.0+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"libreoffice-presentation-minimizer", ver:"1.0.3+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"libreoffice-pdfimport", ver:"1.0.5+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+if ((res = isdpkgvuln(pkg:"libreoffice-mysql-connector", ver:"1.0.1+LibO3.5.4+dfsg2-0+deb7u9", rls_regex:"DEB7\.[0-9]+", remove_arch:TRUE )) != NULL) {
+    report += res;
+}
+
 if (report != "") {
   security_message(data:report);
 } else if (__pkg_match) {
-  exit(99); # Not vulnerable.
+  exit(99);
 }

@@ -27,9 +27,9 @@ include("revisions-lib.inc");
 
 if(description)
 {
-  script_id(881910);
-  script_version("$Revision: 6656 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:49:38 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.881910");
+  script_version("$Revision: 9587 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-24 14:50:26 +0200 (Tue, 24 Apr 2018) $");
   script_tag(name:"creation_date", value:"2014-04-03 11:25:22 +0530 (Thu, 03 Apr 2014)");
   script_cve_id("CVE-2013-1860", "CVE-2014-0055", "CVE-2014-0069", "CVE-2014-0101");
   script_tag(name:"cvss_base", value:"7.1");
@@ -79,17 +79,6 @@ rebooted for this update to take effect.
 
   tag_solution = "Please Install the Updated Packages.";
 
-  desc = "
-
-  Vulnerability Insight:
-  " + tag_insight + "
-
-  Affected Software/OS:
-  " + tag_affected + "
-
-  Solution:
-  " + tag_solution;
-
   script_tag(name : "affected" , value : tag_affected);
   script_tag(name : "insight" , value : tag_insight);
   script_tag(name : "solution" , value : tag_solution);
@@ -97,7 +86,7 @@ rebooted for this update to take effect.
   script_tag(name:"solution_type", value:"VendorFix");
   script_xref(name: "CESA", value: "2014:0328");
   script_xref(name: "URL" , value: "http://lists.centos.org/pipermail/centos-announce/2014-March/020230.html");
-  script_summary("Check for the Version of kernel");
+  script_tag(name:"summary", value:"Check for the Version of kernel");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

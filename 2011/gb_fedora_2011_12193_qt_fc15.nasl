@@ -36,17 +36,17 @@ tag_affected = "qt on Fedora 15";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.fedoraproject.org/pipermail/package-announce/2011-September/066319.html");
-  script_id(863554);
+  script_oid("1.3.6.1.4.1.25623.1.0.863554");
   script_tag(name:"cvss_base", value:"9.3");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
- script_version("$Revision: 6626 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 08:30:10 +0200 (Mon, 10 Jul 2017) $");
+ script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-09-30 16:02:57 +0200 (Fri, 30 Sep 2011)");
   script_xref(name: "FEDORA", value: "2011-12193");
   script_cve_id("CVE-2011-3194");
   script_name("Fedora Update for qt FEDORA-2011-12193");
 
-  script_summary("Check for the Version of qt");
+  script_tag(name:"summary", value:"Check for the Version of qt");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("Fedora Local Security Checks");

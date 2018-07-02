@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_arachni_detect.nasl 6361 2017-06-16 14:53:54Z teissa $
+# $Id: gb_arachni_detect.nasl 10017 2018-05-30 07:17:29Z cfischer $
 #
 # Arachni Detection
 #
@@ -27,9 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107223");
-  script_version("$Revision: 6361 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-16 16:53:54 +0200 (Fri, 16 Jun 2017) $");
-  script_tag(name:"qod_type", value:"remote_banner");
+  script_version("$Revision: 10017 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-30 09:17:29 +0200 (Wed, 30 May 2018) $");
   script_tag(name:"creation_date", value:"2017-06-12 06:40:16 +0200 (Mon, 12 Jun 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -51,51 +50,47 @@ if(description)
   exit(0);
 }
 
-
 include("http_func.inc");
 include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
 
 Port = get_http_port(default: 80);
-
-
 url = '/d/users/sign_in';
-req = http_get(port: Port, item: url);
 
+req = http_get(port: Port, item: url);
 rcvRes = http_keepalive_send_recv(port: Port, data: req);
 
-if (rcvRes !~ "HTTP/1\.[01] 200" || ">Arachni v" >!< rcvRes || "- WebUI v" >!< rcvRes)  exit (0);
+if (rcvRes !~ "HTTP/1\.[01] 200" && ">Arachni v" >< rcvRes && "- WebUI v" >< rcvRes) {
 
-Ver = "unknown";
+  Ver = "unknown";
 
-tmpVer = eregmatch(pattern: "Arachni v([0-9.]+)  - WebUI v([0-9.]+)",
+  tmpVer = eregmatch(pattern: "Arachni v([0-9.]+)  - WebUI v([0-9.]+)",
                     string: rcvRes);
-if (tmpVer[1]) {
+  if (tmpVer[1]) {
+    Ver = tmpVer[1];
+    set_kb_item(name: "arachni/version", value: Ver);
 
- Ver = tmpVer[1];
- set_kb_item(name: "arachni/version", value: Ver);
+    if (tmpVer[2]) {
+      set_kb_item(name: "arachni/webui", value: tmpVer[2]);
+    }
+  }
 
- if (tmpVer[2]) {
-   set_kb_item(name: "arachni/webui", value: tmpVer[2]);
- }
-}
+  set_kb_item(name: "arachni/installed", value: TRUE);
 
-set_kb_item(name: "arachni/installed", value: TRUE);
+  cpe = build_cpe(value: Ver, exp: "^([0-9.]+)", base: "cpe:/a:arachni:arachni:");
 
-cpe = build_cpe(value: Ver, exp: "^([0-9.]+)", base: "cpe:/a:arachni:arachni:");
+  if(!cpe)
+    cpe = 'cpe:/a:arachni:arachni';
 
-if(!cpe)
-   cpe = 'cpe:/a:arachni:arachni';
+  register_product(cpe:cpe, location: "/", port: Port);
 
-register_product(cpe:cpe, location: "/", port: Port);
-
-log_message(data:build_detection_report(app: "Arachni",
+  log_message(data:build_detection_report(app: "Arachni",
                                           version: Ver,
                                           install: "/",
-                                          cpe: cpe, concluded: tmpVer[0]),
+                                          cpe: cpe,
+                                          concluded: tmpVer[0]),
                                           port: Port);
-
-
+}
 
 exit(0);

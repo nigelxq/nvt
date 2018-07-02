@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_vlc_media_player_mult_dos_vuln_june17_win.nasl 8174 2017-12-19 12:23:25Z cfischer $
+# $Id: gb_vlc_media_player_mult_dos_vuln_june17_win.nasl 9780 2018-05-09 12:51:34Z cfischer $
 #
 # VLC Media Player Multiple Denial-of-Service Vulnerabilities (Windows)
 #
@@ -29,12 +29,12 @@ CPE = "cpe:/a:videolan:vlc_media_player";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811077");
-  script_version("$Revision: 8174 $");
+  script_version("$Revision: 9780 $");
   script_cve_id("CVE-2017-9301","CVE-2017-9300");
   script_bugtraq_id(98747, 98746);
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-19 13:23:25 +0100 (Tue, 19 Dec 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-09 14:51:34 +0200 (Wed, 09 May 2018) $");
   script_tag(name:"creation_date", value:"2017-06-05 14:19:32 +0530 (Mon, 05 Jun 2017)");
   script_tag(name:"qod_type", value:"registry");
   script_name("VLC Media Player Multiple Denial-of-Service Vulnerabilities (Windows)");
@@ -42,11 +42,10 @@ if(description)
   script_tag(name: "summary" , value:"The host is installed with VLC media player
   and is prone to multiple denial-of-service vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name: "vuldetect" , value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name: "insight" , value:"Multiple flaws exist due to an error in
-  the 'plugins\codec\libflac_plugin.dll' and 
+  the 'plugins\codec\libflac_plugin.dll' and
   'plugins\audio_filter\libmpgatofixed32_plugin.dll' scripts while reading a
   crafted file.");
 
@@ -59,11 +58,9 @@ if(description)
 
   script_tag(name: "affected" , value:"VideoLAN VLC media player version 2.2.4 on Windows");
 
-  script_tag(name: "solution" , value:"No solution or patch is available as of 7th
-  November, 2017. Information regarding this issue will be updated once the solution
-  details are available. For details refer to http://www.videolan.org");
+  script_tag(name: "solution" , value:"Update to version 3.0 or above.");
 
-  script_tag(name:"solution_type", value:"NoneAvailable");
+  script_tag(name:"solution_type", value:"VendorFix");
   script_xref(name : "URL" , value : "http://code610.blogspot.in/2017/04/multiple-crashes-in-vlc-224.html");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
@@ -73,23 +70,18 @@ if(description)
   exit(0);
 }
 
-
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-vlcVer = "";
-report = "";
-
-## Get version
 if(!vlcVer = get_app_version(cpe:CPE)){
   exit(0);
 }
 
-## Check VLC media player vulnerable version
 if(vlcVer == "2.2.4")
 {
-  report = report_fixed_ver(installed_version:vlcVer, fixed_version:"NoneAvailable");
+  report = report_fixed_ver(installed_version:vlcVer, fixed_version:"3.0");
   security_message(data:report);
   exit(0);
 }
+
+exit(99);

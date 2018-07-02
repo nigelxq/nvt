@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_cybozu_office_mul_vuln.nasl 6084 2017-05-09 05:36:00Z cfi $
+# $Id: gb_cybozu_office_mul_vuln.nasl 9523 2018-04-18 21:57:48Z asteins $
 #
 # Cybozu Office Multiple Security Vulnerabilities
 #
@@ -29,8 +29,8 @@ CPE = "cpe:/a:cybozu:office";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107149");
-  script_version("$Revision: 6084 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-09 07:36:00 +0200 (Tue, 09 May 2017) $");
+  script_version("$Revision: 9523 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-18 23:57:48 +0200 (Wed, 18 Apr 2018) $");
   script_tag(name:"creation_date", value:"2017-04-19 14:53:28 +0200 (Wed, 19 Apr 2017)");
   script_cve_id("CVE-2017-2114", "CVE-2017-2115", "CVE-2017-2116", "CVE-2016-4449");
 
@@ -38,13 +38,16 @@ if(description)
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:N/A:P");
 
   script_tag(name:"qod_type", value:"remote_banner");
-  script_name(" Cybozu Office Multiple Security Vulnerabilities");
-  script_tag(name: "summary", value: "Cybozu Office is prone to multiple security vulnerabilities.
-    ");
+  script_name("Cybozu Office Multiple Security Vulnerabilities");
+  script_tag(name: "summary", value: "Cybozu Office is prone to multiple security vulnerabilities.");
 
-  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if the version is vulnerable or not.");
+  script_tag(name: "vuldetect", value: "Get the installed version with the help of the detection NVT and
+  check if the version is vulnerable or not.");
 
-  script_tag(name: "impact" , value: " attacker can exploit these issues to execute arbitrary script code in the browser of an unsuspecting user in the context of the affected site, steal cookie-based authentication credentials, access or modify data, bypass security restrictions and perform unauthorized actions in the context of the affected application.");
+  script_tag(name: "impact" , value:"An attacker can exploit these issues to execute arbitrary script
+  code in the browser of an unsuspecting user in the context of the affected site, steal cookie-based
+  authentication credentials, access or modify data, bypass security restrictions and perform unauthorized
+  actions in the context of the affected application.");
 
   script_tag(name: "affected", value: "Cybozu Office 10.0.0 through 10.5.0 are vulnerable");
 
@@ -66,7 +69,6 @@ if(description)
 include("host_details.inc");
 include("version_func.inc");
 
-
 if(!Port = get_app_port(cpe:CPE)){
   exit(0);
 }
@@ -84,3 +86,5 @@ if (Ver =~ "10\.")
       exit(0);
     }
 }
+
+exit(99);

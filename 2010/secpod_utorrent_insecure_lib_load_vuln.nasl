@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_utorrent_insecure_lib_load_vuln.nasl 8457 2018-01-18 07:58:32Z teissa $
+# $Id: secpod_utorrent_insecure_lib_load_vuln.nasl 10175 2018-06-13 11:53:08Z tpassfeld $
 #
 # uTorrent File Opening Insecure Library Loading Vulnerability
 #
@@ -24,24 +24,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_impact = "Successful exploitation will allow the attackers to execute arbitrary code and
-  conduct DLL hijacking attacks.
-  Impact Level: Application.";
-tag_affected = "uTorrent version 2.0.3 and prior";
-
-tag_insight = "The flaw is due to the application insecurely loading certain librairies
-  from the current working directory, which could allow attackers to execute
-  arbitrary code by tricking a user into opening a Torrent file.";
-tag_solution = "Upgrade to uTorrent version 2.0.4 or later,
-  For updates refer to http://www.utorrent.com/downloads";
-tag_summary = "This host is installed with uTorrent and is prone to insecure library
-  loading vulnerability.";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.902240");
-  script_version("$Revision: 8457 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-18 08:58:32 +0100 (Thu, 18 Jan 2018) $");
+  script_version("$Revision: 10175 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-13 13:53:08 +0200 (Wed, 13 Jun 2018) $");
   script_tag(name:"creation_date", value:"2010-09-01 09:34:36 +0200 (Wed, 01 Sep 2010)");
   script_cve_id("CVE-2010-3129");
   script_tag(name:"cvss_base", value:"9.3");
@@ -51,45 +38,41 @@ if(description)
   script_xref(name : "URL" , value : "http://www.exploit-db.com/exploits/14726/");
   script_xref(name : "URL" , value : "http://www.vupen.com/english/advisories/2010/2164");
 
+  script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"registry");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2010 SecPod");
   script_family("General");
-  script_dependencies("secpod_reg_enum.nasl");
-  script_mandatory_keys("SMB/WindowsVersion");
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "solution" , value : tag_solution);
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "impact" , value : tag_impact);
-  script_tag(name : "affected" , value : tag_affected);
+  script_dependencies("gb_utorrent_detect_portable_win.nasl");
+  script_require_keys("uTorrent/Win/Version");
+
+  script_tag(name : "insight" , value : "The flaw is due to the application insecurely loading certain libraries
+  from the current working directory, which could allow attackers to execute
+  arbitrary code by tricking a user into opening a Torrent file.");
+  script_tag(name : "solution" , value : "Upgrade to uTorrent version 2.0.4 or later,
+  For updates refer to http://www.utorrent.com/downloads");
+  script_tag(name : "summary" , value : "uTorrent on this host is prone to insecure library
+  loading vulnerability.");
+  script_tag(name : "impact" , value : "Successful exploitation will allow the attackers to execute arbitrary code and
+  conduct DLL hijacking attacks.
+
+  Impact Level: Application.");
+  script_tag(name : "affected" , value : "uTorrent version 2.0.3 and prior");
+
   exit(0);
 }
-
 
 include("smb_nt.inc");
 include("version_func.inc");
 
-if(!get_kb_item("SMB/WindowsVersion")){
-  exit(0);
+uTorrentVer = "";
+
+uTorrentVer = get_kb_item("uTorrent/Win/Version");
+
+if(!uTorrentVer) exit(0);
+
+if(version_is_less_equal(version:uTorrentVer, test_version:"2.0.3")) {
+      security_message( port: 0, data: "The target host was found to be vulnerable" );
 }
 
-key = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\uTorrent\";
-if(!registry_key_exists(key:key)){
- exit(0);
-}
-
-utName = registry_get_sz(key:key, item:"DisplayIcon");
-
-## Check the name of the application
-if("uTorrent" >< utName)
-{
-  ## Check for utorrent
-  utVer = registry_get_sz(key: key, item:"DisplayVersion");
-  if(utVer)
-  {
-    ## Check for uTorrent version 2.0.3 and prior
-    if(version_is_less_equal(version:utVer, test_version:"2.0.3")){
-      security_message(0) ;
-    }
-  }
-}
+exit(0);

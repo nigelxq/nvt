@@ -47,9 +47,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_id(881725);
-  script_version("$Revision: 6655 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:48:58 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.881725");
+  script_version("$Revision: 9372 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:56:37 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-05-02 11:05:13 +0530 (Thu, 02 May 2013)");
   script_cve_id("CVE-2012-5614", "CVE-2013-1506", "CVE-2013-1521", "CVE-2013-1531",
                 "CVE-2013-1532", "CVE-2013-1544", "CVE-2013-1548", "CVE-2013-1552",
@@ -61,7 +61,7 @@ if(description)
 
   script_xref(name: "CESA", value: "2013:0772");
   script_xref(name: "URL" , value: "http://lists.centos.org/pipermail/centos-announce/2013-April/019707.html");
-  script_summary("Check for the Version of mysql");
+  script_tag(name:"summary", value:"Check for the Version of mysql");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

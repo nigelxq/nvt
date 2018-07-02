@@ -1,9 +1,8 @@
+###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: remote-Opentaps-defaultPwd.nasl 5016 2017-01-17 09:06:21Z teissa $
-# Description: 
-# This script the Opentaps ERP + CRM default administrator credentials vulnerability
+# $Id: remote-Opentaps-defaultPwd.nasl 9946 2018-05-24 10:25:05Z cfischer $
 #
-# remote-Opentaps-defaultPwd.nasl
+# Opentaps ERP + CRM Default Credentials
 #
 # Author:
 # Christian Eric Edjenguele <christian.edjenguele@owasp.org>
@@ -20,84 +19,91 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-#
+###############################################################################
+
+CPE = "cpe:/a:apache:opentaps";
 
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.101024");
-  script_version("$Revision: 5016 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-01-17 10:06:21 +0100 (Tue, 17 Jan 2017) $");
+  script_version("$Revision: 9946 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-24 12:25:05 +0200 (Thu, 24 May 2018) $");
   script_tag(name:"creation_date", value:"2009-04-25 22:17:58 +0200 (Sat, 25 Apr 2009)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_name("Opentaps ERP + CRM Weak Password security check");
+  script_name("Opentaps ERP + CRM Default Credentials");
   script_category(ACT_ATTACK);
   script_copyright("Christian Eric Edjenguele <christian.edjenguele@owasp.org>");
   script_family("Web application abuses");
-  script_dependencies("find_service.nasl", "remote-detect-Opentaps_ERP_CRM.nasl");
-  script_require_keys("OpentapsERP/port");
-  script_require_ports("Services/www", 8080);
-  script_exclude_keys("Settings/disable_cgi_scanning");
+  script_dependencies("remote-detect-Opentaps_ERP_CRM.nasl");
+  script_mandatory_keys("OpentapsERP/installed");
 
-  script_tag(name:"summary", value:"The remote host is running the Apache OFBiz with default administrator username and password. 
-  Opentaps is a full-featured ERP + CRM suite which incorporates several open source projects, 
-  including Apache Geronimo, Tomcat, and OFBiz for the data model and transaction framework; 
-  Pentaho and JasperReports for business intelligence; Funambol for mobile device and Outlook integration; 
-  and the opentaps applications which provide user-driven applications for CRM, accounting and finance, 
-  warehouse and manufacturing, and purchasing and supply chain mmanagement.");
-  script_tag(name:"solution", value:"You must change the default settings if you want to run it for
-  production purposes, please refer to the Opentaps ERP + CRM documentation, for
-  further information on how to do this");
-  script_tag(name:"impact", value:"This allow an attacker to gain administrative access to the remote application");
+  script_tag(name:"summary", value:"The remote host is running Opentaps ERP + CRM with default
+  credentials.");
+
+  script_tag(name:"solution", value:"Set a strong password for the mentioned accounts.");
+
+  script_tag(name:"impact", value:"This allow an attacker to gain possible administrative access to
+  the remote application.");
 
   script_tag(name:"qod_type", value:"remote_app");
   script_tag(name:"solution_type", value:"Mitigation");
 
   exit(0);
-
 }
 
-#
-# The script code starts here
-#
-
-include("misc_func.inc");
 include("http_func.inc");
 include("http_keepalive.inc");
+include("host_details.inc");
 
+if( ! port = get_app_port( cpe:CPE ) ) exit(0);
+if( ! get_app_location( port:port, cpe:CPE, nofork:TRUE ) ) exit( 0 ); # To have a reference to the Detection-NVT
 
-port = get_kb_item("OpentapsERP/port");
-if(!port) port = 8080;
-if(!get_port_state(port)) exit(0);
+modules = get_kb_list( "OpentapsERP/" + port + "/modules" );
+if( modules ) {
 
-module = '/webtools/control/login';
-report = '';
-host = http_host_name(port:port);
-postdata = string("USERNAME=admin&PASSWORD=ofbiz");
+  # http://www.opentaps.org/docs/index.php/General_Installation_of_Opentaps#Signing_In
+  credentials = make_array( "1", "1",
+                            "2", "2",
+                            "admin", "ofbiz",
+                            "DemoCustomer", "ofbiz" );
 
-request = string("POST ", module, " HTTP/1.1\r\n",
-                 "Content-Type: application/x-www-form-urlencoded\r\n", 
-                 "Content-Length: ", strlen(postdata), "\r\n",
-                 "Referer: http://", host, module, "\r\n",
-                 "Host: ", host, 
-                 "\r\n\r\n",
-                 postdata);
+  foreach username( keys( credentials ) ) {
 
-reply = http_keepalive_send_recv(port:port, data:request);
+    postdata = string( "USERNAME=" + username + "&PASSWORD=" + credentials[username] );
+    postlen = strlen( postdata );
 
-if(reply){
+    # Sort no not report on changes on delta reports if the order is different
+    modules = sort( modules );
 
-  welcomeMsg = egrep(pattern:"Welcome THE ADMIN.*", string:reply);
+    host = http_host_name( port:port );
 
-  if(welcomeMsg){
-    report += "Opentaps ERP + CRM said: " + welcomeMsg + "this application is running using default ADMINISTRATOR username [admin] and pawssord [ofbiz], this can cause security problem in production environment";
-  }	
+    foreach module( modules ) {
+      url = module + "/control/login";
+      req = string( "POST ", url, " HTTP/1.1\r\n",
+                    "Content-Type: application/x-www-form-urlencoded\r\n",
+                    "Content-Length: ", postlen , "\r\n",
+                    "Referer: http://", host, url, "\r\n",
+                    "Host: ", host,
+                    "\r\n\r\n",
+                    postdata );
+      res = http_keepalive_send_recv( port:port, data:req );
+      if( ! res ) continue;
+      # <h2>Welcome <br />THE ADMINISTRATOR</h2>
+      # <h2>Welcome <br />Limited Administrator</h2>
+      # <h2>Welcome <br />Demo Customer</h2>
+      welcomeMsg = egrep( pattern:'(Welcome(&nbsp;| | <br />)(THE(&nbsp;| )ADMIN|Limited Administrator|Demo Customer)|THE PRIVILEGED ADMINISTRATOR|/control/logout">Logout</a></li>)', string:res );
+      if( ! welcomeMsg ) continue;
+      VULN = TRUE;
+      report += username + ":" + credentials[username] + ":" + report_vuln_url( port:port, url:url, url_only:TRUE ) + '\n';
+    }
+  }
+
+  if( VULN ) {
+    report = 'It was possible to login with default credentials at the following modules (username:password:url):\n\n' + report;
+    security_message( port:port, data:report );
+    exit( 0 );
+  }
 }
 
-
-if(report) {
-  security_message(port:port, data:report);
-  exit(0);
-}
-
-exit(99);
+exit( 99 );

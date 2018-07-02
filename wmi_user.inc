@@ -25,7 +25,7 @@
 ###############################################################################
 
 ##############################################################################
-# CLASS: Win32_Service Functions
+# CLASS: Win32_SystemAccount / Win32_UserAccount / Win32_Group / Win32_GroupUser Functions
 #
 # - wmi_user_sysaccount              - Queries System Account Information.
 # - wmi_user_useraccount             - Lists the information of User Account.
@@ -219,3 +219,15 @@ function wmi_local_users(handle)
   return LocalUserList;
 }
 
+function wmi_useraccounts_active(handle)
+{
+  query = "Select SID from Win32_UserAccount WHERE Status='Ok'";
+  usrList = wmi_query(wmi_handle:handle, query:query);
+
+  if(("NTSTATUS" >< usrList) || !usrList){
+    set_kb_item(name:"WMI/UserAccount/Active", value:"Error");
+    return(0);
+  }
+  set_kb_item(name:"WMI/UserAccount/Active", value:usrList);
+  return usrList;
+}

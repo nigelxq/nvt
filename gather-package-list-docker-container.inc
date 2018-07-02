@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: gather-package-list-docker-container.inc 8066 2017-12-10 09:01:59Z cfischer $
+# $Id: gather-package-list-docker-container.inc 10057 2018-06-04 07:56:17Z cfischer $
 #
 # Functions for OS Detection in Docker Containers
 #
@@ -25,7 +25,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
 # USA.
 #
-# $Revision: 8066 $
+# $Revision: 10057 $
 #
 ###############################################################################
 
@@ -74,6 +74,7 @@ OS_CPE = make_array(
     "UCS2.0", "cpe:/o:univention:univention_corporate_server:2.0",
 
     # Ubuntu
+    "UBUNTU18.04 LTS","cpe:/o:canonical:ubuntu_linux:18.04:-:lts",
     "UBUNTU17.10",    "cpe:/o:canonical:ubuntu_linux:17.10",
     "UBUNTU17.04",    "cpe:/o:canonical:ubuntu_linux:17.04",
     "UBUNTU16.10",    "cpe:/o:canonical:ubuntu_linux:16.10",
@@ -116,6 +117,7 @@ OS_CPE = make_array(
     "CentOS2", "cpe:/o:centos:centos:2",
 
     # Fedora / Fedora Core
+    "FC28", "cpe:/o:fedoraproject:fedora:28",
     "FC27", "cpe:/o:fedoraproject:fedora:27",
     "FC26", "cpe:/o:fedoraproject:fedora:26",
     "FC25", "cpe:/o:fedoraproject:fedora:25",
@@ -146,6 +148,7 @@ OS_CPE = make_array(
 
     # Debian
     "DEB10.0", "cpe:/o:debian:debian_linux:10.0",
+    "DEB9.4", "cpe:/o:debian:debian_linux:9.4",
     "DEB9.3", "cpe:/o:debian:debian_linux:9.3",
     "DEB9.2", "cpe:/o:debian:debian_linux:9.2",
     "DEB9.1", "cpe:/o:debian:debian_linux:9.1",
@@ -262,16 +265,53 @@ OS_CPE = make_array(
     "AMAZON",     "cpe:/o:amazon:linux",
 
     # Oracle Linux
-    "OracleLinux7",  "cpe:/o:oraclelinux:oraclelinux:7",
-    "OracleLinux6",  "cpe:/o:oraclelinux:oraclelinux:6",
-    "OracleLinux5",  "cpe:/o:oraclelinux:oraclelinux:5",
+    "OracleLinux7.4",  "cpe:/o:oracle:linux:7.4",
+    "OracleLinux7.3",  "cpe:/o:oracle:linux:7.3",
+    "OracleLinux7.2",  "cpe:/o:oracle:linux:7.2",
+    "OracleLinux7.1",  "cpe:/o:oracle:linux:7.1",
+    "OracleLinux7.0",  "cpe:/o:oracle:linux:7.0",
+    "OracleLinux7",    "cpe:/o:oracle:linux:7",
+    "OracleLinux6.9",  "cpe:/o:oracle:linux:6.9",
+    "OracleLinux6.8",  "cpe:/o:oracle:linux:6.8",
+    "OracleLinux6.7",  "cpe:/o:oracle:linux:6.7",
+    "OracleLinux6.6",  "cpe:/o:oracle:linux:6.6",
+    "OracleLinux6.5",  "cpe:/o:oracle:linux:6.5",
+    "OracleLinux6.4",  "cpe:/o:oracle:linux:6.4",
+    "OracleLinux6.3",  "cpe:/o:oracle:linux:6.3",
+    "OracleLinux6.2",  "cpe:/o:oracle:linux:6.2",
+    "OracleLinux6.1",  "cpe:/o:oracle:linux:6.1",
+    "OracleLinux6.0",  "cpe:/o:oracle:linux:6.0",
+    "OracleLinux6",    "cpe:/o:oracle:linux:6",
+    "OracleLinux5.11", "cpe:/o:oracle:linux:5.11",
+    "OracleLinux5.10", "cpe:/o:oracle:linux:5.10",
+    "OracleLinux5.9",  "cpe:/o:oracle:linux:5.9",
+    "OracleLinux5.8",  "cpe:/o:oracle:linux:5.8",
+    "OracleLinux5.7",  "cpe:/o:oracle:linux:5.7",
+    "OracleLinux5.6",  "cpe:/o:oracle:linux:5.6",
+    "OracleLinux5.5",  "cpe:/o:oracle:linux:5.5",
+    "OracleLinux5.4",  "cpe:/o:oracle:linux:5.4",
+    "OracleLinux5.3",  "cpe:/o:oracle:linux:5.3",
+    "OracleLinux5.2",  "cpe:/o:oracle:linux:5.2",
+    "OracleLinux5.1",  "cpe:/o:oracle:linux:5.1",
+    "OracleLinux5.0",  "cpe:/o:oracle:linux:5.0",
+    "OracleLinux5",    "cpe:/o:oracle:linux:5",
+    "OracleLinux4.9",  "cpe:/o:oracle:linux:4.9",
+    "OracleLinux4.8",  "cpe:/o:oracle:linux:4.8",
+    "OracleLinux4.7",  "cpe:/o:oracle:linux:4.7",
+    "OracleLinux4.6",  "cpe:/o:oracle:linux:4.6",
+    "OracleLinux4.5",  "cpe:/o:oracle:linux:4.5",
+    "OracleLinux4",    "cpe:/o:oracle:linux:4",
 
     # Gentoo
-    "GENTOO", "cpe:/o:gentoo:linux"
+    "GENTOO", "cpe:/o:gentoo:linux",
+
+    # Arch Linux
+    # nb: Arch Linux is a rolling release so there is no "real" version
+    "ArchLinux", "cpe:/o:archlinux:archlinux"
 );
 
 
-function register_detected_docker_os( container_id,  os, oskey ) {
+function register_detected_docker_os( container_id, os, oskey ) {
 
   local_var container_id, os, oskey;
 
@@ -303,22 +343,48 @@ function get_container_os( container_id, soc ) {
   # oraclelinux is almost like rhel .. but ..
   rls = ssh_cmd(socket:soc, cmd:base_cmd + "rpm -qf /etc/redhat-release");
 
+  if( "oraclelinux-release-4" >< rls ) {
+    buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
+    if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
+    if( match = eregmatch( pattern:"oraclelinux-release-4.([0-9]+)", string:rls ) ) {
+      version = "4." + match[1];
+    } else {
+      version = "4";
+    }
+    ret = register_detected_docker_os(container_id:container_id, os:"Oracle Linux " + version, oskey:"OracleLinux" + version );
+    return ret;
+  }
   if( "oraclelinux-release-5" >< rls ) {
     buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
     if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
-    ret = register_detected_docker_os(container_id:container_id, os:"OracleLinux release 5", oskey:"OracleLinux5" );
+    if( match = eregmatch( pattern:"oraclelinux-release-5.([0-9]+)", string:rls ) ) {
+      version = "5." + match[1];
+    } else {
+      version = "5";
+    }
+    ret = register_detected_docker_os(container_id:container_id, os:"Oracle Linux " + version, oskey:"OracleLinux" + version );
     return ret;
   }
   if( "oraclelinux-release-6" >< rls ) {
     buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
     if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
-    ret = register_detected_docker_os(container_id:container_id, os:"OracleLinux release 6", oskey:"OracleLinux6" );
+    if( match = eregmatch( pattern:"oraclelinux-release-6.([0-9]+)", string:rls ) ) {
+      version = "6." + match[1];
+    } else {
+      version = "6";
+    }
+    ret = register_detected_docker_os(container_id:container_id, os:"Oracle Linux " + version, oskey:"OracleLinux" + version );
     return ret;
   }
   if( "oraclelinux-release-7" >< rls ) {
     buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
     if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
-    ret = register_detected_docker_os(container_id:container_id, os:"OracleLinux release 7", oskey:"OracleLinux7" );
+    if( match = eregmatch( pattern:"oraclelinux-release-7.([0-9]+)", string:rls ) ) {
+      version = "7." + match[1];
+    } else {
+      version = "7";
+    }
+    ret = register_detected_docker_os(container_id:container_id, os:"Oracle Linux " + version, oskey:"OracleLinux" + version );
     return ret;
   }
 
@@ -504,6 +570,12 @@ function get_container_os( container_id, soc ) {
     buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
     if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
     ret = register_detected_docker_os(container_id:container_id, os:rls, oskey:"FC27");
+    return ret;
+  }
+  if("Fedora release 28" >< rls && "(Twenty Eight)" >< rls) {
+    buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
+    if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
+    ret = register_detected_docker_os(container_id:container_id, os:rls, oskey:"FC28");
     return ret;
   }
 
@@ -899,6 +971,12 @@ function get_container_os( container_id, soc ) {
     ret = register_detected_docker_os(container_id:container_id, os:"Ubuntu 17.10", oskey:"UBUNTU17.10");
     return ret;
   }
+  if("DISTRIB_ID=Ubuntu"><rls && "DISTRIB_RELEASE=18.04"><rls) {
+    buf = ssh_cmd(socket:soc, cmd:base_cmd + "bash -c 'COLUMNS=400 dpkg -l'", nosh:TRUE);
+    if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/packages", value: ";" + buf );
+    ret = register_detected_docker_os(container_id:container_id, os:"Ubuntu 18.04 LTS", oskey:"UBUNTU18.04 LTS");
+    return ret;
+  }
 
   # Check for Univention Corporate Server (UCS)
   if ( rls =~ 'DISTRIB_ID=("|\')?Univention("|\')?') {
@@ -1240,6 +1318,12 @@ function get_container_os( container_id, soc ) {
     buf = ssh_cmd(socket:soc, cmd:base_cmd + "/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'");
     if( buf ) set_kb_item( name:"docker/lsc/container/" + container_id + "/rpms", value: ";" + buf );
     ret = register_detected_docker_os(container_id:container_id, os:"openSUSE Leap 42.1", oskey:"openSUSELeap42.1");
+    return ret;
+  }
+
+  # nb: Arch Linux is a rolling release so there is no "real" version
+  if('NAME="Arch Linux"' >< rls) {
+    ret = register_detected_docker_os(container_id:container_id, os:"Arch Linux", oskey:"ArchLinux");
     return ret;
   }
 

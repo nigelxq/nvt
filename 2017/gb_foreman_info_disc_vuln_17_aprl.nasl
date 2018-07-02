@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_foreman_info_disc_vuln_17_aprl.nasl 8595 2018-01-31 08:04:59Z cfischer $
+# $Id: gb_foreman_info_disc_vuln_17_aprl.nasl 9505 2018-04-17 09:16:54Z asteins $
 #
 # Foreman CVE-2017-2672 Information Disclosure Vulnerability
 #
@@ -29,8 +29,8 @@ CPE = 'cpe:/a:theforeman:foreman';
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107147");
-  script_version("$Revision: 8595 $");
-  script_tag(name: "last_modification", value: "$Date: 2018-01-31 09:04:59 +0100 (Wed, 31 Jan 2018) $");
+  script_version("$Revision: 9505 $");
+  script_tag(name: "last_modification", value: "$Date: 2018-04-17 11:16:54 +0200 (Tue, 17 Apr 2018) $");
   script_tag(name: "creation_date", value: "2017-04-11 07:35:49 +0200 (Tue, 11 Apr 2017)");
   script_tag(name: "cvss_base", value: "5.0");
   script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:P/I:N/A:N");
@@ -43,21 +43,21 @@ if(description)
 
   script_tag(name: "summary", value: "Foreman is prone to an information disclosure vulnerability.");
 
-  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if the
+  script_tag(name: "vuldetect", value: "Get the installed version with the help of the detection NVT and check if the
 version is vulnerable or not.");
 
   script_tag(name: "insight", value: "When images for compute resources (e.g. an OpenStack image) are
 added/registered in Foreman, the password used to log in is recorded in plain text in the audit log. This may
 allow users with access to view the audit log to access newly provisioned hosts using the stored credentials.");
 
-  script_tag(name: "impact", value: "Successful exploits may allow an attacker to gain access to sensitive
+  script_tag(name: "impact", value: "Successfully exploiting this issue may allow an attacker to gain access to sensitive
 information that may aid in further attacks.");
 
-  script_tag(name: "affected", value: "Foreman 1.4 and later are vulnerable");
+  script_tag(name: "affected", value: "Foreman 1.4 up to 1.15.4 are vulnerable");
 
   script_tag(name: "solution", value: "Update to version 1.16.0 or later.");
 
-  script_tag(name:"solution_type", value:"VendorFix");
+  script_tag(name: "solution_type", value: "VendorFix");
 
   script_category(ACT_GATHER_INFO);
 
@@ -83,9 +83,10 @@ if(!Ver = get_app_version(cpe:CPE, port:Port)){
   exit(0);
 }
 
-if (version_in_range(version: Ver, test_version:"1.4", test_version2: "1.15.4"))
-{
-  report =  report_fixed_ver(installed_version:Ver, fixed_version:"1.16.0");
-  security_message(data:report);
+if(version_in_range(version:Ver, test_version:"1.4", test_version2:"1.15.4")){
+  report = report_fixed_ver(installed_version:Ver, fixed_version:"1.16.0");
+  security_message(port:Port, data:report);
   exit(0);
 }
+
+exit(99);

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ibm_lotus_domino_buf_vuln.nasl 7575 2017-10-26 09:47:04Z cfischer $
+# $Id: gb_ibm_lotus_domino_buf_vuln.nasl 9494 2018-04-16 09:16:25Z asteins $
 #
 # IBM Lotus Domino Server Stack Buffer Overflow Vulnerability
 #
@@ -30,8 +30,8 @@ if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107155");
 
-  script_version("$Revision: 7575 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-26 11:47:04 +0200 (Thu, 26 Oct 2017) $");
+  script_version("$Revision: 9494 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-16 11:16:25 +0200 (Mon, 16 Apr 2018) $");
 
   script_tag(name:"creation_date", value:"2017-04-26 07:07:25 +0200 (Wed, 26 Apr 2017)");
 
@@ -45,21 +45,20 @@ if(description)
 
   script_name("IBM Lotus Domino Server Stack Buffer Overflow Vulnerability");
 
-  script_tag(name: "summary", value: "IBM Lotus Domino Server is prone to a stack-based buffer overflow vulnerability.");
+  script_tag(name:"summary", value:"IBM Lotus Domino Server is prone to a stack-based buffer overflow vulnerability.");
 
-  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if the version is vulnerable or not.");
+  script_tag(name:"vuldetect", value:"Get the installed version with the help of the detection NVT and check if the version is vulnerable or not.");
 
-  script_tag(name: "insight", value: "IBM Domino is vulnerable to a stack-based buffer overflow, caused by improper bounds checking when parsing BMP images. 
-");
+  script_tag(name:"insight", value:"IBM Domino is vulnerable to a stack-based buffer overflow, caused by improper bounds checking when parsing BMP images.");
 
-  script_tag(name: "impact" , value: "Attackers can exploit this issue to execute arbitrary code within the context of the affected application. Failed exploit attempts will likely cause a denial-of-service condition.");
+  script_tag(name:"impact" , value:"Attackers can exploit this issue to execute arbitrary code within the context of the affected application. Failed exploit attempts will likely cause a denial-of-service condition.");
 
-  script_tag(name: "affected", value: "IBM Domino 9.0.1 Fix Pack 3 (plus Interim Fixes) and earlier .IBM Domino 8.5.3 Fix Pack 6 (plus Interim Fixes) and earlier All 9.0 and 8.5.x releases of IBM Domino prior to those listed above.
-");
+  script_tag(name:"affected", value:"IBM Domino 9.0.1 Fix Pack 3 (plus Interim Fixes) and earlier.
+  IBM Domino 8.5.3 Fix Pack 6 (plus Interim Fixes) and earlier All 9.0 and 8.5.x releases of IBM Domino prior to those listed above.");
 
-  script_tag(name: "solution", value: "Domino 9.0.x users should update to Domino 9.0.1 Fix Pack 3 Interim Fix 3. Domino 8.5.x users should update to Domino 8.5.3 Fix Pack 6 Interim Fix 7.");
+  script_tag(name:"solution", value:"Domino 9.0.x users should update to Domino 9.0.1 Fix Pack 3 Interim Fix 3. Domino 8.5.x users should update to Domino 8.5.3 Fix Pack 6 Interim Fix 7.");
 
-  script_xref(name: "URL" , value: "http://www.securityfocus.com/bid/97910");
+  script_xref(name:"URL", value:"http://www.securityfocus.com/bid/97910");
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_category(ACT_GATHER_INFO);
@@ -85,22 +84,22 @@ if(!Ver = get_highest_app_version(cpe:CPE)){
   exit(0);
 }
 
-Ver = ereg_replace( pattern: "FP", string: Ver, replace: ".");
+Ver = ereg_replace(pattern:"FP", string:Ver, replace:".");
 
-if(version_in_range(version: Ver, test_version:"9.0", test_version2: "9.0.1.3"))
-{
+if(version_in_range(version:Ver, test_version:"9.0", test_version2:"9.0.1.3")){
   fix = "9.0.1 FP3 IF3";
   VULN = TRUE;
 }
-if (version_in_range(version:Ver, test_version:"8.5", test_version2:"8.5.3.6"))
-{
+
+if(version_in_range(version:Ver, test_version:"8.5", test_version2:"8.5.3.6")){
   fix = "8.5.3 FP6 IF7";
   VULN = TRUE;
 }
 
-if (VULN)
-{
-  report =  report_fixed_ver(installed_version:Ver, fixed_version:fix);
-  security_message(data:report);
+if(VULN){
+  report = report_fixed_ver(installed_version:Ver, fixed_version:fix);
+  security_message(port:Port, data:report);
   exit(0);
 }
+
+exit(99);

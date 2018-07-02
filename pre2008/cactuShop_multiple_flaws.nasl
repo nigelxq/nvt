@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: cactuShop_multiple_flaws.nasl 6040 2017-04-27 09:02:38Z teissa $
+# $Id: cactuShop_multiple_flaws.nasl 9348 2018-04-06 07:01:19Z cfischer $
 # Description: CactuShop XSS and SQL injection flaws
 #
 # Authors:
@@ -46,9 +46,9 @@ tag_solution = "Upgrade to the latest version of this software";
 
 if(description)
 {
-  script_id(15461);
-  script_version("$Revision: 6040 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-04-27 11:02:38 +0200 (Thu, 27 Apr 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.15461");
+  script_version("$Revision: 9348 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:01:19 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_cve_id("CVE-2004-1881", "CVE-2004-1882");
   script_bugtraq_id(10019, 10020);
@@ -62,7 +62,7 @@ if(description)
 
  
 
-  script_category(ACT_GATHER_INFO);
+  script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
   script_copyright("This script is Copyright (C) 2004 David Maciejak");
   script_family("Web application abuses");

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: opencart_34724.nasl 5002 2017-01-13 10:17:13Z teissa $
+# $Id: opencart_34724.nasl 9425 2018-04-10 12:38:38Z cfischer $
 #
 # OpenCart 'index.php' Local File Include Vulnerability
 #
@@ -37,9 +37,9 @@ tag_solution = "Update to newer Version. See http://www.opencart.com/ for more i
 
 if (description)
 {
- script_id(100179);
- script_version("$Revision: 5002 $");
- script_tag(name:"last_modification", value:"$Date: 2017-01-13 11:17:13 +0100 (Fri, 13 Jan 2017) $");
+ script_oid("1.3.6.1.4.1.25623.1.0.100179");
+ script_version("$Revision: 9425 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-04-10 14:38:38 +0200 (Tue, 10 Apr 2018) $");
  script_tag(name:"creation_date", value:"2009-05-02 19:46:33 +0200 (Sat, 02 May 2009)");
  script_tag(name:"cvss_base", value:"5.0");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
@@ -49,7 +49,7 @@ if (description)
  script_name("OpenCart 'index.php' Local File Include Vulnerability");
 
 
- script_category(ACT_GATHER_INFO);
+ script_category(ACT_ATTACK);
   script_tag(name:"qod_type", value:"remote_vul");
  script_family("Web application abuses");
  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");

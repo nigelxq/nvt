@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: yppasswdd.nasl 8023 2017-12-07 08:36:26Z teissa $
+# $Id: yppasswdd.nasl 9633 2018-04-26 14:07:08Z jschulte $
 # Description: yppasswdd overflow
 #
 # Authors:
@@ -22,38 +22,31 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-tag_summary = "The remote RPC service 100009 (yppasswdd) is vulnerable
-to a buffer overflow which allows any user to obtain a root
-shell on this host.";
-
-tag_solution = "disable this service if you don't use
-it, or contact Sun for a patch";
-
 if(description)
 {
- script_id(80035);
- script_version("$Revision: 8023 $");
- script_tag(name:"last_modification", value:"$Date: 2017-12-07 09:36:26 +0100 (Thu, 07 Dec 2017) $");
+ script_oid("1.3.6.1.4.1.25623.1.0.80035");
+ script_version("$Revision: 9633 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
  script_tag(name:"creation_date", value:"2008-10-24 20:15:31 +0200 (Fri, 24 Oct 2008)");
  script_bugtraq_id(2763);
 script_cve_id("CVE-2001-0779");
  script_tag(name:"cvss_base", value:"10.0");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
  script_tag(name:"qod_type", value:"remote_analysis");
- 
- name = "yppasswdd overflow";
- script_name(name);
- 
- 
+
+ script_name("yppasswdd overflow");
+
  script_category(ACT_DENIAL);
- 
+
  script_copyright("This script is Copyright (C) 2001 Renaud Deraison");
- family = "Gain a shell remotely";
- script_family(family);
+ script_family("Gain a shell remotely");
  script_dependencies("secpod_rpc_portmap.nasl");
  script_require_keys("rpc/portmap");
- script_tag(name : "solution" , value : tag_solution);
- script_tag(name : "summary" , value : tag_summary);
+ script_tag(name : "solution" , value : "disable this service if you don't use
+  26 it, or contact Sun for a patch");
+ script_tag(name : "summary" , value : "The remote RPC service 100009 (yppasswdd) is vulnerable
+to a buffer overflow which allows any user to obtain a root
+shell on this host.");
  exit(0);
 }
 
@@ -77,8 +70,8 @@ if(port)
     # and hopefully painlessly.
     #
     crp = crap(796);
-    
-    req = raw_string(0x56, 0x6C, 0x9F, 0x6B, 
+
+    req = raw_string(0x56, 0x6C, 0x9F, 0x6B,
     		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
 		     0x00, 0x01, 0x86, 0xA9, 0x00, 0x00, 0x00, 0x01,
 		     0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,

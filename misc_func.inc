@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: misc_func.inc 8230 2017-12-22 08:51:56Z cfischer $
+# $Id: misc_func.inc 10245 2018-06-19 06:43:31Z cfischer $
 #
 # Miscellaneous support methods
 #
@@ -26,7 +26,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 8230 $
+# $Revision: 10245 $
 #
 ###############################################################################
 
@@ -453,8 +453,8 @@ function construct_rpc_packet( program, prog_ver, procedure, data, udp, credenti
   header  = mkdword( xid );                          ## XID
   header += mkdword( 0 );                            ## Message Type: Call (0)
   header += mkdword( 2 );                            ## RPC Version: 2
-  header += mkdword( program );                      ## Prgram
-  header += mkdword( prog_ver );                     ## Prgram Version
+  header += mkdword( program );                      ## Program
+  header += mkdword( prog_ver );                     ## Program Version
   header += mkdword( procedure );                    ## Procedure
 
   ## Credentials
@@ -901,7 +901,7 @@ function get_unknown_port( default, nodefault, ipproto ) {
   } else {
     if( ipproto == "udp" ) {
       udp = TRUE;
-      # nb: We only want to return all unknown UDP ports if this is explicitely enabled within global_settings.nasl
+      # nb: We only want to return all unknown UDP ports if this is explicitly enabled within global_settings.nasl
       if( get_kb_item( "global_settings/non-default_udp_service_discovery" ) ) {
         port = get_kb_item( "Services/udp/unknown" );
       } else {
@@ -960,7 +960,7 @@ function get_unknown_port_list( default, nodefault, ipproto ) {
   } else {
     if( ipproto == "udp" ) {
       udp = TRUE;
-      # nb: We only want to return all unknown UDP ports if this is explicitely enabled within global_settings.nasl
+      # nb: We only want to return all unknown UDP ports if this is explicitly enabled within global_settings.nasl
       if( get_kb_item( "global_settings/non-default_udp_service_discovery" ) ) {
         port_list = get_kb_list( "Services/udp/unknown" );
       } else {
@@ -1087,7 +1087,7 @@ function get_host_open_tcp_port( ) {
   ports = get_all_tcp_ports_list();
   if( isnull( ports[0] ) ) exit( 0 );
 
-  return ports[0]; # TDB: Bring some randomness into this?
+  return ports[0]; # TBD: Bring some randomness into this?
 
 }
 
@@ -1273,9 +1273,9 @@ function eol_date_reached( eol_date ) {
   return;
 }
 
-function build_eol_message( eol_type, name, cpe, version, eol_version, eol_date, eol_url ) {
+function build_eol_message( eol_type, name, cpe, version, location, skip_version, eol_version, eol_date, eol_url ) {
 
-  local_var eol_type, name, cpe, version, eol_version, eol_date, report;
+  local_var eol_type, name, cpe, version, location, skip_version, eol_version, eol_date, report;
 
   if( eol_type != "prod" && eol_type != "os" ) {
     set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#build_prod_eol_message: Wrong value passed to eol_type. Valid values are: prod, os" );
@@ -1286,15 +1286,28 @@ function build_eol_message( eol_type, name, cpe, version, eol_version, eol_date,
 
     if( isnull( name ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#name#-#build_eol_message" );
     if( isnull( cpe ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#cpe#-#build_eol_message" );
-    if( isnull( version ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#version#-#build_eol_message" );
+    if( isnull( version ) && ! skip_version ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#version#-#build_eol_message" );
     if( isnull( eol_version ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#eol_version#-#build_eol_message" );
     if( isnull( eol_date ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#eol_date#-#build_eol_message" );
 
-    report = 'The "' + name + '" version on the remote host has reached the end of life.\n\n' +
-             'CPE:               ' + cpe + ':' + version + '\n' +
-             'Installed version: ' + version + '\n' +
-             'EOL version:       ' + eol_version + '\n' +
-             'EOL date:          ' + eol_date;
+    if( ! skip_version ) {
+      report = 'The "' + name + '" version on the remote host has reached the end of life.\n\n' +
+               'CPE:               ' + cpe + ':' + version + '\n' +
+               'Installed version: ' + version + '\n';
+    } else {
+      report = 'The "' + name + '" product on the remote host has reached the end of life.\n\n' +
+               'CPE:               ' + cpe + '\n';
+    }
+
+    if( location )
+      report += 'Location/URL:      ' + location + '\n';
+
+    report +=   'EOL version:       ' + eol_version + '\n' +
+                'EOL date:          ' + eol_date;
+
+    if( eol_url )
+      report += '\nEOL info:          ' + eol_url;
+
   } else if( eol_type == "os" ) {
 
     if( isnull( name ) ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#name#-#build_eol_message" );
@@ -1426,4 +1439,66 @@ function get_all_udp_ports_list( ) {
   }
 
   return ports;
+}
+
+# This function gets the hostname of the target via get_host_name()
+# and if no IPv4/IPv6 address was returned by this function it
+# returns a list containing the parts of the target hostname.
+#
+# For example a hostname of www.example.com returns a list containing
+# the following:
+# 1 -> www
+# 2 -> example
+# 3 -> com
+# 4 -> www.example
+# 5 -> www.example.com
+# 6 -> example.com
+# 7 -> com.example
+# 8 -> com.example.www
+#
+# TODO: We currently can't catch a example.com from www.sub.example.com
+function create_hostname_parts_list( ) {
+
+  local_var list, hn, hnp, hnl, p, parts, i;
+
+  list = make_list();
+  hn   = get_host_name();
+  hn = "www.example.com";
+
+  # nb: We don't want to add an IPv4/IPv6 address here...
+  if( ":" >!< hn && ! ereg( string:hn, pattern:"^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$" ) ) {
+
+    hnp = split( hn, sep:".", keep:FALSE );
+    hnl = max_index( hnp );
+
+    parts = "";
+    for( i = 0; i < hnl; i++ ) {
+      # each single entry on its own
+      list = make_list( list, hnp[i] );
+      # concatenate each entry with the previous one
+      parts += "." + hnp[i];
+      parts = ereg_replace( pattern:"^\.", string:parts, replace:'' );
+      if( ! in_array( search:parts, array:list ) )
+        list = make_list( list, parts );
+    }
+
+    parts = "";
+    for( i = 1; i < hnl; i++ ) {
+      # This is a special case to skip the first part like www from www.example.com
+      parts += "." + hnp[i];
+      parts = ereg_replace( pattern:"^\.", string:parts, replace:'' );
+      if( ! in_array( search:parts, array:list ) )
+        list = make_list( list, parts );
+    }
+
+    parts = "";
+    for( i = hnl - 1; i >= 0; i-- ) {
+      # concatenate each entry with the previous one
+      parts += "." + hnp[i];
+      parts = ereg_replace( pattern:"^\.", string:parts, replace:'' );
+      if( ! in_array( search:parts, array:list ) )
+        list = make_list( list, parts );
+    }
+  }
+  return list;
 }

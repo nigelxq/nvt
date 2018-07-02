@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: deb_dla_874.nasl 8435 2018-01-16 09:37:17Z teissa $
+# $Id: deb_dla_874.nasl 10219 2018-06-15 12:00:55Z cfischer $
 #
 # Auto-generated from advisory DLA 874-1 using nvtgen 1.0
 # Script version:1.0
@@ -31,13 +31,13 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.890874");
-  script_version("$Revision: 8435 $");
+  script_version("$Revision: 10219 $");
   script_cve_id("CVE-2016-9601");
-  script_name("Debian Lts Announce DLA 874-1 ([SECURITY] [DLA 874-1] jbig2dec security update)");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-16 10:37:17 +0100 (Tue, 16 Jan 2018) $");
+  script_name("Debian LTS Advisory ([SECURITY] [DLA 874-1] jbig2dec security update)");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-15 14:00:55 +0200 (Fri, 15 Jun 2018) $");
   script_tag(name:"creation_date", value:"2018-01-12 00:00:00 +0100 (Fri, 12 Jan 2018)");
-  script_tag(name:"cvss_base", value:"10.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
+  script_tag(name:"cvss_base", value:"4.3");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:N/A:P");
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"package");
 
@@ -48,7 +48,7 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH http://greenbone.net");
   script_family("Debian Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages", re:"ssh/login/release=DEB7\.[0-9]+");
   script_tag(name:"affected", value:"jbig2dec on Debian Linux");
   script_tag(name:"insight", value:"jbig2dec is a decoder library and example utility implementing the JBIG2
 bi-level image compression spec. Also known as ITU T.88 and ISO IEC
@@ -96,5 +96,5 @@ if ((res = isdpkgvuln(pkg:"libjbig2dec0-dev", ver:"0.13-4~deb7u1", rls_regex:"DE
 if (report != "") {
   security_message(data:report);
 } else if (__pkg_match) {
-  exit(99); # Not vulnerable.
+  exit(99);
 }

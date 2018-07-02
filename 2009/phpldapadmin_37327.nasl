@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: phpldapadmin_37327.nasl 6704 2017-07-12 14:13:36Z cfischer $
+# $Id: phpldapadmin_37327.nasl 9425 2018-04-10 12:38:38Z cfischer $
 #
 # phpldapadmin 'cmd.php' Local File Include Vulnerability
 #
@@ -37,9 +37,9 @@ affected.";
 
 if (description)
 {
- script_id(100396);
- script_version("$Revision: 6704 $");
- script_tag(name:"last_modification", value:"$Date: 2017-07-12 16:13:36 +0200 (Wed, 12 Jul 2017) $");
+ script_oid("1.3.6.1.4.1.25623.1.0.100396");
+ script_version("$Revision: 9425 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-04-10 14:38:38 +0200 (Tue, 10 Apr 2018) $");
  script_tag(name:"creation_date", value:"2009-12-15 19:11:56 +0100 (Tue, 15 Dec 2009)");
  script_cve_id("CVE-2009-4427");
  script_bugtraq_id(37327);
@@ -52,7 +52,7 @@ if (description)
  script_xref(name : "URL" , value : "http://phpldapadmin.sourceforge.net/");
 
  script_tag(name:"qod_type", value:"remote_vul");
- script_category(ACT_GATHER_INFO);
+ script_category(ACT_ATTACK);
  script_family("Web application abuses");
  script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
  script_dependencies("phpldapadmin_detect.nasl");

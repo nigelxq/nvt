@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: find_service1.nasl 8478 2018-01-21 17:52:33Z cfischer $
+# $Id: find_service1.nasl 10347 2018-06-27 15:16:56Z cfischer $
 #
 # Service Detection with 'GET' Request
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.17975");
-  script_version("$Revision: 8478 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-21 18:52:33 +0100 (Sun, 21 Jan 2018) $");
+  script_version("$Revision: 10347 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-27 17:16:56 +0200 (Wed, 27 Jun 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -36,7 +36,7 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("This script is Copyright (C) 2005 Michel Arboi");
   script_family("Service detection");
-  script_dependencies("find_service.nasl", "cifs445.nasl");
+  script_dependencies("find_service.nasl", "cifs445.nasl", "apache_SSL_complain.nasl");
   script_require_ports("Services/unknown");
 
   script_tag(name:"summary", value:"This plugin performs service detection.
@@ -212,7 +212,7 @@ else
 r_len = strlen( r );
 if( r_len == 0 ) {
   soc = open_sock_tcp( port );
-  if( ! soc )  exit( 0 );
+  if( ! soc ) exit( 0 );
   send( socket:soc, data:'GET / HTTP/1.0\r\n\r\n' );
   r = recv( socket:soc, length:4096 );
   close( soc );
@@ -450,10 +450,33 @@ if( port == 515 && rhexstr =~ "^ff$") {
   exit( 0 );
 }
 
-if( "(Thread" >< r && ( "Notify Wlan Link" >< r ||
+# Running on a Hama IR110 WiFi Radio on port 514/tcp
+# (Thread0): [      2.185608] I2S    (2): After waiting approx. 0.0 seconds...
+# (Thread0): [      2.185860] I2S    (2): Timer fired at 0x00215C2E
+# (Thread0): [      2.186123] SPDIF  (2): Timer fired at 0x00215E40
+# (Thread2): [     16.463611] NET    (2): Notify Eth Link i/f 1 UP
+# (Thread2): [     21.894697] NET    (2): Notify IP i/f 1 (192.168.0.1) UP
+# (Thread2): [     22.072539] HTTP   (2): Found existing handle 1 (hama.wifiradiofrontier.com:80)
+# (Thread2): [     22.158205] CB     (2): Received interface callback data ok.
+# (Thread2): [     23.451059] UI     (2): IntSetupWizard connected
+# (Thread0): [     25.139968] I2S    (2): After waiting approx. 0.0 seconds...
+# (Thread0): [     25.140278] I2S    (2): Timer fired at 0x017F9D9A
+# (Thread0): [     25.140583] SPDIF  (2): Timer fired at 0x017FA01F
+# (Thread2): [     49.340946] RSA    (2): fsRsaGenerateKeyTask: Key created. Time taken 49299ms
+#
+# or
+#
+# (Thread0): [  11828.608232] I2S    (2): After waiting approx. 0.0 seconds...
+# (Thread0): [  11828.608552] I2S    (2): Timer fired at 0xC10A3F89
+# (Thread0): [  11828.608895] SPDIF  (2): Timer fired at 0xC10A4232
+
+if( "(Thread" >< r && ( "Notify Wlan Link " >< r ||
+    "Notify Eth Link " >< r ||
     "Received unknown command on socket" >< r ||
     "fsfsFlashFileHandleOpen" >< r ||
-    "Found existing handle" >< r ) ) {
+    "Found existing handle " >< r ||
+    "After waiting approx. " >< r ||
+    "Timer fired at " >< r ) ) {
   register_service( port:port, proto:"wifiradio-setup", message:"A WiFi radio setup service seems to be running on this port." );
   log_message( port:port, data:"A WiFi radio setup service seems to be running on this port." );
   exit( 0 );
@@ -495,8 +518,8 @@ if( ( r =~ "^-ERR wrong number of arguments for 'get' command" && "-ERR unknown 
 # 0x40:  6D 71 70 3A 64 65 63 6F 64 65 2D 65 72 72 6F 72    mqp:decode-error
 # 0x50:  A1 37 43 6F 6E 6E 65 63 74 69 6F 6E 20 66 72 6F    .7Connection fro
 # 0x60:  6D 20 63 6C 69 65 6E 74 20 75 73 69 6E 67 20 75    m client using u
-# 0x70:  6E 73 75 70 70 6F 72 74 65 64 20 41 4D 51 50 20    nsupported AMQP 
-# 0x80:  61 74 74 65 6D 70 74 65 64                         attempted   
+# 0x70:  6E 73 75 70 70 6F 72 74 65 64 20 41 4D 51 50 20    nsupported AMQP
+# 0x80:  61 74 74 65 6D 70 74 65 64                         attempted
 
 if( "Connection from client using unsupported AMQP attempted" >< r || "amqp:decode-error" >< r ) {
   register_service( port:port, proto:"amqp", message:"A AMQP service seems to be running on this port." );
@@ -554,11 +577,281 @@ if( port == 5556 && ":-ERR Error reading from socket: Unknown protocol exception
 
 # 0x00:  04 20 4E 73 75 72 65 20 41 75 64 69 74 20 4C 69    . Nsure Audit Li
 # 0x10:  6E 75 78 20 5B 37 66 35 31 32 32 30 32 3A 31 5D    nux [7f512202:1]
-# 0x20:  0D 0A                                           ..  
+# 0x20:  0D 0A                                           ..
 # Running on 1289/tcp
 if( r =~ "Nsure Audit .* \[.*\]" ) {
   register_service( port:port, proto:"naudit", message:"A Novell Audit Secure Logging Server service seems to be running on this port." );
   log_message( port:port, data:"A Novell Audit Secure Logging Server service seems to be running on this port." );
+  exit( 0 );
+}
+
+# 0x00:  45 52 52 4F 52 0D 0A 45 52 52 4F 52 0D 0A 45 52    ERROR..ERROR..ER
+# 0x10:  52 4F 52 0D 0A                                     ROR..
+if( r =~ '^ERROR\r\nERROR\r\nERROR\r\n$' ) {
+  register_service( port:port, proto:"memcached", message:"A Memcached service seems to be running on this port." );
+  log_message( port:port, data:"A Memcached service seems to be running on this port." );
+  exit( 0 );
+}
+
+# 0x00:  55 6E 6B 6E 6F 77 6E 20 6D 65 73 73 61 67 65       Unknown message
+# https://www.eyelock.com/index.php/products/myris
+# Reported via http://lists.wald.intevation.org/pipermail/openvas-plugins/2018-March/001372.html
+# nb: Only checking the two ports mentioned in the mailing list post above as
+# the message is quite too common to check on all ports
+if( ( port == 8083 || port == 9099 ) && rhexstr == "556e6b6e6f776e206d657373616765" ) {
+  register_service( port:port, proto:"myris", message:"A Myris service seems to be running on this port." );
+  log_message( port:port, data:"A Myris service seems to be running on this port." );
+  exit( 0 );
+}
+
+# nb: Keep in sync with find_service2.nasl.
+# Daytime seems to be responding late or even not to the HELP
+# request there so trying to detect it here.
+if( ereg( pattern:"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Lun|Mar|Mer|Jeu|Ven|Sam|Dim) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|D[eé]c|F[eé]v|Avr|Mai|Ao[uû]) *(0?[0-9]|[1-3][0-9]) [0-9]+:[0-9]+(:[0-9]+)?( *[ap]m)?( +[A-Z]+)? [1-2][0-9][0-9][0-9].?.?$",
+          string:r ) ||
+    ereg( pattern:"^[0-9][0-9] +(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|D[eé]c|F[eé]v|Avr|Mai|Ao[uû]) +[1-2][0-9][0-9][0-9] +[0-9]+:[0-9]+:[0-9]+( *[ap]m)? [A-Z0-9]+.?.?$", string:r, icase:TRUE ) ||
+    r =~ '^(0?[0-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-20[0-9][0-9][\r\n]*$' ||
+    r =~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] (19|20)[0-9][0-9]-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])[ \t\r\n]*$' ||
+    ereg( pattern:"^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (January|February|March|April|May|June|July|August|September|October|November|December) ([0-9]|[1-3][0-9]), [1-2][0-9][0-9][0-9] .*", string:r ) ||
+    # MS flavor of daytime
+    ereg(pattern:"^[0-9][0-9]?:[0-9][0-9]:[0-9][0-9] [AP]M [0-9][0-9]?/[0-9][0-9]?/[0-2][0-9][0-9][0-9].*$", string:r ) ||
+    # e.g. 0:00:42 07.02.2018 or 14:07:03 16.01.2018
+    r =~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] +(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(19|20)[0-9][0-9][ \t\r\n]*$' ) {
+  register_service( port:port, proto:"daytime" );
+  log_message( port:port, data:"Daytime is running on this port" );
+  exit( 0 );
+}
+
+# On 623/tcp
+# 0x00:  00 00 00 02 09 00 00 00 01 00 00 00 00 00 00 00    ................
+# 0x10:  00                                                 .
+if( rhexstr =~ "^0000000209000000010000000000000000$" ) {
+  register_service( port:port, proto:"ipmi-rmcp", message:"A IPMI RMCP service seems to be running on this port." );
+  log_message( port:port, data:"A IMPI RMCP service seems to be running on this port." );
+  exit( 0 );
+}
+
+# On 2701/tcp
+# SCCM Remote Control (control), https://docs.microsoft.com/en-us/sccm/core/plan-design/hierarchy/ports
+# Reported via http://lists.wald.intevation.org/pipermail/openvas-plugins/2018-April/001378.html
+# 0x00:  22 00 00 80 20 00 53 00 54 00 41 00 52 00 54 00    "... .S.T.A.R.T.
+# 0x10:  5F 00 48 00 41 00 4E 00 44 00 53 00 48 00 41 00    _.H.A.N.D.S.H.A.
+# 0x20:  4B 00 45 00 00 00                                  K.E...
+if( rhexstr =~ "^220000802000530054004100520054005F00480041004E0044005300480041004B0045000000" ) {
+  register_service( port:port, proto:"sccm-control", message:"A SCCM Remote Control (control) service seems to be running on this port." );
+  log_message( port:port, data:"A SCCM Remote Control (control) service seems to be running on this port." );
+  exit( 0 );
+}
+
+if( r =~ "^root@metasploitable:/# " ) {
+  register_service( port:port, proto:"rootshell", message:"A root shell of Metasploitable seems to be running on this port." );
+  log_message( port:port, data:"A root shell of Metasploitable seems to be running on this port." );
+  exit( 0 );
+}
+
+# pfstatd on 9999/tcp
+# 0x0000:  2D 31 20 2D 20 30 20 30 0A 30 20 2D 20 30 20 30    -1 - 0 0.0 - 0 0
+# 0x0010:  0A 30 20 2D 20 31 20 30 0A 30 20 2D 20 32 20 30    .0 - 1 0.0 - 2 0
+# 0x0020:  0A 30 20 2D 20 33 20 30 0A 30 20 2D 20 34 20 30    .0 - 3 0.0 - 4 0
+# 0x0030:  0A 30 20 2D 20 35 20 30 0A 30 20 2D 20 36 20 30    .0 - 5 0.0 - 6 0
+# 0x0040:  0A 30 20 2D 20 37 20 30 0A 30 20 2D 20 38 20 30    .0 - 7 0.0 - 8 0
+# 0x0050:  0A 30 20 2D 20 39 20 30 0A 30 20 2D 20 31 30 20    .0 - 9 0.0 - 10
+# 0x0060:  30 0A 30 20 2D 20 31 31 20 30 0A 30 20 2D 20 31    0.0 - 11 0.0 - 1
+# 0x0070:  32 20 30 0A 30 20 2D 20 31 33 20 30 0A 30 20 2D    2 0.0 - 13 0.0 -
+# 0x0080:  20 31 34 20 30 0A 30 20 2D 20 31 35 20 30 0A 30     14 0.0 - 15 0.0
+# 0x0090:  20 2D 20 31 36 20 30 0A 30 20 2D 20 31 37 20 30     - 16 0.0 - 17 0
+# 0x00A0:  0A 30 20 2D 20 31 38 20 30 0A 30 20 2D 20 31 39    .0 - 18 0.0 - 19
+# 0x00B0:  20 30 0A 30 20 2D 20 32 30 20 30 0A 31 20 61 6C     0.0 - 20 0.1 al
+# 0x00C0:  6C 20 30 20 30 0A 31 20 61 6C 6C 20 31 20 30 0A    l 0 0.1 all 1 0.
+if( egrep( string:r, pattern:"^[0-9]+ (all|carp|em0|enc|enc0|lo|lo0|pflog0|pflog|\-) [0-9]+ [0-9]+$" ) ) {
+  register_service( port:port, proto:"pfstatd", message:"A pfstatd service seems to be running on this port." );
+  log_message( port:port, data:"A pfstatd service seems to be running on this port." );
+  exit( 0 );
+}
+
+# R1Soft backup system on, http://wiki.r1soft.com/display/ServerBackup/Configure+network+ports
+#
+# Reported via http://lists.wald.intevation.org/pipermail/openvas-plugins/2018-May/001393.html
+# 1167/tcp:
+# 0x0000:  00 00 01 2E 52 AB 02 0A 14 08 A3 80 04 10 01 18    ....R...........
+# 0x0010:  00 20 00 2A 08 4E 4F 54 46 4F 55 4E 44 10 00 1A    . .*.NOTFOUND...
+# 0x0020:  90 02 2D 2D 2D 2D 2D 42 45 47 49 4E 20 50 55 42    ..-----BEGIN PUB
+# 0x0030:  4C 49 43 20 4B 45 59 2D 2D 2D 2D 2D 0A 4D 49 47    LIC KEY-----.MIG
+# 0x0040:  66 4D 41 30 47 43 53 71 47 53 49 62 33 44 51 45    fMA0GCSqGSIb3DQE
+# 0x0050:  42 41 51 55 41 41 34 47 4E 41 44 43 42 69 51 4B    BAQUAA4GNADCBiQK
+# 0x0060:  42 67 51 44 32 78 57 72 31 58 64 5A 36 45 69 76    BgQD2xWr1XdZ6Eiv
+#
+# Alternatives found on the net on port 8000/tcp:
+#
+# 0x0000:  00 00 01 2E 52 AB 02 0A 14 08 A3 80 04 10 02 18    ....R...........
+# 0x0010:  00 20 00 2A 08 4E 4F 54 46 4F 55 4E 44 10 00 1A    . .*.NOTFOUND...
+# 0x0020:  90 02 2D 2D 2D 2D 2D 42 45 47 49 4E 20 50 55 42    ..-----BEGIN PUB
+# 0x0030:  4C 49 43 20 4B 45 59 2D 2D 2D 2D 2D 0A 4D 49 47    LIC KEY-----.MIG
+# 0x0040:  66 4D 41 30 47 43 53 71 47 53 49 62 33 44 51 45    fMA0GCSqGSIb3DQE
+# 0x0050:  42 41 51 55 41 41 34 47 4E 41 44 43 42 69 51 4B    BAQUAA4GNADCBiQK
+# 0x0060:  42 67 51 44 48 4D 54 4E 6E 51 31 44 2F 78 74 79    BgQDHMTNnQ1D/xty
+#
+# or 8001/tcp:
+# 0x0000:  00 00 01 32 52 AF 02 0A 18 08 A3 80 04 10 02 18    ...2R...........
+# 0x0010:  00 20 01 2A 0C 56 4D 77 61 72 65 56 4D 77 61 72    . .*.VMwareVMwar
+# 0x0020:  65 10 00 1A 90 02 2D 2D 2D 2D 2D 42 45 47 49 4E    e.....-----BEGIN
+# 0x0030:  20 50 55 42 4C 49 43 20 4B 45 59 2D 2D 2D 2D 2D     PUBLIC KEY-----
+# 0x0040:  0A 4D 49 47 66 4D 41 30 47 43 53 71 47 53 49 62    .MIGfMA0GCSqGSIb
+# 0x0050:  33 44 51 45 42 41 51 55 41 41 34 47 4E 41 44 43    3DQEBAQUAA4GNADC
+# 0x0060:  42 69 51 4B 42 67 51 43 70 7A 73 39 54 47 6A 66    BiQKBgQCpzs9TGjf
+#
+# or 88/tcp which are sharing parts with the original reported service.
+#
+# 0x0000:  00 00 01 32 52 AF 02 0A 18 08 A3 80 04 10 01 18    ...2R...........
+# 0x0010:  00 20 01 2A 0C 56 4D 77 61 72 65 56 4D 77 61 72    . .*.VMwareVMwar
+# 0x0020:  65 10 00 1A 90 02 2D 2D 2D 2D 2D 42 45 47 49 4E    e.....-----BEGIN
+# 0x0030:  20 50 55 42 4C 49 43 20 4B 45 59 2D 2D 2D 2D 2D     PUBLIC KEY-----
+# 0x0040:  0A 4D 49 47 66 4D 41 30 47 43 53 71 47 53 49 62    .MIGfMA0GCSqGSIb
+# 0x0050:  33 44 51 45 42 41 51 55 41 41 34 47 4E 41 44 43    3DQEBAQUAA4GNADC
+# 0x0060:  42 69 51 4B 42 67 51 44 66 4D 68 41 36 75 50 63    BiQKBgQDfMhA6uPc
+if( rhexstr =~ "^000001..52..020A..08A3800410..180020..2A.*10001A9002" && "-----BEGIN PUBLIC KEY-----" >< r && "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ" >< r ) {
+  register_service( port:port, proto:"r1soft_backupagent", message:"A R1Soft Backup Agent seems to be running on this port." );
+  log_message( port:port, data:"A R1Soft Backup Agent seems to be running on this port." );
+  exit( 0 );
+}
+
+# https://www.iana.org/assignments/beep-parameters/beep-parameters.xhtml
+# 0x00:  52 50 59 20 30 20 30 20 2E 20 30 20 31 30 32 0D    RPY 0 0 . 0 102.
+# 0x10:  0A 43 6F 6E 74 65 6E 74 2D 54 79 70 65 3A 20 61    .Content-Type: a
+# 0x20:  70 70 6C 69 63 61 74 69 6F 6E 2F 62 65 65 70 2B    pplication/beep+
+# 0x30:  78 6D 6C 0D 0A 0D 0A 3C 67 72 65 65 74 69 6E 67    xml....<greeting
+# 0x40:  3E 3C 70 72 6F 66 69 6C 65 20 75 72 69 3D 22 68    ><profile uri="h
+# 0x50:  74 74 70 3A 2F 2F 69 61 6E 61 2E 6F 72 67 2F 62    ttp://iana.org/b
+# 0x60:  65 65 70 2F 54 4C 53 22 2F 3E 3C 2F 67 72 65 65    eep/TLS"/></gree
+# 0x70:  74 69 6E 67 3E 0D 0A 45 4E 44 0D 0A                ting>..END..
+#
+# nb: beep/xmlrpc has application/xml as the Content-Type so using some
+# different patterns here.
+# nb: Have seen a response to http_get and spontaneuos for this so checking both...
+if( ( ( r0 =~ "^RPY [0-9] [0-9]" && "Content-Type: application/" >< r0 ) ||
+      ( "<profile uri=" >< r0 && "http://iana.org/beep/" >< r0 ) ||
+      "Content-Type: application/beep" >< r0 ) ||
+    ( ( r =~ "^RPY [0-9] [0-9]" && "Content-Type: application/" >< r ) ||
+      ( "<profile uri=" >< r && "http://iana.org/beep/" >< r ) ||
+      "Content-Type: application/beep" >< r )
+  ) {
+  register_service( port:port, proto:"beep", message:"A service supporting the Blocks Extensible Exchange Protocol (BEEP) seems to be running on this port." );
+  log_message( port:port, data:"A service supporting the Blocks Extensible Exchange Protocol (BEEP) seems to be running on this port." );
+  exit( 0 );
+}
+
+# https://github.com/beanshell/beanshell/blob/master/src/main/resources/bsh/commands/server.bsh
+# 0x00:  42 65 61 6E 53 68 65 6C 6C 20 32 2E 30 62 34 20    BeanShell 2.0b4
+# 0x10:  2D 20 62 79 20 50 61 74 20 4E 69 65 6D 65 79 65    - by Pat Niemeye
+# 0x20:  72 20 28 70 61 74 40 70 61 74 2E 6E 65 74 29 0A    r (pat@pat.net).
+# 0x30:  62 73 68 20 25 20 2F 2F 20 45 72 72 6F 72 3A 20    bsh % // Error:
+# 0x40:  50 61 72 73 65 72 20 45 72 72 6F 72 3A 20 49 6E    Parser Error: In
+# 0x50:  20 66 69 6C 65 3A 20 3C 75 6E 6B 6E 6F 77 6E 3E     file: <unknown>
+# 0x60:  20 45 6E 63 6F 75 6E 74 65 72 65 64 20 22 48 6F     Encountered "Ho
+# 0x70:  73 74 22 20 61 74 20 6C 69 6E 65 20 32 2C 20 63    st" at line 2, c
+# 0x80:  6F 6C 75 6D 6E 20 31 2E 0A 0A 62 73 68 20 25 20    olumn 1...bsh %
+#
+# nb: With and without the banner. Just to be sure...
+if( r =~ "^bsh % " || r =~ "^BeanShell " || "- by Pat Niemeyer (pat@pat.net)" >< r ) {
+  register_service( port:port, proto:"beanshell", message:"A BeanShell listener service seems to be running on this port." );
+  log_message( port:port, data:"A BeanShell listener service seems to be running on this port." );
+  set_kb_item( name:"beanshell_listener/detected", value:TRUE ); # nb: No default port. Key is used as mandatory_key().
+  exit( 0 );
+}
+
+# Running on a Hama IR110 WiFi Radio on port 10003/tcp
+# Response length is always 261 or 263 bytes...
+# 0x0000:  77 30 32 35 36 41 8F F6 EE 52 63 48 15 DB 14 B1    w0256A...RcH....
+# 0x0010:  92 B6 5D 67 58 D1 76 C4 0F 45 D8 82 73 81 A2 2F    ..]gX.v..E..s../
+# 0x0020:  F7 FD 49 F7 1B FB 94 93 56 C4 A6 9D 4D D7 67 FF    ..I.....V...M.g.
+# 0x0030:  16 69 40 39 97 3C 51 D7 91 BD 47 F2 08 C2 D3 0D    .i@9.<Q...G.....
+# 0x0040:  25 3C 7C 5C 9A 9D 4C C0 3E 7A 4A D6 D8 52 B4 57    %<|\..L.>zJ..R.W
+# 0x0050:  CF 48 DE 49 9A 58 6F BC 02 B5 E3 D3 AF 75 47 DA    .H.I.Xo......uG.
+# 0x0060:  83 BF 64 A4 D4 8E 24 00 BD C6 86 6C 69 AE DA B4    ..d...$....li...
+# 0x0070:  BE C7 00 A0 24 58 0D F1 04 59 22 3C 4C EF C6 51    ....$X...Y"<L..Q
+# 0x0080:  0B 8B 1A 09 B6 DC 3F 2C 1C A8 5C A7 07 CD C3 05    ......?,..\.....
+# 0x0090:  00 6B E1 59 4A 1F 53 04 74 26 BD 03 EB 8E 74 9F    .k.YJ.S.t&....t.
+# 0x00A0:  8E 48 EF F7 95 B0 B6 28 A9 5E 10 EB 47 88 02 97    .H.....(.^..G...
+# 0x00B0:  B3 20 11 65 B0 01 9F 14 7B 33 03 58 E3 D4 B1 C2    . .e....{3.X....
+# 0x00C0:  25 41 7D 9A 6E B7 F2 98 78 90 51 FE 5C 32 42 EC    %A}.n...x.Q.\2B.
+# 0x00D0:  8E FD AD 93 E7 51 9D 82 19 79 12 76 EA 91 B4 4F    .....Q...y.v...O
+# 0x00E0:  48 52 1B BB E3 F8 C3 B9 3A 37 6C BB E0 3A 32 49    HR......:7l..:2I
+# 0x00F0:  88 D9 25 79 D4 AB 05 72 C8 79 1A 6C 21 40 BF 7C    ..%y...r.y.l!@.|
+# 0x0100:  11 68 2E DD 1C                                     .h...
+#
+# nb: Pattern is not that reliable so checking the length as well...
+if( r =~ "^w0256" && ( r_len == 261 || r_len == 263 ) ) {
+  register_service( port:port, proto:"wifiradio-unknown", message:"An unknown service related to a WiFi radio seems to be running on this port." );
+  log_message( port:port, data:"An unknown service related to a WiFi radio seems to be running on this port." );
+  exit( 0 );
+}
+
+# Unknown telnet service running on 23/tcp. The check is not that reliable so checking the port as well...
+# 0x00:  43 6F 6E 6E 65 63 74 69 6F 6E 20 72 65 66 75 73    Connection refus
+# 0x10:  65 64 0D 0A                                        ed..
+if( port == 23 && rhexstr == "436f6e6e656374696f6e20726566757365640d0a" ) {
+  register_service( port:port, proto:"telnet", message:"A telnet service rejecting the access of the scanner seems to be running on this port." );
+  log_message( port:port, data:"A telnet service rejecting the access of the scanner seems to be running on this port." );
+  exit( 0 );
+}
+
+# Found on the IceWarp Suite (but there might be more similar products). This is a SIP service
+# which isn't responding to our SIP OPTIONS request of sip_detection_tcp.nasl and find_service5.nasl
+# 0x00:  53 49 50 2F 32 2E 30 20 34 30 30 20 42 61 64 20    SIP/2.0 400 Bad
+# 0x10:  52 65 71 75 65 73 74 0D 0A 55 73 65 72 2D 41 67    Request..User-Ag
+# 0x20:  65 6E 74 3A 20 49 63 65 57 61 72 70 20 53 49 50    ent: IceWarp SIP
+# 0x30:  20 31 31 2E 31 2E 32 2E 31 20 44 45 42 37 20 78     11.1.2.1 DEB7 x
+# 0x40:  36 34 0D 0A 43 6F 6E 74 65 6E 74 2D 4C 65 6E 67    64..Content-Leng
+# 0x50:  74 68 3A 20 30 0D 0A 56 69 61 3A 20 3B 72 65 63    th: 0..Via: ;rec
+# 0x60:  65 69 76 65 64 3D 31 39 32 2E 31 36 38 2E 31 2E    eived=192.168.1.
+# 0x70:  31 30 3B 72 70 6F 72 74 3D 34 35 34 36 31 3B 74    10;rport=45461;t
+# 0x80:  72 61 6E 73 70 6F 72 74 3D 54 43 50 0D 0A 48 6F    ransport=TCP..Ho
+# 0x90:  73 74 3A 20 74 65 73 74 0D 0A 0D 0A                st: test....
+#
+# Another special case on e.g. a AVM FRITZ!Box
+# 0x0000:  53 49 50 2F 32 2E 30 20 34 30 30 20 49 6C 6C 65    SIP/2.0 400 Ille
+# 0x0010:  67 61 6C 20 72 65 71 75 65 73 74 20 6C 69 6E 65    gal request line
+# 0x0020:  0D 0A 46 72 6F 6D 3A 20 3C 73 69 70 3A 6D 69 73    ..From: <sip:mis
+# 0x0030:  73 69 6E 67 3E 0D 0A 54 6F 3A 20 3C 73 69 70 3A    sing>..To: <sip:
+# 0x0040:  6D 69 73 73 69 6E 67 3E 3B 74 61 67 3D 62 61 64    missing>;tag=bad
+# 0x0050:  72 65 71 75 65 73 74 0D 0A 55 73 65 72 2D 41 67    request..User-Ag
+# 0x0060:  65 6E 74 3A 20 46 52 49 54 5A 21 4F 53 0D 0A 43    ent: FRITZ!OS..C
+# 0x0070:  6F 6E 74 65 6E 74 2D 4C 65 6E 67 74 68 3A 20 30    ontent-Length: 0
+# 0x0080:  0D 0A 0D 0A 53 49 50 2F 32 2E 30 20 34 30 30 20    ....
+if( r =~ "^SIP/2\.0 [0-9]+" && egrep( string:r, pattern:"^Via: " ) ||
+    r =~ "^SIP/2\.0 400 Illegal request line..From: <sip:missing>..To: <sip:missing>;tag=badrequest..User-Agent: " ) {
+  register_service( port:port, proto:"sip", message:"A service supporting the SIP protocol seems to be running on this port." );
+  log_message( port:port, data:"A service supporting the SIP protocol seems to be running on this port." );
+  exit( 0 );
+}
+
+# Citrix NetScaler Metric Exchange Protocol on 3011/tcp
+# 0x00:  10 00 00 00 A5 A5 00 00 D4 00 60 01 00 00 00 00    ..........`.....
+if( rhexstr == "10000000a5a50000d400600100000000" ) {
+  register_service( port:port, proto:"mep", message:"A service supporting the Metric Exchange Protocol (MEP) seems to be running on this port." );
+  log_message( port:port, data:"A service supporting the Metric Exchange Protocol (MEP) seems to be running on this port." );
+  exit( 0 );
+}
+
+# chargen services
+# Ensuring that at least 3 patterns match
+# In case a pattern is missing or doesn't make it into the response (due to it being slow), the service will still be reported
+chargen_found = 0;
+foreach chargen_pattern( make_list( '!"#$%&\'()*+,-./', "ABCDEFGHIJ", "abcdefg", "0123456789" ) ) {
+  if( chargen_pattern >< r ) chargen_found++;
+}
+if( chargen_found > 2 ) {
+  register_service( port:port, proto:"chargen", message:"A chargen service seems to be running on this port." );
+  log_message( port:port, data:"A chargen service seems to be running on this port." );
+  exit( 0 );
+}
+
+# Xrdp on 3389/tcp seems to be responding like this
+# 0x00:  03 00 00 09 02 F0 80 21 80                         .......!.
+if( rhexstr == "0300000902f0802180" ) {
+  register_service( port:port, proto:"ms-wbt-server", message:"A service (e.x. Xrdp) supporting the Microsoft Remote Desktop Protocol (RDP) seems to be running on this port." );
+  log_message( port:port, data:"A service (e.x. Xrdp) supporting the Microsoft Remote Desktop Protocol (RDP) seems to be running on this port." );
+  set_kb_item( "rdp/" + port + "/isxrdp", value:TRUE ); # Later used in check_xrdp() of ms_rdp_detect.nasl to avoid an already done request.
   exit( 0 );
 }
 

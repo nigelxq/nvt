@@ -1,5 +1,5 @@
 # OpenVAS Vulnerability Test
-# $Id: asip-status.nasl 7000 2017-08-24 11:51:46Z teissa $
+# $Id: asip-status.nasl 9580 2018-04-24 08:44:20Z jschulte $
 # Description: AppleShare IP Server status query
 #
 # Authors:
@@ -22,24 +22,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-tag_summary = "File sharing service is available.
-
-Description :
-
-The remote host is running an AppleShare IP file service.
-By sending DSIGetStatus request on tcp port 548, it was
-possible to disclose information about the remote host.";
-
 # NASL script to send a DSIGetStatus / FPGetSrvrInfo to an AppleShare IP
 # server & parse the reply
 # based off of http://www.jammed.com/~jwa/hacks/security/asip/asip-status
 
 if (description)
 {
-  	script_id(10666);
+  	script_oid("1.3.6.1.4.1.25623.1.0.10666");
   	script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-        script_version("$Revision: 7000 $");
-  	script_tag(name:"last_modification", value:"$Date: 2017-08-24 13:51:46 +0200 (Thu, 24 Aug 2017) $");
+        script_version("$Revision: 9580 $");
+  	script_tag(name:"last_modification", value:"$Date: 2018-04-24 10:44:20 +0200 (Tue, 24 Apr 2018) $");
   	script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
         script_tag(name:"cvss_base", value:"0.0");
 	script_name( "AppleShare IP Server status query");
@@ -50,7 +42,13 @@ if (description)
 	script_copyright("Copyright (C) 2004 James W. Abendschan <jwa@jammed.com>");
 	script_dependencies("find_service.nasl");
 	script_require_ports(548);
-        script_tag(name : "summary" , value : tag_summary);
+        script_tag(name : "summary" , value : "File sharing service is available.
+
+Description :
+
+The remote host is running an AppleShare IP file service.
+By sending DSIGetStatus request on tcp port 548, it was
+possible to disclose information about the remote host.");
 	exit(0);
 }
 

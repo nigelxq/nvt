@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: EZsiteForum.nasl 6703 2017-07-12 13:57:25Z cfischer $
+# $Id: EZsiteForum.nasl 9782 2018-05-09 13:46:05Z cfischer $
 # Description: EZsite Forum Discloses Passwords to Remote Users
 #
 # Authors:
@@ -40,15 +40,16 @@ features, remove the product or replace the product by another one.";
 
 if(description)
 {
- script_id(11833);
- script_version("$Revision: 6703 $");
- script_tag(name:"last_modification", value:"$Date: 2017-07-12 15:57:25 +0200 (Wed, 12 Jul 2017) $");
+ script_oid("1.3.6.1.4.1.25623.1.0.11833");
+ script_version("$Revision: 9782 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-05-09 15:46:05 +0200 (Wed, 09 May 2018) $");
  script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
  script_tag(name:"cvss_base", value:"5.0");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:N/A:N");
  script_name("EZsite Forum Discloses Passwords to Remote Users");
  script_category(ACT_GATHER_INFO);
  script_tag(name:"qod_type", value:"remote_active");
+ script_tag(name:"solution_type", value:"WillNotFix");
  script_copyright("This script is Copyright (C) 2003 deepquest");
  script_family("Web application abuses");
  script_dependencies("secpod_ms_iis_detect.nasl");

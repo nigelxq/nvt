@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_puppet_enterprise_mult_vuln.nasl 6549 2017-07-06 09:27:17Z ckuersteiner $
+# $Id: gb_puppet_enterprise_mult_vuln.nasl 8990 2018-03-01 07:43:09Z cfischer $
 #
-# Puppet Enterprise Multiple Vulnerabilities 
+# Puppet Enterprise < 2016.4.5 / < 2017.2.1 Multiple Vulnerabilities 
 #
 # Authors:
 # Christian Kuersteiner <christian.kuersteiner@greenbone.net>
@@ -30,11 +30,11 @@ CPE = "cpe:/a:puppet:enterprise";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.106929");
-  script_version("$Revision: 6549 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-07-06 11:27:17 +0200 (Thu, 06 Jul 2017) $");
+  script_version("$Revision: 8990 $");
+  script_tag(name: "last_modification", value: "$Date: 2018-03-01 08:43:09 +0100 (Thu, 01 Mar 2018) $");
   script_tag(name: "creation_date", value: "2017-07-06 15:23:17 +0700 (Thu, 06 Jul 2017)");
-  script_tag(name: "cvss_base", value: "6.6");
-  script_tag(name: "cvss_base_vector", value: "AV:N/AC:H/Au:S/C:C/I:C/A:N");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
 
   script_cve_id("CVE-2017-2292", "CVE-2017-2293", "CVE-2017-2294", "CVE-2017-2295", "CVE-2017-2297");
 
@@ -42,7 +42,7 @@ if (description)
 
   script_tag(name: "solution_type", value: "VendorFix");
 
-  script_name("Puppet Enterprise Multiple Vulnerabilities");
+  script_name("Puppet Enterprise < 2016.4.5 / < 2017.2.1 Multiple Vulnerabilities");
 
   script_category(ACT_GATHER_INFO);
 

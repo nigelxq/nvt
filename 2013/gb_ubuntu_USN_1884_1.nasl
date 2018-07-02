@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_1884_1.nasl 7958 2017-12-01 06:47:47Z santu $
+# $Id: gb_ubuntu_USN_1884_1.nasl 9650 2018-04-27 08:51:00Z cfischer $
 #
 # Ubuntu Update for libraw USN-1884-1
 #
@@ -26,21 +26,11 @@
 
 include("revisions-lib.inc");
 
-tag_affected = "libraw on Ubuntu 13.04 ,
-  Ubuntu 12.10 ,
-  Ubuntu 12.04 LTS";
-tag_insight = "It was discovered that LibRaw incorrectly handled broken full-color images.
-  If a user or automated system were tricked into processing a specially
-  crafted raw image, applications linked against LibRaw could be made to
-  crash, resulting in a denial of service, or possibly execute arbitrary
-  code.";
-tag_solution = "Please Install the Updated Packages.";
-
 if(description)
 {
-  script_id(841487);
-  script_version("$Revision: 7958 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-01 07:47:47 +0100 (Fri, 01 Dec 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.841487");
+  script_version("$Revision: 9650 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:51:00 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-06-24 15:06:48 +0530 (Mon, 24 Jun 2013)");
   script_cve_id("CVE-2013-2126");
   script_tag(name:"cvss_base", value:"7.5");
@@ -49,15 +39,21 @@ if(description)
 
   script_xref(name: "USN", value: "1884-1");
   script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1884-1/");
-  script_summary("Check for the Version of libraw");
+  script_tag(name:"summary", value:"Check for the Version of libraw");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "solution" , value : tag_solution);
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU(12\.04 LTS|12\.10|13\.04)");
+  script_tag(name : "affected" , value : "libraw on Ubuntu 13.04 ,
+  Ubuntu 12.10 ,
+  Ubuntu 12.04 LTS");
+  script_tag(name : "insight" , value : "It was discovered that LibRaw incorrectly handled broken full-color images.
+  If a user or automated system were tricked into processing a specially
+  crafted raw image, applications linked against LibRaw could be made to
+  crash, resulting in a denial of service, or possibly execute arbitrary
+  code.");
+  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -82,7 +78,7 @@ if(release == "UBUNTU12.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }
 
@@ -96,7 +92,7 @@ if(release == "UBUNTU12.10")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }
 
@@ -110,6 +106,6 @@ if(release == "UBUNTU13.04")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

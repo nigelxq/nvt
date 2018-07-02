@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: http_keepalive.inc 7805 2017-11-17 08:42:10Z cfischer $
+# $Id: http_keepalive.inc 10271 2018-06-20 12:45:27Z cfischer $
 #
 # Methods to support http keep alive handling
 #
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 7805 $
+# $Revision: 10271 $
 #
 ###############################################################################
 
@@ -39,7 +39,7 @@ __ka_last_request = "";
 
 # Enables debugging output for a few functions below
 global_var _http_ka_debug;
-_http_ka_debug = 0;
+_http_ka_debug = FALSE;
 
 # Based on the last headers we received, we determine if we need
 # to close our socket and re-open it or not
@@ -67,15 +67,20 @@ function enable_keepalive( port ) {
   __ka_socket  = http_open_socket( port );
 }
 
+# @brief This function determines if the remote web server is keep-alive-enabled or not.
 #
-# This function determines if the remote web server is
-# keep-alive-enabled or not.
+# @param port the HTTP port of the target
+#
+# @return 1 if keep alive is enabled, 0 otherwise and -2 if no port was passed or no socket could be openend to the target host
 #
 function http_keepalive_enabled( port ) {
 
-  local_var req, soc, r, kb;
+  local_var port, host, req, soc, r, kb;
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_keepalive_enabled" );
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_keepalive_enabled" );
+    return -2;
+  }
 
   kb = get_kb_item( strcat( "www/", port, "/keepalive" ) );
 
@@ -86,6 +91,9 @@ function http_keepalive_enabled( port ) {
     return( 0 );
   }
 
+  # nb: Always keep http_host_name() before http_open_socket() as the first
+  # could fork with multiple vhosts and the childs would share the same
+  # socket causing race conditions and similar.
   host = http_host_name( port:port );
 
   req = strcat( 'GET / HTTP/1.1\r\n',
@@ -116,7 +124,6 @@ function http_keepalive_enabled( port ) {
       return( 1 );
     }
   }
-
   set_kb_item( name:strcat( "www/", port, "/keepalive" ), value:"no" );
   return( 0 );
 }
@@ -159,7 +166,7 @@ function http_keepalive_recv_body( headers, bodyonly ) {
         length = 1048576;
         killme = 1;
       }
-      body  = strcat( body, recv( socket:__ka_socket, length:length, min:length ) );
+      body = strcat( body, recv( socket:__ka_socket, length:length, min:length ) );
       # "\r\n"
       recv( socket:__ka_socket, length:2, min:2 );
       if( strlen( body ) > 1048576 ) killme = 1;
@@ -188,7 +195,7 @@ function http_keepalive_recv_body( headers, bodyonly ) {
     # If we don't have the length, we close the connection to make sure
     # the next request won't mix up the replies.
 
-    if( _http_ka_debug ) display("ERROR - Keep Alive, but no length!!!\n", __ka_last_request);
+    if( _http_ka_debug ) display( "DEBUG: ERROR - Keep Alive, but no length!!!\n", __ka_last_request );
     body = recv( socket:__ka_socket, length:16384, min:0 );
     if( body =~ '<html[^>]*>' && body !~ '</html>' ) { # case insensitive
       repeat {
@@ -196,7 +203,7 @@ function http_keepalive_recv_body( headers, bodyonly ) {
         body += tmp;
       }
       until( ! tmp || body =~ "</html>" );
-      if( _http_ka_debug && body !~ "</html>" ) display( "http_keepalive_recv_body: incomplete body?\n------------\n", body, "\n------------\n" );
+      if( _http_ka_debug && body !~ "</html>" ) display( "DEBUG: http_keepalive_recv_body: incomplete body?\n------------\n", body, "\n------------\n" );
     }
     http_close_socket( __ka_socket );
     __ka_socket = http_open_socket( __ka_port );
@@ -222,7 +229,7 @@ function on_exit() {
   }
 }
 
-if( 0 ) on_exit(); #TBD: Whats the purpose of this?
+if( 0 ) on_exit(); #TBD: What's the purpose of this?
 
 #
 # This is our "public" Keep-Alive function. It sends <data> to the remote
@@ -250,7 +257,7 @@ function http_keepalive_send_recv( port, data, bodyonly, fetch404, content_type_
     set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#No 'Host:' header passed in data variable of http_keepalive_send_recv(). This might lead to issues if SNI is enabled on the remote host." );
   }
 
-  if( _http_ka_debug ) display( "http_keepalive_send_recv( port: ", port, ", data: ", data, ", bodyonly: ", bodyonly, " )\n" );
+  if( _http_ka_debug ) display( "DEBUG: http_keepalive_send_recv( port: ", port, ", data: ", data, ", bodyonly: ", bodyonly, " )\n" );
 
   if( __ka_enabled == -1 ) __ka_enabled = http_keepalive_enabled( port:port );
   if( __ka_enabled == -2 ) return NULL;
@@ -310,7 +317,7 @@ function http_keepalive_send_recv( port, data, bodyonly, fetch404, content_type_
   # Old behavior: data = str_replace( string:data, find:"Connection: Close", replace:"Connection: Keep-Alive", count:1 );
   # https://tools.ietf.org/html/rfc7230#section-6.1 -> Connection options are case-insensitive.
   # Some NVTs devs might add a "Connection: close" to the header data passed to this function so doing an ereg_replace instead
-  # nb: Be aware that this ereg_replace is also replacing any occurance of "Connection: Close" somewhere in the body of the request data.
+  # nb: Be aware that this ereg_replace is also replacing any occurrence of "Connection: Close" somewhere in the body of the request data.
   data = ereg_replace( string:data, pattern:"Connection: Close", replace:"Connection: Keep-Alive", icase:TRUE );
   __ka_last_request = data;
   n = send( socket:__ka_socket, data:data );
@@ -362,24 +369,48 @@ function check_win_dir_trav_ka( port, url ) {
   return( 0 );
 }
 
+# @brief This function creates a HTTP GET request with enabled Keep-Alive Connection
+#        for a specified item (e.g. a script), sends the request to the target and checks
+#        if the requested item is available.
+#
+# @param port the HTTP port of the target
+# @param item the item to request
+#
+# @return TRUE if the requested item exists on the remote web server, FALSE otherwise
+#         and NULL in the cases where wrong data is passed to the function or where the
+#         server is respondig with a 200 status code to not existing files.
+#
 function is_cgi_installed_ka( item, port ) {
 
-  local_var r, no404, dir, slash, dirs, banner;
+  local_var item, port, req, res, no404, dir, slash, dirs;
+  # nb: http_cgi_disabled and optimize_test_enabled are global vars from http_func.inc
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#is_cgi_installed_ka" );
+  if( ! item ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#is_cgi_installed_ka" );
+    return NULL;
+  }
 
-  if( get_kb_item( "Settings/disable_cgi_scanning" ) ) return 0;
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#is_cgi_installed_ka" );
+    return NULL;
+  }
 
-  banner = get_http_banner( port:port );
+  if( http_cgi_disabled ) {
+    if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
+      set_kb_item( name:"nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#is_cgi_installed_ka()" );
+    }
+    exit( 0 );
+  }
+
   if( item[0] != "/" ) {
     dirs = cgi_dirs( port:port );
     slash = "/";
   } else {
-    dirs = make_list( "" );
+    dirs = make_list("");
     slash = "";
   }
 
-  no404 = get_kb_item( strcat( "www/no404/", port ) );
+  no404 = get_kb_item( "www/no404/" + port );
   if( strlen( no404 ) >= 1 ) return NULL;
 
   foreach dir( dirs ) {
@@ -387,56 +418,83 @@ function is_cgi_installed_ka( item, port ) {
     if( dir == "/" ) dir = "";
 
     # some server return a 404 for / but sometimes not for all subdirs. so check again...
-    t =  http_keepalive_send_recv( port:port, data:http_get( item:dir + slash + item + '_' + rand(), port:port ) );
+    req = http_get( item:dir + slash + item + '_' + rand(), port:port );
+    res = http_keepalive_send_recv( port:port, data:req );
+    if( res !~ "^HTTP/1\.[01] 404" ) continue;
 
-    if( t !~ "HTTP/1\.. 404" ) continue;
+    req = http_get( item:dir + slash + item, port:port );
+    res = http_keepalive_send_recv( port:port, data:req );
+    if( isnull( res ) ) continue;
 
-    r = http_keepalive_send_recv( port:port, data:http_get( item:dir + slash + item, port:port ) );
-    if( r == NULL ) continue;
-
-    if( r =~ "^HTTP/1\.[0-9.] +200 +" && "Proxy-Agent: IWSS" >!< r ) {
-      if( no404 && tolower( no404 ) >< tolower( r ) ) {
+    if( res =~ "^HTTP/1\.[01] +200 +" && "Proxy-Agent: IWSS" >!< r ) {
+      if( no404 && tolower( no404 ) >< tolower( res ) ) {
         continue;
       } else {
-        return( 1 );
+        return TRUE;
       }
     }
   }
-  return( 0 );
+  return FALSE;
 }
 
-function get_http_page( port, url, redirect ) {
+# @brief This function creates a HTTP GET request with enabled Keep-Alive Connection
+#        for a specified item (e.g. a script), sends the request to the target and
+#        returns the response. It will also follow up to 32 times a received redirect.
+#
+# @param port          the HTTP port of the target
+# @param url           the URL to request
+# @param max_redirects the count of redirects to follow, defaults to 32 if not passed
+#
+# @return the response to the HTTP GET request or NULL if no response was received or the
+#         max count of redirects was reached.
+#
+function get_http_page( port, url, max_redirects ) {
 
-  local_var r, u, v, i, l, seen_loc, n;
+  local_var port, url, max_redirects, count, seen_loc, i, req, res, redirect, location;
+  # nb: http_cgi_disabled and optimize_test_enabled are global vars from http_func.inc
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_page" );
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#get_http_page" );
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_page" );
+    return NULL;
+  }
 
-  if( isnull( redirect ) ) {
-    n = 32;
-  } else if( redirect <= 0 ) {
-    n = 1;
+  if( ! url ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#get_http_page" );
+    return NULL;
+  }
+
+  if( http_cgi_disabled ) {
+    if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
+      set_kb_item( name:"nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#get_http_page()" );
+    }
+    exit( 0 );
+  }
+
+  if( isnull( max_redirects ) ) {
+    count = 32;
+  } else if( max_redirects <= 0 ) {
+    count = 1;
   } else {
-    n = redirect + 1;
+    count = max_redirects + 1;
   }
 
   seen_loc = make_list();
-  u = url;
-  for( i = 0; i < n; i ++ ) { # Limited iterations to avoid traps
-    seen_loc[u] = 1;
-    r = http_keepalive_send_recv( port:port, data:http_get( port:port, item:u ) );
-    if( isnull( r ) ) return NULL;
+  for( i = 0; i < count; i ++ ) { # Limited iterations to avoid traps
+    seen_loc[url] = TRUE;
+    req = http_get( port:port, item:url );
+    res = http_keepalive_send_recv( port:port, data:req );
+    if( isnull( res ) ) return NULL;
 
-    if( r =~ "^HTTP/1\.[01] +30[0-9] .*" ) {
-      v = eregmatch( pattern:'\r\nLocation: *([^ \t\r\n]+)[ \t]*[\r\n]+', string:r, icase:TRUE );
-      if( isnull( v ) ) return NULL; # Big problem
-      l = v[1];
-      if( seen_loc[l] ) return NULL;
-      seen_loc[l] = 1;
-    } else if( r =~ "^HTTP/1\.[01] +200 " ) {
-      r = strstr( r, '\r\n\r\n' );
-      r = substr( r, 4 );
-      return r;
+    if( res =~ "^HTTP/1\.[01] +30[0-9] .*" ) {
+      redirect = eregmatch( pattern:'\r\nLocation: *([^ \t\r\n]+)[ \t]*[\r\n]+', string:res, icase:TRUE );
+      if( isnull( redirect ) ) return NULL; # Big problem
+      location = redirect[1];
+      if( seen_loc[location] ) return NULL;
+      seen_loc[location] = TRUE;
+    } else if( res =~ "^HTTP/1\.[01] +200 " ) {
+      res = strstr( res, '\r\n\r\n' );
+      res = substr( res, 4 );
+      return res;
     } else { # Code 4xx or 5xx
       return NULL;
     }
@@ -445,19 +503,48 @@ function get_http_page( port, url, redirect ) {
   return NULL;
 }
 
+# @brief This function creates a HTTP GET request for the specified URL,
+#        sends the request to the target and receives the response.
+#        If a response was received it is saved into the knowledge base.
+#        If an URL was requested which was requested previously the cached
+#        response will be returned instead of doing a new request.
+#        nb: The global_var __ka_last_request can be used to access the "req"
+#        crafted by this function.
+#
+# @param port the HTTP port of the target
+# @param item the URL/item to request
+#
+# @return the response to the HTTP GET request or NULL if no response was received
+#
 function http_get_cache( port, item ) {
 
   local_var port, item, req, res;
 
-  if( ! port ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_get_cache" );
-  if( ! item ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#http_get_cache" );
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_get_cache" );
+    return NULL;
+  }
+
+  if( ! item ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#item#-#http_get_cache" );
+    return NULL;
+  }
+
+  if( http_cgi_disabled ) {
+    if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
+      set_kb_item( name:"nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#http_get_cache()" );
+    }
+    exit( 0 );
+  }
 
   res = get_kb_item( "Cache/" + port + "/URL_" + item );
   if( res ) return res;
 
   req = http_get( port:port, item:item );
   res = http_keepalive_send_recv( port:port, data:req, bodyonly:FALSE );
-  if( ! res ) return NULL;
+  if( isnull( res  ) || res == "" || ! res ) return NULL;
+
+  __ka_last_request = req;
 
   # Only save a valid HTTP response into the KB. We also
   # don't want so save the following HTTP status codes
@@ -472,35 +559,55 @@ function http_get_cache( port, item ) {
       res =~ "^HTTP/1\.[01]" ) {
     replace_kb_item( name:"Cache/" + port + "/URL_" + item, value:res );
   }
-
   return res;
 }
 
+# @brief This function creates a HTTP GET request with enabled Keep-Alive Connection for
+#        a specified item (e.g. a script), sends the request to the target and checks
+#        if one or more specific patterns are included in the response. If the pattern
+#        was found a security_message() is reported and the script exit afterwards.
+#
+# @param default_port  the default HTTP port to assume if no open ports was found on the target host
+# @param extra_dirs    additional directories to check which are added to the found directories of cgi_dirs(). If empty only cgi_dirs() is used.
+# @param unique_dir    the directory which should be checked, if this parameter is passed extra_dirs will be ignored.
+# @param check_request the request / item to sent in the HTTP GET request
+# @param extra_check   a pattern to check additionally to the check_result in form of a regex
+# @param check_result  the expected result to the response in form of a regex where a security_message() is reported
+# @param command       the command which was used in the check_request parameter
+# @param port          the HTTP port to check
+#
 function http_check_remote_code( default_port, extra_dirs, unique_dir, check_request, extra_check, check_result, command, port ) {
 
+  local_var default_port, extra_dirs, unique_dir, check_request, extra_check, check_result, command, port;
   local_var list, req, txt_result, txt_desc, extra, dir, buf;
+  # nb: http_cgi_disabled and optimize_test_enabled are global vars from http_func.inc
 
-  if( get_kb_item( "Settings/disable_cgi_scanning" ) ) exit( 0 );
+  if( ! check_request ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#check_request#-#http_check_remote_code" );
+  if( ! check_result )  set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#check_result#-#http_check_remote_code" );
+  if( ! command )       set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#command#-#http_check_remote_code" );
 
-  if( ! check_request ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#check_request#-#http_check_remote_code" );
-  if( ! check_result ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#check_result#-#http_check_remote_code" );
-  if( ! command ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#command#-#http_check_remote_code" );
+  if( http_cgi_disabled ) {
+    if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
+      set_kb_item( name:"nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#http_check_remote_code()" );
+    }
+    exit( 0 );
+  }
 
   if( ! port ) {
     if( default_port ) {
       port = get_http_port( default:default_port );
     } else {
       port = get_http_port( default:80 );
-   }
+    }
+  } else {
+    if( ! get_port_state( port ) ) exit( 0 );
   }
-
-  if( ! get_port_state( port ) ) exit( 0 );
 
   if( unique_dir ) {
     list = make_list( unique_dir );
   } else {
     if( ! isnull( extra_dirs ) ) {
-      list = make_list( cgi_dirs( port:port ), extra_dirs );
+      list = make_list_unique( cgi_dirs( port:port ), extra_dirs );
     } else {
       list = make_list( cgi_dirs( port:port ) );
     }
@@ -508,19 +615,21 @@ function http_check_remote_code( default_port, extra_dirs, unique_dir, check_req
 
   foreach dir( list ) {
 
+    if( dir == "/" ) dir = "";
+
     req = string( dir, check_request );
     req = http_get( item:req, port:port );
     buf = http_keepalive_send_recv( port:port, data:req );
-    if( buf == NULL ) exit( 0 ); #TBD: Really exit?
+    if( isnull( buf ) ) exit( 0 ); #TBD: Really exit?
 
     txt_result = egrep( pattern:check_result, string:buf );
     if( extra_check ) {
-      extra = 0;
+      extra = FALSE;
       if( egrep( pattern:extra_check, string:buf ) ) {
-        extra = 1;
+        extra = TRUE;
       }
     } else {
-      extra = 1;
+      extra = TRUE;
     }
 
     if( txt_result && extra ) {
@@ -531,10 +640,11 @@ function http_check_remote_code( default_port, extra_dirs, unique_dir, check_req
   }
 }
 
-function http_vuln_check( port, url, pattern, check_header, debug, extra_check, hostname, cookie, check_nomatch, icase ) {
+# nb: The global_var __ka_last_request can be used to access the "req" crafted by this NVT
+function http_vuln_check( port, url, pattern, check_header, debug, extra_check, hostname, cookie, check_nomatch, icase, usecache ) {
 
   local_var port, url, pattern, check_header, debug, extra_check, hostname, cookie, check_nomatch;
-  local_var req, buf, ec, nm, icase;
+  local_var icase, usecache, req, buf, ec, nm;
 
   if( ! url ) {
     set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#http_vuln_check" );
@@ -553,21 +663,30 @@ function http_vuln_check( port, url, pattern, check_header, debug, extra_check, 
 
   if( isnull( icase ) ) icase = TRUE;
 
-  req = http_get( item:url, port:port );
+  if( usecache ) {
+    buf = http_get_cache( item:url, port:port );
+    if( COMMAND_LINE && hostname )
+      set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#http_vuln_check: Setting nocache to TRUE and passing hostname on command line isn't supported." );
+    if( cookie && ! isnull( cookie ) )
+      set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#http_vuln_check: Setting nocache to TRUE and passing a cookie isn't supported." );
+  } else {
 
-  if( COMMAND_LINE ) { # set hostname for vhosts on command line if hostname parameter was given.
-    if( hostname ) {
-      req = ereg_replace( string:req, pattern:"Host:.*" + get_host_ip(), replace: "Host: " + hostname );
+    req = http_get( item:url, port:port );
+
+    if( COMMAND_LINE ) { # set hostname for vhosts on command line if hostname parameter was given.
+      if( hostname ) {
+        req = ereg_replace( string:req, pattern:"Host:.*" + get_host_ip(), replace: "Host: " + hostname );
+      }
     }
+
+    if( cookie && ! isnull( cookie ) )
+      req = ereg_replace( string:req, pattern:'\r\n\r\n', replace: '\r\nCookie: ' + cookie + '\r\n\r\n' );
+
+    buf = http_keepalive_send_recv( port:port, data:req );
+    __ka_last_request = req;
   }
 
-  if( cookie && ! isnull( cookie ) )
-    req = ereg_replace( string:req, pattern:'\r\n\r\n', replace: '\r\nCookie: ' + cookie + '\r\n\r\n' );
-
-  buf = http_keepalive_send_recv( port:port, data:req );
-  if( buf == NULL ) return FALSE;
-
-  __ka_last_request = req;
+  if( isnull( buf  ) || buf == "" || ! buf ) return FALSE;
 
   if( debug ) {
     display( "\nContent:\n", buf, "\n" );
@@ -750,34 +869,39 @@ function http_get_req( port, url, add_headers, accept_header, user_agent, host_h
   return req;
 }
 
-function recv_http_buf( port, url, bodyonly, nocache )
-{
-  local_var port, url, bodyonly, nocache, req;
+# @brief This function creates a HTTP GET request for the specified URL,
+#        sends the request to the target and receives the response.
+#
+# @param port     the HTTP port of the target
+# @param url      the URL to request
+# @param bodyonly if TRUE only the body of the response is returned (not compatible with the nocache parameter set to FALSE)
+# @param nocache  if TRUE the response is not saved into the knowledge base
+#
+# @return the response to the HTTP GET request or NULL if no response was received
+#
+function recv_http_buf( port, url, bodyonly, nocache ) {
+
+  local_var port, url, bodyonly, nocache, req, res;
 
   if( ! port ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#recv_http_buf" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#recv_http_buf" );
     return;
   }
 
   if( ! url ) {
-    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#recv_http_buf" );
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#recv_http_buf" );
     return;
   }
 
-  if( ! nocache )
-  {
-    if( ! egrep( pattern:"(\?|&|#|;|\[|\]|=)", string:url  ) )
-      return http_get_cache( item:url,
-                             port:port );
-
+  if( ! nocache ) {
+    if( ! egrep( pattern:"(\?|&|#|;|\[|\]|=)", string:url ) ) {
+      if( bodyonly ) set_kb_item( name:"nvt_debug_misc/" + get_script_oid(), value:get_script_oid() + "#-#http_get_cache: nocache set to FALSE but bodyonly set to TRUE, response will contain the body." );
+      res = http_get_cache( item:url, port:port );
+      return res;
+    }
   }
 
   req = http_get( item:url, port:port );
-  return http_keepalive_send_recv( port:port,
-                                   data:http_get( item:url, port:port ),
-                                   bodyonly:bodyonly );
-
-  return;
-
+  res = http_keepalive_send_recv( port:port, data:req, bodyonly:bodyonly );
+  return res;
 }
-

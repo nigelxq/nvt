@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_1123_1.nasl 7964 2017-12-01 07:32:11Z santu $
+# $Id: gb_ubuntu_USN_1123_1.nasl 9648 2018-04-27 08:29:05Z cfischer $
 #
 # Ubuntu Update for xulrunner-1.9.1 USN-1123-1
 #
@@ -25,23 +25,14 @@
 ###############################################################################
 
 include("revisions-lib.inc");
-tag_insight = "A large number of security issues were discovered in the Gecko rendering
-  engine. If a user were tricked into viewing a malicious website, a remote
-  attacker could exploit a variety of issues related to web browser security,
-  including cross-site scripting attacks, denial of service attacks, and
-  arbitrary code execution.";
-
-tag_summary = "Ubuntu Update for Linux kernel vulnerabilities USN-1123-1";
-tag_affected = "xulrunner-1.9.1 on Ubuntu 9.10";
-tag_solution = "Please Install the Updated Packages.";
 
 
 if(description)
 {
   script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1123-1/");
-  script_id(840642);
-  script_version("$Revision: 7964 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-01 08:32:11 +0100 (Fri, 01 Dec 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.840642");
+  script_version("$Revision: 9648 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:29:05 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-05-10 14:04:15 +0200 (Tue, 10 May 2011)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -53,11 +44,15 @@ if(description)
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
-  script_tag(name : "summary" , value : tag_summary);
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "solution" , value : tag_solution);
-  script_tag(name : "insight" , value : tag_insight);
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU9\.10");
+  script_tag(name : "summary" , value : "Ubuntu Update for Linux kernel vulnerabilities USN-1123-1");
+  script_tag(name : "affected" , value : "xulrunner-1.9.1 on Ubuntu 9.10");
+  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
+  script_tag(name : "insight" , value : "A large number of security issues were discovered in the Gecko rendering
+  engine. If a user were tricked into viewing a malicious website, a remote
+  attacker could exploit a variety of issues related to web browser security,
+  including cross-site scripting attacks, denial of service attacks, and
+  arbitrary code execution.");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -83,6 +78,6 @@ if(release == "UBUNTU9.10")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_TELNET_Cisco_Voice.nasl 7076 2017-09-07 11:53:47Z teissa $
+# $Id: GSHB_TELNET_Cisco_Voice.nasl 9567 2018-04-23 13:22:46Z cfischer $
 #
 # List reject Rule on Cisco Voip Devices over Telnet
 #
@@ -30,9 +30,9 @@ tag_summary = "This plugin list reject Rule on Cisco Voip Devices over Telnet.
 
 if(description)
 {
-  script_id(96107);
-  script_version("$Revision: 7076 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-07 13:53:47 +0200 (Thu, 07 Sep 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.96107");
+  script_version("$Revision: 9567 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-23 15:22:46 +0200 (Mon, 23 Apr 2018) $");
   script_tag(name:"creation_date", value:"2010-06-10 15:20:25 +0200 (Thu, 10 Jun 2010)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -50,7 +50,7 @@ if(description)
   exit(0);
 }
 
-include('telnet_func.inc');
+include("telnet_func.inc");
 include("default_account.inc");
 
 telnet_port = get_kb_item("Services/telnet");

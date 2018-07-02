@@ -43,16 +43,16 @@ tag_affected = "xulrunner on CentOS 5";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.centos.org/pipermail/centos-announce/2011-September/018058.html");
-  script_id(881010);
-  script_version("$Revision: 6653 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:46:53 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.881010");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-09-23 16:39:49 +0200 (Fri, 23 Sep 2011)");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
   script_xref(name: "CESA", value: "2011:1268");
   script_name("CentOS Update for xulrunner CESA-2011:1268 centos5 i386");
 
-  script_summary("Check for the Version of xulrunner");
+  script_tag(name:"summary", value:"Check for the Version of xulrunner");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

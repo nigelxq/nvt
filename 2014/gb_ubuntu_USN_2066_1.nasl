@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_2066_1.nasl 7957 2017-12-01 06:40:08Z santu $
+# $Id: gb_ubuntu_USN_2066_1.nasl 9651 2018-04-27 08:59:56Z cfischer $
 #
 # Ubuntu Update for linux USN-2066-1
 #
@@ -28,9 +28,9 @@ include("revisions-lib.inc");
 
 if(description)
 {
-  script_id(841677);
-  script_version("$Revision: 7957 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-01 07:40:08 +0100 (Fri, 01 Dec 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.841677");
+  script_version("$Revision: 9651 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:59:56 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2014-01-06 16:04:20 +0530 (Mon, 06 Jan 2014)");
   script_cve_id("CVE-2013-4299", "CVE-2013-4470", "CVE-2013-4511", "CVE-2013-4514",
                 "CVE-2013-4515", "CVE-2013-4592", "CVE-2013-6378", "CVE-2013-6383",
@@ -39,7 +39,9 @@ if(description)
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:M/Au:N/C:C/I:C/A:C");
   script_name("Ubuntu Update for linux USN-2066-1");
 
-  tag_insight = "A flaw was discovered in the Linux kernel's dm snapshot facility. A remote
+
+  script_tag(name : "affected" , value : "linux on Ubuntu 12.04 LTS");
+  script_tag(name : "insight" , value : "A flaw was discovered in the Linux kernel's dm snapshot facility. A remote
 authenticated user could exploit this flaw to obtain sensitive information
 or modify/corrupt data. (CVE-2013-4299)
 
@@ -55,7 +57,7 @@ exploit this flaw to gain administrative privileges. (CVE-2013-4511)
 Nico Golde and Fabian Yamaguchi reported a flaw in the Linux kernel's
 driver for Agere Systems HERMES II Wireless PC Cards. A local user with the
 CAP_NET_ADMIN capability could exploit this flaw to cause a denial of
-service or possibly gain administrative priviliges. (CVE-2013-4514)
+service or possibly gain administrative privileges. (CVE-2013-4514)
 
 Nico Golde and Fabian Yamaguchi reported a flaw in the Linux kernel's
 driver for Beceem WIMAX chipset based devices. An unprivileged local user
@@ -82,26 +84,18 @@ corruption) or possibly gain privileges. (CVE-2013-6763)
 
 Evan Huus reported a buffer overflow in the Linux kernel's radiotap header
 parsing. A remote attacker could cause a denial of service (buffer over-
-read) via a specially crafted header. (CVE-2013-7027)";
-
-  tag_affected = "linux on Ubuntu 12.04 LTS";
-
-  tag_solution = "Please Install the Updated Packages.";
-
-
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "solution" , value : tag_solution);
+read) via a specially crafted header. (CVE-2013-7027)");
+  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   script_xref(name: "USN", value: "2066-1");
   script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-2066-1/");
-  script_summary("Check for the Version of linux");
+  script_tag(name:"summary", value:"Check for the Version of linux");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU12\.04 LTS");
   exit(0);
 }
 
@@ -160,6 +154,6 @@ if(release == "UBUNTU12.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

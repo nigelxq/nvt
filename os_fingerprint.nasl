@@ -1,6 +1,6 @@
 ###################################################################
-# OpenVAS Network Vulnerability Test
-# $Id: os_fingerprint.nasl 8720 2018-02-08 13:20:07Z cfischer $
+# OpenVAS Vulnerability Test
+# $Id: os_fingerprint.nasl 9745 2018-05-07 11:45:41Z cfischer $
 #
 # ICMP based OS Fingerprinting
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.102002");
-  script_version("$Revision: 8720 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-08 14:20:07 +0100 (Thu, 08 Feb 2018) $");
+  script_version("$Revision: 9745 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-07 13:45:41 +0200 (Mon, 07 May 2018) $");
   script_tag(name:"creation_date", value:"2009-05-19 12:05:50 +0200 (Tue, 19 May 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -52,11 +52,14 @@ if(description)
                       "gb_hirschmann_consolidation.nasl", "gb_mikrotik_router_routeros_consolidation.nasl",
                       "gb_xenserver_version.nasl", "gb_cisco_ios_xe_version.nasl",
                       "gb_mcafee_email_gateway_version.nasl", "gb_brocade_netiron_snmp_detect.nasl",
+                      "gb_brocade_fabricos_consolidation.nasl",
                       "gb_arubaos_detect.nasl", "gb_cyberoam_umt_ngfw_detect.nasl",
                       "gb_aerohive_hiveos_detect.nasl", "gb_qnap_nas_detect.nasl",
                       "gb_synology_dsm_detect.nasl", "gb_simatic_s7_version.nasl",
                       "gb_simatic_cp_consolidation.nasl", "gb_simatic_scalance_snmp_detect.nasl",
-                      "gb_watchguard_fireware_detect.nasl", "gb_windows_cpe_detect.nasl",
+                      "gb_siemens_ruggedcom_consolidation.nasl", "ilo_detect.nasl",
+                      "gb_watchguard_fireware_detect.nasl", "gb_vibnode_consolidation.nasl",
+                      "gb_hyperip_consolidation.nasl", "gb_windows_cpe_detect.nasl",
                       "gather-package-list.nasl", "gb_cisco_pis_version.nasl",
                       "gb_checkpoint_fw_version.nasl", "gb_smb_windows_detect.nasl",
                       "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)
@@ -71,16 +74,15 @@ if(description)
                       "gb_sip_os_detection.nasl", "gb_check_mk_agent_detect.nasl",
                       "ms_rdp_detect.nasl", "gb_apache_activemq_detect.nasl",
                       "dcetest.nasl", "gb_hnap_os_detection.nasl",
-                      "ident_process_owner.nasl"); # but without gb_nmap_os_detection.nasl and the own os_fingerprint.nasl
+                      "ident_process_owner.nasl", "gb_pihole_detect.nasl",
+                      "gb_dropbear_ssh_detect.nasl"); # but without gb_nmap_os_detection.nasl and the own os_fingerprint.nasl
   script_exclude_keys("keys/TARGET_IS_IPV6");
 
   script_xref(name:"URL", value:"http://www.phrack.org/issues.html?issue=57&id=7#article");
 
-  tag_summary = "This script performs ICMP based OS fingerprinting (as described by
+  script_tag(name:"summary", value:"This script performs ICMP based OS fingerprinting (as described by
   Ofir Arkin and Fyodor Yarochkin in Phrack #57). It can be used to determine
-  remote operating system version. The result is stored in the KB for later analysis only.";
-
-  script_tag(name:"summary", value:tag_summary);
+  remote operating system version. The result is stored in the KB for later analysis only.");
 
   script_tag(name:"qod_type", value:"remote_analysis");
 
@@ -107,7 +109,7 @@ SCRIPT_DESC = "ICMP based OS Fingerprinting";
 # Fingerprints extracted from xprobe2.conf
 # -----
 # The fingerprints table is divided into sections. Each section starts with its
-# label, followed by the corresponding fingerprints. An emty string closes the
+# label, followed by the corresponding fingerprints. An empty string closes the
 # section.
 # In case there are several matches for the remote OS, then the section title(s)
 # will be displayed instead of the whole list of matches.

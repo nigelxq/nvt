@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gather-package-list.nasl 8720 2018-02-08 13:20:07Z cfischer $
+# $Id: gather-package-list.nasl 10164 2018-06-12 11:48:11Z jschulte $
 #
 # Determine OS and list of installed packages via SSH login
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.50282");
-  script_version("$Revision: 8720 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-08 14:20:07 +0100 (Thu, 08 Feb 2018) $");
+  script_version("$Revision: 10164 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-12 13:48:11 +0200 (Tue, 12 Jun 2018) $");
   script_tag(name:"creation_date", value:"2008-01-17 22:05:49 +0100 (Thu, 17 Jan 2008)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -137,6 +137,7 @@ OS_CPE = make_array(
     "SLED10.0SP0", "cpe:/o:suse:linux_enterprise_desktop:10:SP0",
 
     # Ubuntu
+    "UBUNTU18.04 LTS","cpe:/o:canonical:ubuntu_linux:18.04:-:lts",
     "UBUNTU17.10",    "cpe:/o:canonical:ubuntu_linux:17.10",
     "UBUNTU17.04",    "cpe:/o:canonical:ubuntu_linux:17.04",
     "UBUNTU16.10",    "cpe:/o:canonical:ubuntu_linux:16.10",
@@ -187,6 +188,7 @@ OS_CPE = make_array(
     "CentOS2", "cpe:/o:centos:centos:2",
 
     # Fedora / Fedora Core
+    "FC28", "cpe:/o:fedoraproject:fedora:28",
     "FC27", "cpe:/o:fedoraproject:fedora:27",
     "FC26", "cpe:/o:fedoraproject:fedora:26",
     "FC25", "cpe:/o:fedoraproject:fedora:25",
@@ -217,6 +219,7 @@ OS_CPE = make_array(
 
     # Debian
     "DEB10.0", "cpe:/o:debian:debian_linux:10.0",
+    "DEB9.4", "cpe:/o:debian:debian_linux:9.4",
     "DEB9.3", "cpe:/o:debian:debian_linux:9.3",
     "DEB9.2", "cpe:/o:debian:debian_linux:9.2",
     "DEB9.1", "cpe:/o:debian:debian_linux:9.1",
@@ -334,11 +337,6 @@ OS_CPE = make_array(
     # Amazon Linux
     "AMAZON",     "cpe:/o:amazon:linux",
 
-    # Oracle Linux
-    "OracleLinux7",  "cpe:/o:oraclelinux:oraclelinux:7",
-    "OracleLinux6",  "cpe:/o:oraclelinux:oraclelinux:6",
-    "OracleLinux5",  "cpe:/o:oraclelinux:oraclelinux:5",
-
     # Univention Corporate Server (http://wiki.univention.de/index.php?title=Maintenance_Cycle_for_UCS)
     "UCS4.2", "cpe:/o:univention:univention_corporate_server:4.2",
     "UCS4.1", "cpe:/o:univention:univention_corporate_server:4.1",
@@ -391,7 +389,11 @@ OS_CPE = make_array(
     "HPUX10.01", "cpe:/o:hp:hp-ux:10.01",
 
     # FortiOS
-    "FortiOS", "cpe:/o:fortinet:fortios"
+    "FortiOS", "cpe:/o:fortinet:fortios",
+
+    # Arch Linux
+    # nb: Arch Linux is a rolling release so there is no "real" version
+    "ArchLinux", "cpe:/o:archlinux:archlinux"
 );
 
 # GNU/Linux platforms:
@@ -415,6 +417,10 @@ function register_rpms( buf ) {
   set_kb_item( name:"ssh/login/rpms", value:";" + buf );
 }
 
+function register_npms( buf ) {
+  set_kb_item( name:"ssh/login/npms", value:buf );
+}
+
 port = get_preference( "auth_port_ssh" );
 if( ! port ) port = get_kb_item( "Services/ssh" );
 if( ! port ) port = 22;
@@ -425,6 +431,28 @@ if( ! sock ) exit( 0 );
 # First command: Grab uname -a of the remote system
 uname = ssh_cmd( socket:sock, cmd:"uname -a", return_errors:TRUE, pty:TRUE, timeout:60, retry:30 );
 if( isnull( uname ) ) exit( 0 );
+
+buf = ssh_cmd( socket:sock, cmd:"COLUMNS=400 npm list" );
+if( ! isnull( buf ) && "command not found" >!< buf ) register_npms( buf:buf );
+
+if( "HyperIP Command Line Interface" >< uname ) {
+
+  replace_kb_item( name:"ssh/send_extra_cmd", value:'\n' );
+  show_version = ssh_cmd( socket:sock, cmd:"showVersion", nosh:TRUE, return_errors:FALSE, pty:TRUE, timeout:20, retry:10, pattern:"Product Version" );
+
+  # Product Version ............ HyperIP 6.1.1 11-Jan-2018 13:09 (build 2) (r9200)
+  if( "Product Version" >< show_version && "HyperIP" >< show_version ) {
+    set_kb_item( name:"hyperip/ssh-login/" + port + "/show_version", value:show_version );
+  }
+
+  set_kb_item( name:"hyperip/ssh-login/" + port + "/uname", value:uname );
+  set_kb_item( name:"hyperip/ssh-login/show_version_or_uname", value:TRUE );
+  set_kb_item( name:"hyperip/ssh-login/port", value:port );
+
+  set_kb_item( name:"ssh/restricted_shell", value:TRUE );
+  set_kb_item( name:"ssh/no_linux_shell", value:TRUE );
+  exit( 0 );
+}
 
 # e.g. Cisco Prime Infrastructure if another admin is logged in
 if( "Another user is logged into the system at this time" >< uname && "Are you sure you want to continue" >< uname ) {
@@ -448,7 +476,7 @@ if( "Welcome to pfSense" >< uname ) {
   set_kb_item( name:"pfsense/ssh/port", value:port);
   set_kb_item( name:"ssh/force/pty", value:TRUE );
   set_kb_item( name:"ssh/force/nosh", value:TRUE );
-  # clear the buffer to avoid that we're saving the whole pfSense menue in the uname
+  # clear the buffer to avoid that we're saving the whole pfSense menu in the uname
   set_kb_item( name:"ssh/force/clear_buffer", value:TRUE );
   replace_kb_item( name:"ssh/send_extra_cmd", value:'8\n' );
   uname = ssh_cmd( socket:sock, cmd:"uname -a", return_errors:TRUE, pty:TRUE, timeout:20, retry:10 );
@@ -458,12 +486,16 @@ if( "Welcome to pfSense" >< uname ) {
 if( "Welcome to the Greenbone OS" >< uname ) {
   set_kb_item( name:"greenbone/gos/uname", value:uname );
   set_kb_item( name:"greenbone/gos", value:TRUE );
-}
 
-# nb: Don't save the text based login menu of GOS in here
-if( "Welcome to the Greenbone OS" >!< uname ) {
-set_kb_item( name:"ssh/login/uname", value:uname );
-set_kb_item( name:"Host/uname", value:uname );
+  # Don't use a pty which avoids that we're getting the GOS admin menu back in our uname command
+  # and to save the "real" uname later
+  uname = ssh_cmd( socket:sock, cmd:"uname -a", return_errors:FALSE, pty:FALSE, timeout:20, retry:10 );
+
+  # This is from GOS 3.1.x where we need to use a pty and pass an extra command for each ssh_cmd call
+  if( "Type 'gos-admin-menu' to start the Greenbone OS Administration tool" >< uname ) {
+    replace_kb_item( name:"ssh/send_extra_cmd", value:'shell\n' );
+    uname = ssh_cmd( socket:sock, cmd:"uname -a", return_errors:FALSE, pty:TRUE, timeout:20, retry:10 );
+  }
 }
 
 if( "linux" >< tolower( uname ) ) {
@@ -480,13 +512,14 @@ if( "linux" >< tolower( uname ) ) {
 
 if( "(Cisco Controller)" >< uname ) exit( 0 );
 
+# To catch the uname above before doing an exit
+if( get_kb_item( "greenbone/gos" ) ) exit( 0 );
+
+# nb: It wasn't clear if this was only seen on GOS so keep this for now
 if( "restricted: cannot specify" >< uname ) {
   set_kb_item( name:"ssh/restricted_shell", value:TRUE );
   exit( 0 );
 }
-
-# To catch the restricted shell and uname stuff above before doing an exit
-if( get_kb_item( "greenbone/gos" ) ) exit( 0 );
 
 if( "TANDBERG Video Communication Server" >< uname ) {
   set_kb_item( name:"cisco/ssh/vcs", value:TRUE );
@@ -1227,12 +1260,33 @@ rls = ssh_cmd(socket:sock, cmd:"rpm -qf /etc/redhat-release");
 if( "No such file or directory" >!< rls && strlen( rls ) )
   _unknown_os_info += 'rpm -qf /etc/redhat-release: ' + rls + '\n\n';
 
+if( "oraclelinux-release-4" >< rls ) {
+  set_kb_item( name:"ssh/login/oracle_linux", value:TRUE );
+  buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
+  register_rpms( buf:buf );
+  if( match = eregmatch( pattern:"oraclelinux-release-4.([0-9]+)", string:rls ) ) {
+    version = "4." + match[1];
+  } else {
+    version = "4";
+  }
+  log_message( port:port, data:"We are able to login and detect that you are running Oracle Linux " + version );
+  register_and_report_os( os:"Oracle Linux " + version, cpe:"cpe:/o:oracle:linux:" + version, banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  set_kb_item( name:"ssh/login/release", value:"OracleLinux4" ); # nb: Special handling as the Oracle / ELSA LSCs are using just the major release
+  exit( 0 );
+}
+
 if( "oraclelinux-release-5" >< rls ) {
   set_kb_item( name:"ssh/login/oracle_linux", value:TRUE );
   buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
   register_rpms( buf:buf );
-  log_message( port:port, data:"We are able to login and detect that you are running OracleLinux release 5" );
-  register_detected_os( os:"OracleLinux release 5", oskey:"OracleLinux5" );
+  if( match = eregmatch( pattern:"oraclelinux-release-5.([0-9]+)", string:rls ) ) {
+    version = "5." + match[1];
+  } else {
+    version = "5";
+  }
+  log_message( port:port, data:"We are able to login and detect that you are running Oracle Linux " + version );
+  register_and_report_os( os:"Oracle Linux " + version, cpe:"cpe:/o:oracle:linux:" + version, banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  set_kb_item( name:"ssh/login/release", value:"OracleLinux5" ); # nb: Special handling as the Oracle / ELSA LSCs are using just the major release
   exit( 0 );
 }
 
@@ -1240,8 +1294,14 @@ if( "oraclelinux-release-6" >< rls ) {
   set_kb_item( name:"ssh/login/oracle_linux", value:TRUE );
   buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
   register_rpms( buf:buf );
-  log_message( port:port, data:"We are able to login and detect that you are running OracleLinux release 6" );
-  register_detected_os( os:"OracleLinux release 6", oskey:"OracleLinux6" );
+  if( match = eregmatch( pattern:"oraclelinux-release-6.([0-9]+)", string:rls ) ) {
+    version = "6." + match[1];
+  } else {
+    version = "6";
+  }
+  log_message( port:port, data:"We are able to login and detect that you are running Oracle Linux " + version );
+  register_and_report_os( os:"Oracle Linux " + version, cpe:"cpe:/o:oracle:linux:" + version, banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  set_kb_item( name:"ssh/login/release", value:"OracleLinux6" ); # nb: Special handling as the Oracle / ELSA LSCs are using just the major release
   exit( 0 );
 }
 
@@ -1249,8 +1309,14 @@ if( "oraclelinux-release-7" >< rls ) {
   set_kb_item( name:"ssh/login/oracle_linux", value:TRUE );
   buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
   register_rpms( buf:buf );
-  log_message( port:port, data:"We are able to login and detect that you are running OracleLinux release 7" );
-  register_detected_os( os:"OracleLinux release 7", oskey:"OracleLinux7" );
+  if( match = eregmatch( pattern:"oraclelinux-release-7.([0-9]+)", string:rls ) ) {
+    version = "7." + match[1];
+  } else {
+    version = "7";
+  }
+  log_message( port:port, data:"We are able to login and detect that you are running Oracle Linux " + version );
+  register_and_report_os( os:"Oracle Linux " + version, cpe:"cpe:/o:oracle:linux:" + version, banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  set_kb_item( name:"ssh/login/release", value:"OracleLinux7" ); # nb: Special handling as the Oracle / ELSA LSCs are using just the major release
   exit( 0 );
 }
 
@@ -1532,7 +1598,14 @@ if( "Fedora release 27" >< rls && "(Twenty Seven)" >< rls ) {
   register_detected_os( os:rls, oskey:"FC27" );
   exit( 0 );
 }
-
+if( "Fedora release 28" >< rls && "(Twenty Eight)" >< rls ) {
+  set_kb_item( name:"ssh/login/fedora", value:TRUE );
+  buf = ssh_cmd( socket:sock, cmd:"/bin/rpm -qa --qf '%{NAME}~%{VERSION}~%{RELEASE};'" );
+  register_rpms( buf:buf );
+  log_message( port:port, data:"We are able to login and detect that you are running " + rls );
+  register_detected_os( os:rls, oskey:"FC28" );
+  exit( 0 );
+}
 # Red Hat Enterprise Linux ES release 2.1 (Panama)
 # Red Hat Enterprise Linux AS release 3 (Taroon Update 1)
 # Red Hat Enterprise Linux AS release 3 (Taroon Update 2)
@@ -2108,8 +2181,15 @@ if( "DISTRIB_ID=Ubuntu" >< rls && "DISTRIB_RELEASE=17.10" >< rls ) {
   register_detected_os( os:"Ubuntu 17.10", oskey:"UBUNTU17.10" );
   exit( 0 );
 }
+if( "DISTRIB_ID=Ubuntu" >< rls && "DISTRIB_RELEASE=18.04" >< rls ) {
+  set_kb_item( name:"ssh/login/ubuntu_linux", value:TRUE );
+  buf = ssh_cmd( socket:sock, cmd:"COLUMNS=400 dpkg -l" );
+  if( ! isnull( buf ) ) register_packages( buf:buf );
+  log_message( port:port, data:"We are able to login and detect that you are running Ubuntu 18.04 LTS" );
+  register_detected_os( os:"Ubuntu 18.04 LTS", oskey:"UBUNTU18.04 LTS" );
+  exit( 0 );
+}
 
-# Check for Univention Corporate Server (UCS)
 if( rls =~ 'DISTRIB_ID=("|\')?Univention("|\')?' ) {
 
   ucs_release = eregmatch( string:rls, pattern:'DISTRIB_RELEASE="([1-9][0-9]*[.][0-9]+)-([0-9]+) errata([0-9]+)[^"]*"' );
@@ -2660,8 +2740,16 @@ if( "openSUSE Leap 42.1" >< rls ) {
   exit( 0 );
 }
 
+# nb: Arch Linux is a rolling release so there is no "real" version
+if( 'NAME="Arch Linux"' >< rls ) {
+  set_kb_item( name:"ssh/login/arch_linux", value:TRUE );
+  log_message( port:port, data:"We are able to login and detect that you are running Arch Linux. Note: Local Security Checks (LSC) are not available for this OS." );
+  register_detected_os( os:"Arch Linux", oskey:"ArchLinux" );
+  exit( 0 );
+}
+
 # nb: In SLES12+ /etc/SuSE-release is deprecated in favor of /etc/os-release
-rls = ssh_cmd(socket:sock, cmd:"cat /etc/SuSE-release");
+rls = ssh_cmd( socket:sock, cmd:"cat /etc/SuSE-release" );
 
 if( "No such file or directory" >!< rls && strlen( rls ) )
   _unknown_os_info += '/etc/SuSE-release: ' + rls + '\n\n';
@@ -3222,6 +3310,24 @@ if( "SunOS " >< uname ) {
   exit( 0 );
 }
 
+# This is just doing a basic detection, we don't have any LSCs for OpenBSD...
+# OpenBSD $hostname 5.5 GENERIC#271 amd64
+# OpenBSD $hostname 6.3 GENERIC#100 amd64
+if( "OpenBSD " >< uname ) {
+
+  osversion = ssh_cmd( socket:sock, cmd:"uname -r" );
+  set_kb_item( name:"ssh/login/openbsdversion", value:osversion );
+
+  if( match = eregmatch( pattern:"^([0-9.]+)", string:osversion ) ) {
+    register_and_report_os( os:"OpenBSD", version:match[1], cpe:"cpe:/o:openbsd:openbsd", banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  } else {
+    register_and_report_os( os:"OpenBSD", cpe:"cpe:/o:openbsd:openbsd", banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+    # nb: We want to report the unknown / not detected version
+    register_unknown_os_banner( banner:'Unknown OpenBSD release.\n\nuname: ' + uname + '\nuname -r: ' + osversion, banner_type_name:SCRIPT_DESC, banner_type_short:"gather_package_list", port:port );
+  }
+  exit( 0 );
+}
+
 #maybe it's a real OS... like Mac OS X :)
 if( "Darwin" >< uname ) {
 
@@ -3232,13 +3338,14 @@ if( "Darwin" >< uname ) {
   set_kb_item( name:"ssh/login/osx_name", value:buf );
 
   buf = chomp( ssh_cmd( socket:sock, cmd:"sw_vers -productVersion" ) );
-  set_kb_item( name:"ssh/login/osx_version", value:buf );
-  if( match = eregmatch( pattern:"^([0-9]+\.[0-9]+\.[0-9]+)", string:buf ) ) {
-    register_and_report_os( os:"Mac OS X", version:match[1], cpe:"cpe:/o:apple:mac_os_x", banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+  if( match = eregmatch( pattern:"^([0-9]+\.[0-9]+\.[0-9]+)", string:buf ) )
+  {
+    set_kb_item( name:"ssh/login/osx_version", value:match[1]);
+    register_and_report_os( os:"Mac OS X / macOS", version:match[1], cpe:"cpe:/o:apple:mac_os_x", banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
   } else {
-    register_and_report_os( os:"Mac OS X", cpe:"cpe:/o:apple:mac_os_x", banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
+    register_and_report_os( os:"Mac OS X / macOS", cpe:"cpe:/o:apple:mac_os_x", banner_type:"SSH login", desc:SCRIPT_DESC, runs_key:"unixoide" );
     # nb: We want to report the unknown / not detected version
-    register_unknown_os_banner( banner:'Unknown Mac OS X release.\n\nsw_vers output:\n' + sw_vers_buf, banner_type_name:SCRIPT_DESC, banner_type_short:"gather_package_list", port:port );
+    register_unknown_os_banner( banner:'Unknown Mac OS X  / macOS release.\n\nsw_vers output:\n' + sw_vers_buf, banner_type_name:SCRIPT_DESC, banner_type_short:"gather_package_list", port:port );
   }
 
   buf = chomp( ssh_cmd( socket:sock, cmd:"sw_vers -buildVersion" ) );
@@ -3250,8 +3357,8 @@ if( "Darwin" >< uname ) {
   exit( 0 );
 }
 
+# TODO:
 #{ "NetBSD",     "????????????????",         },
-#{ "OpenBSD",    "????????????????",         },
 #{ "WhiteBox",   "????????????????",         },
 #{ "Linspire",   "????????????????",         },
 #{ "Desktop BSD","????????????????",         },
@@ -3260,14 +3367,21 @@ if( "Darwin" >< uname ) {
 #{ "JDS",        "/etc/sun-release",         },
 #{ "Yellow Dog", "/etc/yellowdog-release",   },
 
-report = 'System identifier unknown:\n\n';
-report += uname;
-report += '\n\nTherefore no local security checks applied (missing list of installed packages) ';
-report += 'though SSH login provided and works.';
+if( uname ) {
+  report  = 'System identifier unknown:\n\n';
+  report += uname;
+  report += '\n\nTherefore no local security checks applied (missing list of installed packages) ';
+  report += 'though SSH login provided and works.';
+} else {
+  report  = 'System identifier unknown. Therefore no local security checks applied ';
+  report += '(missing list of installed packages) though SSH login provided and works.';
+}
 
 log_message( port:port, data:report );
 
-_unknown_os_info = 'uname: ' + uname + '\n\n' + _unknown_os_info;
-register_unknown_os_banner( banner:_unknown_os_info, banner_type_name:SCRIPT_DESC, banner_type_short:"gather_package_list", port:port );
+if( _unknown_os_info ) {
+  if( uname ) _unknown_os_info = 'uname: ' + uname + '\n\n' + _unknown_os_info;
+  register_unknown_os_banner( banner:_unknown_os_info, banner_type_name:SCRIPT_DESC, banner_type_short:"gather_package_list", port:port );
+}
 
 exit( 0 );

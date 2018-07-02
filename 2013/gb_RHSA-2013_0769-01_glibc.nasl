@@ -85,9 +85,9 @@ tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_id(870985);
-  script_version("$Revision: 6687 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:46:43 +0200 (Wed, 12 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.870985");
+  script_version("$Revision: 9372 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:56:37 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-04-25 10:17:44 +0530 (Thu, 25 Apr 2013)");
   script_cve_id("CVE-2013-0242", "CVE-2013-1914");
   script_tag(name:"cvss_base", value:"5.0");
@@ -96,7 +96,7 @@ if(description)
 
   script_xref(name: "RHSA", value: "2013:0769-01");
   script_xref(name: "URL" , value: "https://www.redhat.com/archives/rhsa-announce/2013-April/msg00034.html");
-  script_summary("Check for the Version of glibc");
+  script_tag(name:"summary", value:"Check for the Version of glibc");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("Red Hat Local Security Checks");

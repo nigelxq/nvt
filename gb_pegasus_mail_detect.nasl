@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_pegasus_mail_detect.nasl 5372 2017-02-20 16:26:11Z cfi $
+# $Id: gb_pegasus_mail_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
 #
 # Pegasus Mail Version Detection
 #
@@ -24,15 +24,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This script retrieves the installed version of Pegasus Mail and
-  saves the result in KB.";
-
 if(description)
 {
-  script_id(800969);
+  script_oid("1.3.6.1.4.1.25623.1.0.800969");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 5372 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-02-20 17:26:11 +0100 (Mon, 20 Feb 2017) $");
+ script_version("$Revision: 9633 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
   script_tag(name:"creation_date", value:"2009-11-05 12:25:48 +0100 (Thu, 05 Nov 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Pegasus Mail Version Detection");
@@ -43,7 +40,8 @@ if(description)
   script_dependencies("secpod_reg_enum.nasl");
   script_mandatory_keys("SMB/WindowsVersion");
   script_require_ports(139, 445);
-  script_tag(name : "summary" , value : tag_summary);
+  script_tag(name : "summary" , value : "This script retrieves the installed version of Pegasus Mail and
+  saves the result in KB.");
   exit(0);
 }
 
@@ -53,8 +51,6 @@ include("secpod_smb_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Constant values
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.800969";
 SCRIPT_DESC = "Pegasus Mail Version Detection";
 
 if(!get_kb_item("SMB/WindowsVersion")){
@@ -82,11 +78,10 @@ if("Pegasus Mail" >< pmailName)
         log_message(data:"Pegasus Mail version " + pmailVer +
                            " running at location " + pmailPath +
                            " was detected on the host");
-  
-        ## build cpe and store it as host_detail
+
         cpe = build_cpe(value:pmailVer, exp:"^([0-9.]+)", base:"cpe:/a:pmail:pegasus_mail:");
         if(!isnull(cpe))
-           register_host_detail(name:"App", value:cpe, nvt:SCRIPT_OID, desc:SCRIPT_DESC);
+           register_host_detail(name:"App", value:cpe, desc:SCRIPT_DESC);
 
       }
     }

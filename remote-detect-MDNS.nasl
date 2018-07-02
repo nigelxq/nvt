@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: remote-detect-MDNS.nasl 7589 2017-10-27 07:03:33Z cfischer $
+# $Id: remote-detect-MDNS.nasl 9977 2018-05-28 08:02:51Z cfischer $
 #
 # MDNS Service Detection
 #
@@ -26,8 +26,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.101013");
-  script_version("$Revision: 7589 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-27 09:03:33 +0200 (Fri, 27 Oct 2017) $");
+  script_version("$Revision: 9977 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-28 10:02:51 +0200 (Mon, 28 May 2018) $");
   script_tag(name:"creation_date", value:"2009-03-16 00:46:49 +0100 (Mon, 16 Mar 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -150,7 +150,6 @@ reply = recv( socket:soc, length:1024 );
 
 if( reply ) {
 
-  # get host informations
   hostinfos = grabHostInfos( stringa:reply );
 
   if( typeof( hostinfos ) == "array" ) {
@@ -163,7 +162,6 @@ if( reply ) {
     reply = recv( socket:soc, length:1 );
     reply = recv( socket:soc, length:1024 );
 
-    # get cpu informations
     cpuinfos = grabCpuInfos( stringa:reply );
   }
 
@@ -174,7 +172,7 @@ close( soc );
 
 report = '';
 
-# save gathered informations into variables
+# save gathered information into variables
 if( strlen( hostinfos[1] ) > 1 ) {
   hostname = hostinfos[1];
   report  += 'Hostname: ' + hostname;
@@ -185,7 +183,7 @@ if( strlen( hostinfos[0] ) > 1 ) {
   mac_address = hostinfos[0];
   report += ' \nMAC Address: ' + mac_address;
   set_kb_item( name:"MDNS/Host/MacAddress", value:mac_address );
-  register_host_detail( name:"MAC", value:mac_address );
+  register_host_detail( name:"MAC", value:mac_address, desc:"MDNS Service Detection" );
 }
 
 if( strlen( cpuinfos[0] ) > 1 ) {

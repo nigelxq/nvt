@@ -59,9 +59,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "https://www.redhat.com/archives/rhsa-announce/2011-December/msg00034.html");
-  script_id(870524);
-  script_version("$Revision: 6685 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 11:44:46 +0200 (Wed, 12 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.870524");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-12-16 11:08:49 +0530 (Fri, 16 Dec 2011)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
@@ -69,7 +69,7 @@ if(description)
   script_cve_id("CVE-2009-4274", "CVE-2011-4516", "CVE-2011-4517");
   script_name("RedHat Update for netpbm RHSA-2011:1811-01");
 
-  script_summary("Check for the Version of netpbm");
+  script_tag(name:"summary", value:"Check for the Version of netpbm");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("Red Hat Local Security Checks");

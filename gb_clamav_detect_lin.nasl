@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_clamav_detect_lin.nasl 8138 2017-12-15 11:42:07Z cfischer $
+# $Id: gb_clamav_detect_lin.nasl 9633 2018-04-26 14:07:08Z jschulte $
 #
 # CalmAV Version Detection (Linux)
 #
@@ -24,15 +24,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This script retrieves ClamAV Version and saves the result
-  in KB.";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.800553");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8138 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 12:42:07 +0100 (Fri, 15 Dec 2017) $");
+ script_version("$Revision: 9633 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
   script_tag(name:"creation_date", value:"2009-04-23 08:16:04 +0200 (Thu, 23 Apr 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("ClamAV Version Detection (Linux)");
@@ -44,7 +41,8 @@ if(description)
   script_mandatory_keys("login/SSH/success");
   script_exclude_keys("ssh/no_linux_shell");
 
-  script_tag(name : "summary" , value : tag_summary);
+  script_tag(name : "summary" , value : "This script retrieves ClamAV Version and saves the result
+  in KB.");
   exit(0);
 }
 
@@ -54,8 +52,6 @@ include("version_func.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Constant values
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.800553";
 SCRIPT_DESC = "ClamAV Version Detection (Linux)";
 
 sock = ssh_login_or_reuse_connection();
@@ -72,14 +68,13 @@ foreach binaryFile (getPath)
   {
     set_kb_item(name:"ClamAV/installed", value:TRUE);
     set_kb_item(name:"ClamAV/Lin/Ver", value:avVer[1]);
-    log_message(data:"Clam Anti Virus version " + avVer[1] + " running at" + 
+    log_message(data:"Clam Anti Virus version " + avVer[1] + " running at" +
                        " location " + binaryFile + " was detected on the host");
     ssh_close_connection();
-    
-    ## build cpe and store it as host_detail
+   
     cpe = build_cpe(value:avVer[1], exp:"^([0-9.]+)", base:"cpe:/a:clamav:clamav:");
     if(!isnull(cpe))
-       register_host_detail(name:"App", value:cpe, nvt:SCRIPT_OID, desc:SCRIPT_DESC);
+       register_host_detail(name:"App", value:cpe, desc:SCRIPT_DESC);
 
     exit(0);
   }

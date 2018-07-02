@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: deb_dla_887.nasl 8460 2018-01-18 11:25:52Z teissa $
+# $Id: deb_dla_887.nasl 10219 2018-06-15 12:00:55Z cfischer $
 #
 # Auto-generated from advisory DLA 887-1 using nvtgen 1.0
 # Script version:1.0
@@ -31,10 +31,9 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.890887");
-  script_version("$Revision: 8460 $");
-  
-  script_name("Debian Lts Announce DLA 887-1 ([SECURITY] [DLA 887-1] libdatetime-timezone-perl new upstream version)");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-18 12:25:52 +0100 (Thu, 18 Jan 2018) $");
+  script_version("$Revision: 10219 $");
+  script_name("Debian LTS Advisory ([SECURITY] [DLA 887-1] libdatetime-timezone-perl new upstream version)");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-15 14:00:55 +0200 (Fri, 15 Jun 2018) $");
   script_tag(name:"creation_date", value:"2018-01-17 00:00:00 +0100 (Wed, 17 Jan 2018)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -48,7 +47,7 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH http://greenbone.net");
   script_family("Debian Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages", re:"ssh/login/release=DEB7\.[0-9]+");
   script_tag(name:"affected", value:"libdatetime-timezone-perl on Debian Linux");
   script_tag(name:"insight", value:"DateTime::TimeZone is a Perl module framework providing an interface to the
 Olson time zone database. It exposes the database as a set of modules, one
@@ -59,11 +58,17 @@ zone calculations.");
 
 We recommend that you upgrade your libdatetime-timezone-perl packages.");
   script_tag(name:"summary",  value:"This update includes the changes in tzdata 2017b for the
-Perl bindings. For the list of changes, see DLA-886-1.");
+Perl bindings. For the list of changes, see DLA-886-1.
+
+  This NVT has been deprecated as it doesn't have any security relevance.");
   script_tag(name:"vuldetect", value:"This check tests the installed software version using the apt package manager.");
+
+  script_tag(name:"deprecated", value:TRUE);
 
   exit(0);
 }
+
+exit(66);
 
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
@@ -77,5 +82,5 @@ if ((res = isdpkgvuln(pkg:"libdatetime-timezone-perl", ver:"1:1.58-1+2017b", rls
 if (report != "") {
   security_message(data:report);
 } else if (__pkg_match) {
-  exit(99); # Not vulnerable.
+  exit(99);
 }

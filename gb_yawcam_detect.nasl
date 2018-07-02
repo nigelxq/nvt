@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_yawcam_detect.nasl 8423 2018-01-15 10:43:49Z ckuersteiner $
+# $Id: gb_yawcam_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
 #
 # yawcam Detection
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.140683");
-  script_version("$Revision: 8423 $");
-  script_tag(name: "last_modification", value: "$Date: 2018-01-15 11:43:49 +0100 (Mon, 15 Jan 2018) $");
+  script_version("$Revision: 9633 $");
+  script_tag(name: "last_modification", value: "$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
   script_tag(name: "creation_date", value: "2018-01-15 14:18:25 +0700 (Mon, 15 Jan 2018)");
   script_tag(name: "cvss_base", value: "0.0");
   script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -41,7 +41,7 @@ if(description)
   script_tag(name: "summary" , value: "Detection of yawcam (Yet Another Webcam Software).
 
 The script sends a connection request to the server and attempts to detect yawcam and to extract its version.");
-  
+
   script_category(ACT_GATHER_INFO);
 
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -49,7 +49,6 @@ The script sends a connection request to the server and attempts to detect yawca
   script_dependencies("gb_get_http_banner.nasl");
   script_require_ports("Services/www", 80, 8081, 8888);
   script_mandatory_keys("yawcam/banner");
-  script_exclude_keys("Settings/disable_cgi_scanning");
 
   script_xref(name: "URL", value: "http://www.yawcam.com/");
 

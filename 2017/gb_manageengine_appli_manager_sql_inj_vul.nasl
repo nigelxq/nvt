@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_manageengine_appli_manager_sql_inj_vul.nasl 7968 2017-12-01 08:26:28Z asteins $
+# $Id: gb_manageengine_appli_manager_sql_inj_vul.nasl 10128 2018-06-08 03:58:14Z ckuersteiner $
 #
 # ManageEngine Applications Manager SQL Injection Vulnerability
 #
@@ -30,8 +30,8 @@ CPE = "cpe:/a:manageengine:applications_manager";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107251");
-  script_version("$Revision: 7968 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-12-01 09:26:28 +0100 (Fri, 01 Dec 2017) $");
+  script_version("$Revision: 10128 $");
+  script_tag(name: "last_modification", value: "$Date: 2018-06-08 05:58:14 +0200 (Fri, 08 Jun 2018) $");
   script_tag(name: "creation_date", value: "2017-11-07 15:43:15 +0700 (Tue, 07 Nov 2017)");
 
   script_tag(name:"cvss_base", value:"7.5");
@@ -56,15 +56,15 @@ if (description)
 vulnerability.");
 
   script_tag(name: "insight", value: "ManageEngine Applications Manager is vulnerable to SQL injection via the
-name parameter in a manageApplications.do request and via GraphicalView.do, as demonstrated by a 
+name parameter in a manageApplications.do request and via GraphicalView.do, as demonstrated by a
 crafted viewProps yCanvas field or viewid parameter.");
 
   script_tag(name: "vuldetect", value: "Check the version.");
 
   script_tag(name: "affected", value: "ManageEngine Applications Manager 13.");
 
-  script_tag(name: "solution", value: "No solution or patch is available as of 15th November, 2017.
-  Information regarding this issue will be updated once the solution details are available.");
+  script_tag(name: "solution", value: "No known solution is available as of 04th June, 2018. Information regarding
+this issue will be updated once solution details are available.");
 
   script_xref(name: "URL", value: "https://code610.blogspot.de/2017/11/sql-injection-in-manageengine.html");
 
@@ -89,4 +89,5 @@ if (version =~ "^13.*")
       exit(0);
     }
 }
+
 exit(99);

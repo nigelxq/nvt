@@ -72,9 +72,9 @@ tag_affected = "samba3x on CentOS 5";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.centos.org/pipermail/centos-announce/2011-September/017970.html");
-  script_id(880985);
-  script_version("$Revision: 6653 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:46:53 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.880985");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-09-23 16:39:49 +0200 (Fri, 23 Sep 2011)");
   script_tag(name:"cvss_base", value:"6.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
@@ -82,7 +82,7 @@ if(description)
   script_cve_id("CVE-2011-1678", "CVE-2011-2522", "CVE-2011-2694", "CVE-2011-2724", "CVE-2010-0547");
   script_name("CentOS Update for samba3x CESA-2011:1220 centos5 i386");
 
-  script_summary("Check for the Version of samba3x");
+  script_tag(name:"summary", value:"Check for the Version of samba3x");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

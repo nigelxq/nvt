@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: telnet.nasl 8503 2018-01-23 16:49:56Z cfischer $
+# $Id: telnet.nasl 9701 2018-05-03 06:24:12Z cfischer $
 #
 # Check for Telnet Server
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.100074");
-  script_version("$Revision: 8503 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-23 17:49:56 +0100 (Tue, 23 Jan 2018) $");
+  script_version("$Revision: 9701 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-03 08:24:12 +0200 (Thu, 03 May 2018) $");
   script_tag(name:"creation_date", value:"2009-03-24 15:43:44 +0100 (Tue, 24 Mar 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -36,10 +36,12 @@ if(description)
   script_category(ACT_GATHER_INFO);
   script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
   script_family("Service detection");
-  script_dependencies("find_service6.nasl", "mysql_version.nasl", "secpod_open_tcp_ports.nasl");
+  # nb: Makes sure that this NVT is running late as it is often mis-identifying services as Telnet (see no_telnet below)
+  script_dependencies("unknown_services.nasl", "find_service_nmap.nasl");
+  script_require_ports("Services/unknown", "Services/telnet");
   script_mandatory_keys("TCP/PORTS");
 
-  tag_summary = "A telnet Server is running at this host.
+  script_tag(name:"summary", value:"A telnet Server is running at this host.
 
    Experts in computer security, such as SANS Institute, and the members of the
    comp.os.linux.security newsgroup recommend that the use of Telnet for remote
@@ -59,9 +61,7 @@ if(description)
      in the middle.
 
    * Commonly used Telnet daemons have several vulnerabilities discovered over
-     the years.";
-
-  script_tag(name:"summary", value:tag_summary);
+     the years.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
@@ -88,14 +88,16 @@ no_telnet = make_list( "<<<check_mk>>>", "\\check_mk\.ini", "<<<uptime>>>", "<<<
                        "\-nthreads", "NServer:", # Unknown service on 34903/tcp
                        "^ERROR :Closing Link:.*Throttled: Reconnecting too fast", # unlrealircd
                        "^:.*NOTICE (Auth|AUTH).*Looking up your hostname", # unlrealircd
-                       "^TDMM", #LANDesk Targeted Multicast Service, 33354/tcp
+                       "^TDMM", # LANDesk Targeted Multicast Service, 33354/tcp
+                       "^UDMM", # Unknown LANDesk Service, 33354/tcp
                        "\+HELLO v([0-9.]+) \$Name:", # e.g. +HELLO v1.1 $Name:  $, unknown service on 5600/tcp
                        "^ getnameinfo: Temporary failure in name resolution $", # rsh on 514/tcp, spaces at the begin and end are expected
                        "Welcome to the TeamSpeak 3 ServerQuery interface",
                        "500 OOPS: could not bind listening IPv4 socket", # Probably PureFTPd
                        "^ncacn_http/1\.0",
-                       "220 .* FTP server .* ready",
-                       "220 Service ready",
+                       "^220 .* FTP server .* ready",
+                       "^220 .* Ready for user login\.", # VIBNODE FTP
+                       "^220 Service ready",
                        "^RFB 00[0-9]\.00[0-9]", # VNC
                        "\(Eggdrop v.* Eggheads\)" ); # Eggdrop Bot
 
@@ -113,7 +115,13 @@ function no_telnet_banner( banner ) {
 }
 
 port = get_all_tcp_ports();
-if( ! service_is_unknown( port:port ) ) exit( 0 );
+
+# nb: We still want to collect / report the data below for
+# services detected as telnet by find_service.nasl...
+if( ! verify_service( port:port, proto:"telnet" ) &&
+    ! service_is_unknown( port:port ) ) {
+  exit( 0 );
+}
 
 soc = open_sock_tcp( port );
 if( ! soc ) exit( 0 );

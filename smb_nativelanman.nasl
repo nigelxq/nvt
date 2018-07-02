@@ -1,6 +1,6 @@
 ###################################################################
-# OpenVAS Network Vulnerability Test
-# $Id: smb_nativelanman.nasl 8451 2018-01-17 18:56:46Z cfischer $
+# OpenVAS Vulnerability Test
+# $Id: smb_nativelanman.nasl 9745 2018-05-07 11:45:41Z cfischer $
 #
 # SMB NativeLanMan
 #
@@ -27,10 +27,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.102011");
-  script_version("$Revision: 8451 $");
+  script_version("$Revision: 9745 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-17 19:56:46 +0100 (Wed, 17 Jan 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-07 13:45:41 +0200 (Mon, 07 May 2018) $");
   script_tag(name:"creation_date", value:"2009-09-18 16:06:42 +0200 (Fri, 18 Sep 2009)");
   script_name("SMB NativeLanMan");
   script_category(ACT_GATHER_INFO);
@@ -160,7 +160,7 @@ for( x = l-3; x > 0 && c < 3; x = x - 2 ) {
 
         # At least Samba 4.2.10, 4.2.14 and 4.5.8 on Debian jessie and stretch has a os_str of "Windows 6.1"
         # but we can identify it from the smb_str: Samba 4.2.10-Debian, Samba 4.5.8-Debian
-        # Older Debian versions have "Unix" as os_str and smb_str: like Samba 3.0.20-Debian
+        # Older Debian versions have "Unix" as os_str and smb_str: like Samba 3.0.20-Debian. nb: This isn't valid for at least etch (4.0)
         # Ubuntu 17.10: os_str: Windows 6.1 smb_str: Samba 4.6.7-Ubuntu
         # The same above is also valid for SLES:
         # SLES11: os_str: Unix, smb_str: Samba 3.6.3-0.58.1-3399-SUSE-CODE11-x86_64
@@ -172,7 +172,7 @@ for( x = l-3; x > 0 && c < 3; x = x - 2 ) {
             # nb: Starting with Wheezy (7.x) we have minor releases within the version so we don't use an exact version like 7.0 as we can't differ between the OS in the banner here
             if( "Samba 4.2.10-Debian" >< smb_str || "Samba 4.2.14-Debian" >< smb_str ) {
               os_str = "Debian GNU/Linux 8";
-            } else if( "Samba 4.5.8-Debian" >< smb_str ) {
+            } else if( "Samba 4.5.8-Debian" >< smb_str || "Samba 4.5.12-Debian" >< smb_str ) {
               os_str = "Debian GNU/Linux 9";
             } else {
               os_str = "Debian GNU/Linux";
@@ -225,9 +225,12 @@ for( x = l-3; x > 0 && c < 3; x = x - 2 ) {
             # Zesty
             } else if( "Samba 4.5.8-Ubuntu" >< smb_str || "Samba 4.5.4-Ubuntu" >< smb_str ) {
               os_str = "Ubuntu 17.04";
-            # Artful (and currently upcoming Bionic)
+            # Artful
             } else if( "Samba 4.6.7-Ubuntu" >< smb_str ) {
               os_str = "Ubuntu 17.10";
+            # Bionic
+            } else if( "Samba 4.7.6-Ubuntu" >< smb_str ) {
+              os_str = "Ubuntu 18.04";
             } else {
               # nb: Versions without the the -Ubuntu pattern:
               # Dapper and Edgy: Samba 3.0.22
@@ -248,7 +251,7 @@ for( x = l-3; x > 0 && c < 3; x = x - 2 ) {
               # nb: Starting with Utopic / 14.10 we have a -Ubuntu pattern again
               os_str = "Unknown Ubuntu Release";
             }
-          # On other reporting the same "Windows 6.1" or simlar exit here for now with a generic OS registered
+          # On other reporting the same "Windows 6.1" or similar exit here for now with a generic OS registered
           # TODO: Recheck with other OS
           } else {
             register_and_report_os( os:"Linux/Unix", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, port:port, banner:smb_str, desc:SCRIPT_DESC, runs_key:"unixoide" );
@@ -341,7 +344,9 @@ for( x = l-3; x > 0 && c < 3; x = x - 2 ) {
             register_and_report_os( os:"Debian GNU/Linux", cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
           }
         } else if( "ubuntu" >< tolower( os_str ) ) {
-          if( "17.10" >< os_str ) {
+          if( "18.04" >< os_str ) {
+            register_and_report_os( os:"Ubuntu", version:"18.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+          } else if( "17.10" >< os_str ) {
             register_and_report_os( os:"Ubuntu", version:"17.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
           } else if( "17.04" >< os_str ) {
             register_and_report_os( os:"Ubuntu", version:"17.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );

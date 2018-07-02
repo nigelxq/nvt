@@ -1,11 +1,14 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_google_chrome_mult_vuln01_jul15_win.nasl 6229 2017-05-29 09:04:10Z teissa $
+# $Id: gb_google_chrome_mult_vuln01_jul15_win.nasl 10133 2018-06-08 11:13:34Z asteins $
 #
 # Google Chrome Multiple Vulnerabilities-01 July15 (Windows)
 #
 # Authors:
 # Shakeel <bshakeel@secpod.com>
+#
+# Updated By: Rajat Mishra <rajatm@secpod.com> on 2018-02-21
+# - Updated to include Installation path in the report.
 #
 # Copyright:
 # Copyright (C) 2015 Greenbone Networks GmbH, http://www.greenbone.net
@@ -29,24 +32,24 @@ CPE = "cpe:/a:google:chrome";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.805934");
-  script_version("$Revision: 6229 $");
+  script_version("$Revision: 10133 $");
   script_cve_id("CVE-2015-1271", "CVE-2015-1273", "CVE-2015-1274", "CVE-2015-1276",
                 "CVE-2015-1279", "CVE-2015-1280", "CVE-2015-1281", "CVE-2015-1282",
                 "CVE-2015-1283", "CVE-2015-1284", "CVE-2015-1286", "CVE-2015-1287",
                 "CVE-2015-1270", "CVE-2015-1272", "CVE-2015-1277", "CVE-2015-1278",
-                "CVE-2015-1285", "CVE-2015-1288", "CVE-2015-1289", "CVE-2015-5605");
+                "CVE-2015-1285", "CVE-2015-1288", "CVE-2015-1289", "CVE-2015-5605",
+                "CVE-2015-1290");
   script_bugtraq_id(75973, 76007);
-  script_tag(name:"cvss_base", value:"7.5");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-29 11:04:10 +0200 (Mon, 29 May 2017) $");
+  script_tag(name:"cvss_base", value:"9.3");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-08 13:13:34 +0200 (Fri, 08 Jun 2018) $");
   script_tag(name:"creation_date", value:"2015-07-23 13:02:12 +0530 (Thu, 23 Jul 2015)");
   script_name("Google Chrome Multiple Vulnerabilities-01 July15 (Windows)");
 
   script_tag(name: "summary" , value:"The host is installed with Google Chrome
   and is prone to multiple vulnerabilities.");
 
-  script_tag(name: "vuldetect" , value:"Get the installed version with the help
-  of detect NVT and check the version is vulnerable or not.");
+  script_tag(name: "vuldetect" , value:"Checks if a vulnerable version is present on the target host.");
 
   script_tag(name: "insight" , value:"Multiple flaws are due to:
   - Multiple heap based buffer-overflow in pdfium.
@@ -91,28 +94,22 @@ if(description)
   script_copyright("Copyright (C) 2015 Greenbone Networks GmbH");
   script_category(ACT_GATHER_INFO);
   script_family("General");
-  script_dependencies("gb_google_chrome_detect_win.nasl");
+  script_dependencies("gb_google_chrome_detect_portable_win.nasl");
   script_mandatory_keys("GoogleChrome/Win/Ver");
   exit(0);
 }
 
-
 include("host_details.inc");
 include("version_func.inc");
 
-## Variable Initialization
-chromeVer = "";
+infos = get_app_version_and_location(cpe:CPE, exit_no_version:TRUE );
+vers = infos['version'];
+path = infos['location'];
 
-## Get version
-if(!chromeVer = get_app_version(cpe:CPE)){
-  exit(0);
-}
-
-## Grep for vulnerable version
-if(version_is_less(version:chromeVer, test_version:"44.0.2403.89"))
+if(version_is_less(version:vers, test_version:"44.0.2403.89"))
 {
-  report = 'Installed version: ' + chromeVer + '\n' +
-           'Fixed version:     44.0.2403.89'  + '\n';
+  report = report_fixed_ver(installed_version:vers, fixed_version:"44.0.2403.89", install_path:path);
   security_message(data:report);
   exit(0);
 }
+exit(0);

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_2365_1.nasl 7957 2017-12-01 06:40:08Z santu $
+# $Id: gb_ubuntu_USN_2365_1.nasl 9651 2018-04-27 08:59:56Z cfischer $
 #
 # Ubuntu Update for libvncserver USN-2365-1
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.841989");
-  script_version("$Revision: 7957 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-01 07:40:08 +0100 (Fri, 01 Dec 2017) $");
+  script_version("$Revision: 9651 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:59:56 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2014-10-01 17:00:28 +0530 (Wed, 01 Oct 2014)");
   script_cve_id("CVE-2014-6051", "CVE-2014-6052", "CVE-2014-6053", "CVE-2014-6054", "CVE-2014-6055");
   script_tag(name:"cvss_base", value:"7.5");
@@ -60,12 +60,12 @@ arbitrary code. (CVE-2014-6055)");
 
   script_xref(name: "USN", value: "2365-1");
   script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-2365-1/");
-  script_summary("Check for the Version of libvncserver");
+  script_tag(name:"summary", value:"Check for the Version of libvncserver");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2014 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU(14\.04 LTS|12\.04 LTS)");
   exit(0);
 }
 
@@ -88,7 +88,7 @@ if(release == "UBUNTU14.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }
 
@@ -102,6 +102,6 @@ if(release == "UBUNTU12.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

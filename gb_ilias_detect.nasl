@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ilias_detect.nasl 7525 2017-10-20 08:57:52Z ckuersteiner $
+# $Id: gb_ilias_detect.nasl 9966 2018-05-25 14:32:54Z cfischer $
 #
 # ILIAS Detection
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.140443");
-  script_version("$Revision: 7525 $");
-  script_tag(name: "last_modification", value: "$Date: 2017-10-20 10:57:52 +0200 (Fri, 20 Oct 2017) $");
+  script_version("$Revision: 9966 $");
+  script_tag(name: "last_modification", value: "$Date: 2018-05-25 16:32:54 +0200 (Fri, 25 May 2018) $");
   script_tag(name: "creation_date", value: "2017-10-20 10:51:43 +0700 (Fri, 20 Oct 2017)");
   script_tag(name: "cvss_base", value: "0.0");
   script_tag(name: "cvss_base_vector", value: "AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -42,7 +42,7 @@ if(description)
 
 The script sends a connection request to the server and attempts to detect ILIAS and to extract its
 version.");
-  
+
   script_category(ACT_GATHER_INFO);
 
   script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
@@ -60,47 +60,77 @@ include("cpe.inc");
 include("host_details.inc");
 include("http_func.inc");
 include("http_keepalive.inc");
+include("misc_func.inc");
 
 port = get_http_port(default: 443);
 
 if (!can_host_php(port: port))
   exit(0);
 
-# login.php often needs some parameters so we check over setup.php
-url = "/ilias/setup/setup.php";
-# http_get_cache() doesn't make sense here since we get a unique session id anyway
-req = http_get(port: port, item: url);
-res = http_keepalive_send_recv(port: port, data: req);
+foreach dir (make_list_unique("/", "/ilias", "/ILIAS", cgi_dirs(port: port))) {
 
-# We should get a redirect with a session id
-loc = extract_location_from_redirect(port: port, data: res);
-if (isnull(loc))
-  exit(0);
+  install = dir;
+  if (dir == "/")
+    dir = "";
 
-req = http_get(port: port, item: loc);
-res = http_keepalive_send_recv(port: port, data: req);
+  # login.php often needs some parameters so we check over setup.php
+  url = dir + "/setup/setup.php";
+  # http_get_cache() doesn't make sense here since we get a unique session id anyway
+  req = http_get(port: port, item: url);
+  res = http_keepalive_send_recv(port: port, data: req);
 
-if ("<title>ILIAS Setup</title>" >< res && "std setup ilSetupLogin" >< res) {
-  version = "unknown";
+  # We should get a redirect with a session id
+  loc = extract_location_from_redirect(port: port, data: res);
+  if (isnull(loc))
+    continue;
 
-  vers = eregmatch(pattern: 'class="row">ILIAS ([0-9.]+)', string: res);
-  if (!isnull(vers[1])) {
-    version = vers[1];
+  cookie = get_cookie_from_header( buf: res, pattern: "Set-Cookie: (SESSID=[0-9A-Za-z]+);");
+  # nb: If there is no such cookie (which might be possible) create a random one to avoid an error in make_array below
+  if (!cookie)
+    cookie = "SESSID=" + rand_str(length: 32, charset: "abcdefghijklmnopqrstuvwxyz0123456789");
+  req = http_get_req( port:port, url:loc, add_headers:make_array( "Cookie", cookie));
+  res = http_keepalive_send_recv(port: port, data: req);
+
+  # <title>ILIAS Setup</title>
+  # <title>ILIAS 3 Setup</title>
+  if ((res =~ "<title>ILIAS ([0-9] )?Setup</title>" || "<title>ILIAS Setup</title>" >< res) &&
+      ("std setup ilSetupLogin" >< res || 'class="ilSetupLogin">' >< res ||
+       'class="ilLogin">' >< res || 'class="il_Header">' >< res)) {
+    version = "unknown";
+
+    # <small>ILIAS 3.10.5 2009-03-06 (Setup Version 2 Revision: 17651)</small>
+    # <small>ILIAS 4.4.6 2014-11-22 (Setup Version 2 Revision: 49592)</small>
+    # <div class="row">ILIAS 5.1.13 2016-12-22 (Setup Version 2 Revisio)</div>
+    vers = eregmatch(pattern: '(class="row">|<small>)ILIAS ([0-9.]+)', string: res);
+    if (!isnull(vers[2])) {
+      version = vers[2];
+    } else {
+      # Some versions requires another request to the login.php to get the real version
+      # e.g. 3.4 had only <small>ILIAS3 - setup Version 2.1.61.4.5</small> on the setup page
+      url = "/login.php?lang=en";
+      req = http_get(port: port, item: url);
+      res = http_keepalive_send_recv(port: port, data: req);
+      # <p class="very_small">powered by <b>ILIAS</b> (v3.4.3 2005-06-15)</p>
+      vers = eregmatch(pattern: ">powered by <b>ILIAS</b> \(v([0-9.]+)", string: res);
+      if (!isnull(vers[1])) {
+        version = vers[1];
+      }
+    }
+
     set_kb_item(name: "ilias/version", value: version);
+    set_kb_item(name: "ilias/installed", value: TRUE);
+
+    cpe = build_cpe(value: version, exp: "^([0-9.]+)", base: "cpe:/a:ilias:ilias:");
+    if (!cpe)
+      cpe = 'cpe:/a:ilias:ilias';
+
+    register_product(cpe: cpe, location: install, port: port);
+
+    log_message(data: build_detection_report(app: "ILIAS", version: version, install: install, cpe: cpe,
+                                             concluded: vers[0], concludedUrl: report_vuln_url(port: port, url: url, url_only: TRUE )),
+                port: port);
+    exit(0);
   }
-
-  set_kb_item(name: "ilias/installed", value: TRUE);
-
-  cpe = build_cpe(value: version, exp: "^([0-9.]+)", base: "cpe:/a:ilias:ilias:");
-  if (!cpe)
-    cpe = 'cpe:/a:ilias:ilias';
-
-  register_product(cpe: cpe, location: "/ilias", port: port);
-
-  log_message(data: build_detection_report(app: "ILIAS", version: version, install: "/ilias", cpe: cpe,
-                                           concluded: vers[0], concludedUrl: url),
-              port: port);
-  exit(0);
 }
 
 exit(0);

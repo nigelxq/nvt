@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: cgi_directories.nasl 8106 2017-12-13 14:42:54Z cfischer $
+# $Id: cgi_directories.nasl 10283 2018-06-21 11:10:20Z cfischer $
 #
 # CGI Scanning Consolidation
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.111038");
-  script_version("$Revision: 8106 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-13 15:42:54 +0100 (Wed, 13 Dec 2017) $");
+  script_version("$Revision: 10283 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-21 13:10:20 +0200 (Thu, 21 Jun 2018) $");
   script_tag(name:"creation_date", value:"2015-09-14 07:00:00 +0200 (Mon, 14 Sep 2015)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -40,6 +40,8 @@ if(description)
   "gb_owncloud_detect.nasl", "gb_adobe_aem_remote_detect.nasl", "gb_libreoffice_online_detect.nasl",
   "gb_apache_activemq_detect.nasl", "gb_orientdb_server_detect.nasl"); # gb_* are additional dependencies setting auth_required
   script_require_ports("Services/www", 80);
+
+  script_add_preference(name:"Maximum number of items shown for each list", type:"entry", value:"100");
 
   script_tag(name:"summary", value:"The script consolidates various information for CGI scanning.
 
@@ -55,7 +57,7 @@ if(description)
 
   - The configured 'cgi_path' within the 'Scanner Preferences' of the scan config in use
 
-  - The configured 'Enable CGI scanning', 'Enable generic web application scanning' and 
+  - The configured 'Enable CGI scanning', 'Enable generic web application scanning' and
     'Add historic /scripts and /cgi-bin to directories for CGI scanning' within the
     'Global variable settings' of the scan config in use
 
@@ -75,22 +77,41 @@ if( get_kb_item( "Settings/disable_cgi_scanning" ) ) {
   exit( 0 );
 }
 
+function prepend_max_items_text( curReport, currentItems, maxItems ) {
+
+  local_var curReport, currentItems, maxItems, report;
+
+  report  = "NOTE: The 'Maximum number of items shown for each list' setting has been reached. ";
+  report += "There are " + ( currentItems - maxItems ) + " additional entries available for the ";
+  report += "following truncated list.";
+  report += '\n\n' + curReport;
+  return report;
+}
+
+maxItems = int( script_get_preference( "Maximum number of items shown for each list" ) );
+if( maxItems <= 0 ) maxItems = 100;
+
 port = get_http_port( default:80 );
 
-cgiDirs = cgi_dirs( port:port );
-authRequireDirs = get_kb_list( "www/" + port + "/content/auth_required" );
-cgiList = get_kb_list( "www/" + port + "/content/cgis/*" );
-excludedCgiList = get_kb_list( "www/" + port + "/content/excluded_cgis/*" );
-dirIndexList = get_kb_list( "www/" + port + "/content/dir_index" );
-phpinfoList = get_kb_list( "www/" + port + "/content/phpinfo_script" );
-phpPathList = get_kb_list( "www/" + port + "/content/php_pysical_path" );
-guardianList = get_kb_list( "www/" + port + "/content/guardian" );
-coffeecupList = get_kb_list( "www/" + port + "/content/coffeecup" );
-frontpageList = get_kb_list( "www/" + port + "/content/frontpage_results" );
-skippedDirList = get_kb_list( "www/" + port + "/content/skipped_directories" );
-excludedDirList = get_kb_list( "www/" + port + "/content/excluded_directories" );
-httpVersion = get_kb_item( "http/" + port );
-maxPagesReached = get_kb_item( "www/" + port + "/content/max_pages_reached" );
+cgiDirs          = cgi_dirs( port:port );
+httpVersion      = get_kb_item( "http/" + port );
+authRequireDirs  = get_kb_list( "www/" + port + "/content/auth_required" );
+cgiList          = get_kb_list( "www/" + port + "/content/cgis/*" );
+excludedCgiList  = get_kb_list( "www/" + port + "/content/excluded_cgis/*" );
+dirIndexList     = get_kb_list( "www/" + port + "/content/dir_index" );
+phpinfoList      = get_kb_list( "www/" + port + "/content/phpinfo_script" );
+phpPathList      = get_kb_list( "www/" + port + "/content/php_physical_path" );
+guardianList     = get_kb_list( "www/" + port + "/content/guardian" );
+coffeecupList    = get_kb_list( "www/" + port + "/content/coffeecup" );
+chOptOutList     = get_kb_list( "www/" + port + "/content/coinhive_optout" );
+chOptInList      = get_kb_list( "www/" + port + "/content/coinhive_optin" );
+chNoOptOutList   = get_kb_list( "www/" + port + "/content/coinhive_nooptout" );
+chObfuscatedList = get_kb_list( "www/" + port + "/content/coinhive_obfuscated" );
+frontpageList    = get_kb_list( "www/" + port + "/content/frontpage_results" );
+skippedDirList   = get_kb_list( "www/" + port + "/content/skipped_directories" );
+excludedDirList  = get_kb_list( "www/" + port + "/content/excluded_directories" );
+recursionUrlList = get_kb_list( "www/" + port + "/content/recursion_urls" );
+maxPagesReached  = get_kb_item( "www/" + port + "/content/max_pages_reached" );
 
 #report = 'The hostname "' + http_host_name( port:port ) + '" is used.\n\n'; #TODO is this forking?
 
@@ -100,7 +121,7 @@ if( get_kb_item( "global_settings/disable_generic_webapp_scanning" ) ) {
   report += 'Generic web application scanning is disabled for this host via the "Enable generic web application scanning" option within the "Global variable settings" of the scan config in use.\n\n';
 }
 
-if( get_kb_item( "Services/www/" + port + "/broken" ) ) {
+if( http_is_marked_broken( port:port ) ) {
   report += 'This service is marked as broken and no CGI scanning is launched against it.\n\n';
 }
 
@@ -128,117 +149,189 @@ if( get_kb_item( "global_settings/exclude_historic_cgi_dirs" ) ) {
   report += 'option within the "Global variable settings" of the scan config in use.\n\n';
 }
 
+if( ! isnull( recursionUrlList ) ) {
+
+  currentItems = 0;
+
+  tmpreport  = 'A possible recursion was detected during CGI scanning:\n\n';
+  tmpreport += 'The service is using a relative URL in one or more HTML references where e.g. /file1.html contains <a href="subdir/file2.html"> ';
+  tmpreport += 'and a subsequent request for subdir/file2.html is linking to subdir/file2.html. This would resolves to subdir/subdir/file2.html ';
+  tmpreport += 'causing a recursion. To work around this counter-measures have been enabled but the service should be fixed as well to not ';
+  tmpreport += 'use such problematic links. Below an excerpt of URLs is shown to help identify those issues.\n\n';
+  tmpreport += 'Syntax : URL (HTML link)\n\n';
+
+  # Sort to not report changes on delta reports if just the order is different
+  recursionUrlList = sort( recursionUrlList );
+
+  foreach url( recursionUrlList ) {
+    currentItems++;
+    # Using a fixed list of five items and not the maxItems from the others is expected.
+    if( currentItems >= 6 ) continue;
+    tmpreport += report_vuln_url( port:port, url:url, url_only:TRUE ) + '\n';
+  }
+  report += tmpreport + '\n';
+}
+
 if( ! isnull( authRequireDirs ) ) {
 
-  report += "The following directories require authentication ";
-  report += 'and are tested by the script "HTTP Brute Force Logins with default Credentials (OID: 1.3.6.1.4.1.25623.1.0.108041)":\n\n';
+  currentItems = 0;
+
+  tmpreport  = "The following directories require authentication ";
+  tmpreport += 'and are tested by the script "HTTP Brute Force Logins with default Credentials (OID: 1.3.6.1.4.1.25623.1.0.108041)":\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   authRequireDirs = sort( authRequireDirs );
 
   foreach dir( authRequireDirs ) {
-    report += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( ! isnull( cgiDirs ) ) {
 
-  report += 'The following directories were used for CGI scanning:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'The following directories were used for CGI scanning:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   cgiDirs = sort( cgiDirs );
 
   foreach dir( cgiDirs ) {
-    report += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
   }
-  report += '\nWhile this is not, in and of itself, a bug, you should manually inspect ';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
+  report += 'While this is not, in and of itself, a bug, you should manually inspect ';
   report += "these directories to ensure that they are in compliance with company ";
   report += 'security standards\n\n';
 }
 
 if( ! isnull( skippedDirList ) ) {
 
-  report += "The following directories were skipped for CGI scanning because";
-  report += " the 'Number of cgi directories to save into KB' setting of the NVT";
-  report += ' Web mirroring (OID: 1.3.6.1.4.1.25623.1.0.10662) was reached:\n\n';
+  currentItems = 0;
+
+  tmpreport  = "The following directories were skipped for CGI scanning because";
+  tmpreport += " the 'Number of cgi directories to save into KB' setting of the NVT";
+  tmpreport += ' Web mirroring (OID: 1.3.6.1.4.1.25623.1.0.10662) was reached:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   skippedDirList = sort( skippedDirList );
 
   foreach dir( skippedDirList ) {
-    report += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( ! isnull( excludedDirList ) ) {
 
-  report += "The following directories were excluded from CGI scanning because";
-  report += ' of the "Regex pattern to exclude directories from CGI scanning" setting of the NVT';
-  report += ' "Global variable settings" (OID: 1.3.6.1.4.1.25623.1.0.12288):\n\n';
+  currentItems = 0;
+
+  tmpreport  = "The following directories were excluded from CGI scanning because";
+  tmpreport += ' of the "Regex pattern to exclude directories from CGI scanning" setting of the NVT';
+  tmpreport += ' "Global variable settings" (OID: 1.3.6.1.4.1.25623.1.0.12288):\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   excludedDirList = sort( excludedDirList );
 
   foreach dir( excludedDirList ) {
-    report += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += report_vuln_url( port:port, url:dir, url_only:TRUE ) + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( ! isnull( dirIndexList ) ) {
 
-  report += 'Directory index found at:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'Directory index found at:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   dirIndexList = sort( dirIndexList );
 
   foreach dirIndex( dirIndexList ) {
-    report += dirIndex + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += dirIndex + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( ! isnull( phpinfoList ) ) {
 
-  report += 'Extraneous phpinfo() script found at:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'Extraneous phpinfo() script found at:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   phpinfoList = sort( phpinfoList );
 
   foreach phpinfo( phpinfoList ) {
-    report += phpinfo + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += phpinfo + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( ! isnull( phpPathList ) ) {
 
-  report += 'PHP script discloses physical path at:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'PHP script discloses physical path at:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   phpPathList = sort( phpPathList );
 
   foreach phpPath( phpPathList ) {
-    report += phpPath + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += phpPath + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 
 if( ! isnull( guardianList ) ) {
 
-  report += 'The following files seems to have been "encrypted" with HTML Guardian:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'The following files seems to have been "encrypted" with HTML Guardian:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   guardianList = sort( guardianList );
 
   foreach guardian( guardianList ) {
-    report += guardian + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += guardian + '\n';
   }
-
-  report += '\n\nHTML Guardian is a tool which claims to encrypt web pages, whereas it simply
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n\n';
+  report += 'HTML Guardian is a tool which claims to encrypt web pages, whereas it simply
   does a transposition of the content of the page. It is is no way a safe way to make sure your
   HTML pages are protected.
 
@@ -248,16 +341,22 @@ if( ! isnull( guardianList ) ) {
 
 if( ! isnull( coffeecupList ) ) {
 
-  report += 'The following files seems to contain links "protected" by CoffeCup:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'The following files seems to contain links "protected" by CoffeCup:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   coffeecupList = sort( coffeecupList );
 
   foreach coffeecup( coffeecupList ) {
-    report += coffeecup + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += coffeecup + '\n';
   }
-
-  report += '\n\nCoffeeCup Wizard is a tool which claims to encrypt links to web pages,
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n\n';
+  report += 'CoffeeCup Wizard is a tool which claims to encrypt links to web pages,
   to force users to authenticate before they access the links. However, the "encryption"
   used is a simple transposition method which can be decoded without the need of knowing
   a real username and password.
@@ -267,19 +366,65 @@ if( ! isnull( coffeecupList ) ) {
 
 if( ! isnull( frontpageList ) ) {
 
-  report += 'FrontPage form stores results in web root at:\n\n';
+  currentItems = 0;
+
+  tmpreport = 'FrontPage form stores results in web root at:\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   frontpageList = sort( frontpageList );
 
   foreach frontpage( frontpageList ) {
-    report += frontpage + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += frontpage + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
+}
+
+if( ! isnull( chOptOutList ) || ! isnull( chOptInList ) ||
+    ! isnull( chNoOptOutList ) || ! isnull( chObfuscatedList ) ) {
+
+  currentItems = 0;
+
+  tmpreport = 'The Coinhive JavaScript Miner was found embedded into the following pages:\n\n';
+
+  # Sort to not report changes on delta reports if just the order is different
+  if( chOptOutList )     chOptOutList     = sort( chOptOutList );
+  if( chOptInList )      chOptInList      = sort( chOptInList );
+  if( chNoOptOutList )   chNoOptOutList   = sort( chNoOptOutList );
+  if( chObfuscatedList ) chObfuscatedList = sort( chObfuscatedList );
+
+  foreach chOptOut( chOptOutList ) {
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += chOptOut + ' (OptOut configured for the user)\n';
+  }
+
+  foreach chOptIn( chOptInList ) {
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += chOptIn + ' (Opt-In by the user explicitly required)\n';
+  }
+
+  foreach chNoOptOut( chNoOptOutList ) {
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += chNoOptOut + ' (No OptOut configured for the user, might be malicious)\n';
+  }
+
+  foreach chObfuscated( chObfuscatedList ) {
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += chObfuscated + ' (Obfuscated, look out for code containing \\x73\\x70\\x6C\\x69\\x74. Very likely malicious)\n';
+  }
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( maxPagesReached ) {
-
   report += 'The "Number of pages to mirror" setting of the NVT';
   report += ' "Web mirroring" (OID: 1.3.6.1.4.1.25623.1.0.10662) was reached.';
   report += ' Raising this limit allows to mirror this host more thoroughly';
@@ -288,30 +433,43 @@ if( maxPagesReached ) {
 
 if( ! isnull( cgiList ) ) {
 
-  report += 'The following CGIs were discovered:\n\nSyntax : cginame (arguments [default value])\n\n';
+  currentItems = 0;
+
+  tmpreport = 'The following CGIs were discovered:\n\nSyntax : cginame (arguments [default value])\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   cgiList = sort( cgiList );
 
   foreach cgi( cgiList ) {
-    report += cgi + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += cgi + '\n';
   }
-  report += '\n';
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport + '\n';
 }
 
 if( ! isnull( excludedCgiList ) ) {
 
-  report += "The following cgi scripts were excluded from CGI scanning because";
-  report += ' of the "Regex pattern to exclude cgi scripts" setting of the NVT';
-  report += ' "Web mirroring" (OID: 1.3.6.1.4.1.25623.1.0.10662):\n\n';
-  report += 'Syntax : cginame (arguments [default value])\n\n';
+  currentItems = 0;
+
+  tmpreport  = "The following cgi scripts were excluded from CGI scanning because";
+  tmpreport += ' of the "Regex pattern to exclude cgi scripts" setting of the NVT';
+  tmpreport += ' "Web mirroring" (OID: 1.3.6.1.4.1.25623.1.0.10662):\n\n';
+  tmpreport += 'Syntax : cginame (arguments [default value])\n\n';
 
   # Sort to not report changes on delta reports if just the order is different
   excludedCgiList = sort( excludedCgiList );
 
   foreach cgi( excludedCgiList ) {
-    report += cgi + '\n';
+    currentItems++;
+    if( currentItems >= maxItems ) continue;
+    tmpreport += cgi + '\n';
   }
+  if( currentItems >= maxItems )
+    tmpreport = prepend_max_items_text( curReport:tmpreport, currentItems:currentItems, maxItems:maxItems );
+  report += tmpreport;
 }
 
 log_message( data:report, port:port );

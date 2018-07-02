@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_rancher_sec_bypass_vuln.nasl 7451 2017-10-17 04:59:58Z cfischer $
+# $Id: gb_rancher_sec_bypass_vuln.nasl 9380 2018-04-06 11:04:51Z asteins $
 #
 # Rancher Server Security Bypass Vulnerability
 #
@@ -29,8 +29,8 @@ CPE = "cpe:/a:rancher:rancher";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107248");
-  script_version("$Revision: 7451 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-10-17 06:59:58 +0200 (Tue, 17 Oct 2017) $");
+  script_version("$Revision: 9380 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 13:04:51 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2017-10-16 10:53:43 +0200 (Mon, 16 Oct 2017)");
   script_cve_id("CVE-2017-7297");
   script_bugtraq_id(97180);
@@ -42,7 +42,7 @@ if(description)
   script_name("Rancher Server Security Bypass Vulnerability");
   script_tag(name: "summary", value: "Rancher Server is prone to a security-bypass vulnerability.");
 
-  script_tag(name: "vuldetect", value: "Get the installed version with the help of detect NVT and check if the version is vulnerable or not.");
+  script_tag(name: "vuldetect", value: "Get the installed version with the help of the detection NVT and check if the version is vulnerable or not.");
 
   script_tag(name: "insight", value: "Security Exposure: Any authenticated users can disable auth via API");
 
@@ -67,7 +67,6 @@ if(description)
 
 include("host_details.inc");
 include("version_func.inc");
-
 
 if(!Port = get_app_port(cpe: CPE)){
   exit(0);
@@ -97,19 +96,18 @@ else if(version_is_equal(version: Ver, test_version: "1.3.4"))
   fix = "1.3.5";
 }
 
-else if(version_is_equal(version: Ver, test_version: "1.2.4"))
+else if(version_is_equal(version: Ver, test_version: "1.2.3"))
 {
   Vuln = TRUE;
   fix = "1.2.4";
 }
 
-if (Vuln)
+if(Vuln)
 {
-  report =  report_fixed_ver(installed_version: Ver, fixed_version: fix);
-  security_message(data: report);
-  exit( 0 );
+  report = report_fixed_ver(installed_version: Ver, fixed_version: fix);
+  security_message(port: Port, data: report);
+  exit(0);
 }
 
-exit ( 99 );
-
+exit(99);
 

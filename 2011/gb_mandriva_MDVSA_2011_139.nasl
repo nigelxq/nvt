@@ -85,9 +85,9 @@ tag_affected = "firefox on Mandriva Linux 2009.0,
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.mandriva.com/security-announce/2011-10/msg00000.php");
-  script_id(831457);
-  script_version("$Revision: 6570 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-06 15:06:35 +0200 (Thu, 06 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.831457");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-10-04 16:55:13 +0200 (Tue, 04 Oct 2011)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -95,7 +95,7 @@ if(description)
   script_cve_id("CVE-2011-2996", "CVE-2011-2995", "CVE-2011-2999", "CVE-2011-2998", "CVE-2011-3000", "CVE-2011-3001", "CVE-2010-0170", "CVE-2011-2372");
   script_name("Mandriva Update for firefox MDVSA-2011:139 (firefox)");
 
-  script_summary("Check for the Version of firefox");
+  script_tag(name:"summary", value:"Check for the Version of firefox");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("Mandrake Local Security Checks");

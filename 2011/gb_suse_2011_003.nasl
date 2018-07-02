@@ -83,9 +83,9 @@ tag_affected = "MozillaFirefox,MozillaThunderbird,Seamonkey on openSUSE 11.1, op
 
 if(description)
 {
-  script_id(850158);
-  script_version("$Revision: 8041 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-08 08:28:21 +0100 (Fri, 08 Dec 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.850158");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-01-11 16:07:49 +0100 (Tue, 11 Jan 2011)");
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
@@ -93,7 +93,7 @@ if(description)
   script_cve_id("CVE-2010-0179", "CVE-2010-3766", "CVE-2010-3767", "CVE-2010-3768", "CVE-2010-3769", "CVE-2010-3770", "CVE-2010-3771", "CVE-2010-3772", "CVE-2010-3773", "CVE-2010-3774", "CVE-2010-3775", "CVE-2010-3776", "CVE-2010-3777", "CVE-2010-3778");
   script_name("SuSE Update for MozillaFirefox,MozillaThunderbird,Seamonkey SUSE-SA:2011:003");
 
-  script_summary("Check for the Version of MozillaFirefox,MozillaThunderbird,Seamonkey");
+  script_tag(name:"summary", value:"Check for the Version of MozillaFirefox,MozillaThunderbird,Seamonkey");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

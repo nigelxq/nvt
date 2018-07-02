@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: FormMail_34929.nasl 5864 2017-04-05 07:47:30Z cfi $
+# $Id: FormMail_34929.nasl 9791 2018-05-10 09:39:02Z ckuersteiner $
 #
 # Matt Wright FormMail HTTP Response Splitting and Cross Site
 # Scripting Vulnerabilities
@@ -30,15 +30,15 @@ CPE = "cpe:/a:matt_wright:formmail";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.100202");
-  script_version("$Revision: 5864 $");
+  script_version("$Revision: 9791 $");
   script_cve_id("CVE-2009-1776");
   script_bugtraq_id(34929);
-  script_tag(name:"last_modification", value:"$Date: 2017-04-05 09:47:30 +0200 (Wed, 05 Apr 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-10 11:39:02 +0200 (Thu, 10 May 2018) $");
   script_tag(name:"creation_date", value:"2009-05-14 20:19:12 +0200 (Thu, 14 May 2009)");
   script_tag(name:"cvss_base", value:"4.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:P/A:N");
   script_name("Matt Wright FormMail HTTP Response Splitting and Cross Site Scripting Vulnerabilities");
-  script_category(ACT_GATHER_INFO);
+  script_category(ACT_ATTACK);
   script_family("Web application abuses");
   script_copyright("This script is Copyright (C) 2009 Greenbone Networks GmbH");
   script_dependencies("FormMail_detect.nasl");
@@ -47,22 +47,16 @@ if(description)
 
   script_xref(name:"URL", value:"http://www.securityfocus.com/bid/34929");
 
-  tag_summary = "FormMail is prone to an HTTP-response-splitting vulnerability and
-  multiple cross-site scripting vulnerabilities because it fails to
-  properly sanitize user-supplied input.";
+  script_tag(name: "summary", value: "FormMail is prone to an HTTP-response-splitting vulnerability and multiple
+cross-site scripting vulnerabilities because it fails to properly sanitize user-supplied input.");
 
-  tag_impact = "An attacker may leverage these issues to execute arbitrary script
-  code in the browser of an unsuspecting user, steal cookie-based
-  authentication credentials, and influence how web content is served,
-  cached, or interpreted. This could aid in various attacks that try
-  to entice client users into a false sense of trust.";
+  script_tag(name: "impact", value: "An attacker may leverage these issues to execute arbitrary script code in the
+browser of an unsuspecting user, steal cookie-based authentication credentials, and influence how web content is
+served, cached, or interpreted. This could aid in various attacks that try to entice client users into a false
+sense of trust.");
 
-  tag_affected = "These issues affect FormMail 1.92; prior versions may also be
-  affected.";
+  script_tag(name:"affected" , value:"These issues affect FormMail 1.92, prior versions may also be affected.");
 
-  script_tag(name:"summary" , value:tag_summary);
-  script_tag(name:"impact" , value:tag_impact);
-  script_tag(name:"affected" , value:tag_affected);
   script_tag(name:"solution", value:"Upgrade to the latest version.");
 
   script_tag(name:"solution_type", value:"VendorFix");

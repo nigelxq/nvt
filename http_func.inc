@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: http_func.inc 8150 2017-12-15 17:08:06Z cfischer $
+# $Id: http_func.inc 10283 2018-06-21 11:10:20Z cfischer $
 #
 # Methods to handle HTTP
 #
@@ -24,7 +24,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 8150 $
+# $Revision: 10283 $
 #
 ###############################################################################
 
@@ -32,6 +32,20 @@ global_var OPENVAS_HTTP_USER_AGENT;
 
 if ( ! OPENVAS_HTTP_USER_AGENT = get_kb_item( "http/user-agent" ) )
   OPENVAS_HTTP_USER_AGENT = 'Mozilla/5.0 [en] (X11, U; OpenVAS ' + OPENVAS_VERSION + ')';
+
+# Enables debugging output for a few functions below
+global_var _http_debug;
+_http_debug = FALSE;
+
+# global vars passed to e.g. http_keepalive.inc
+global_var http_cgi_disabled, optimize_test_enabled;
+http_cgi_disabled     = get_kb_item( "Settings/disable_cgi_scanning" );
+optimize_test_enabled = get_preference( "optimize_test" );
+
+# Global keys to avoid that we're repeatedly asking redis for something we already know
+global_var _http_is_broken_array;
+# nb: key is the port or NULL (if not previously checked, value TRUE/FALSE if broken or not
+_http_is_broken_array = make_array();
 
 function headers_split( h ) {
 
@@ -97,45 +111,77 @@ function hex2dec( xvalue ) {
   return int( ret );
 }
 
+# @brief This function creates a HTTP GET request for "/" or a specific URL,
+#        sends the request to the target, receives the response and extracts
+#        the HTTP header (banner) without the body from the response.
+#        If a header was received it is saved into the knowledge base.
+#        If a header was requested which was requested previously the cached
+#        header will be returned instead of doing a new request.
+#
+# @param port          the HTTP port of the target
+# @param file          the URL/file to request, defaults to "/"
+# @param ignore_broken returns the banner even if the remote host was known to be "broken"
+#
+# @return the header of the remote host or NULL if no response was received, no port parameter was passed or the remote port wasn't scanned
+#
 function get_http_banner( port, file, ignore_broken ) {
 
+  local_var port, file, ignore_broken;
   local_var soc, sb, banner, req, body;
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_banner" );
+  if( ! port ) {
+    set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_http_banner" );
+    return NULL;
+  }
+
+  if( ! get_port_state( port ) ) return NULL;
 
   if( ! file ) file = "/";
-
-  if( ! get_port_state( port ) ) return (0);
-
   sb = strcat( "www/real_banner/", port, file );
   banner = get_kb_item( sb );
-  if( banner ) return( banner );
+  if( banner ) return banner;
 
   sb = strcat( "www/banner/", port, file );
   banner = get_kb_item( sb );
-  if( banner ) return( banner );
+  if( banner ) return banner;
 
   if( ! ignore_broken )
-    if( get_kb_item( "Services/www/" + port + "/broken" ) ) return NULL; # TBD: Really return NULL if marked as broken? We still could use the banner version in NVTs...
+    if( http_is_marked_broken( port:port ) ) return NULL; # TBD: Really return NULL if marked as broken? We still could use the banner version in NVTs...
 
-  soc = http_open_socket( port );
-  if( ! soc ) return( NULL );
+  # nb: Always keep http_get() before http_open_socket() as the first could
+  # fork with multiple vhosts and the childs would share the same socket
+  # causing race conditions and similar.
   req = http_get( item:file, port:port );
+  soc = http_open_socket( port );
+  if( ! soc ) return NULL;
+
   send( socket:soc, data:req );
   banner = http_recv_headers2( socket:soc );
-  #body = http_recv_body( socket:soc, headers:banner );
+  #body = http_recv_body( socket:soc, headers:banner ); # TBD: What's the purpose of this?
   http_close_socket( soc );
+
   if( banner ) replace_kb_item( name:sb, value:banner );
-  return( banner );
+  return banner;
 }
 
-# Submitted by Georges Dagousset
-# Usage: port = get_http_port( default:80 );
+# @brief This function returns all HTTP ports of the target system which
+#        are saved in the KB entry "Services/www" found by the scanner.
+#        If no ports where found open it will exit. In the case if the
+#        "unscanned_closed" scanner setting is set to "no" it will return
+#        the port passed via the default parameter.
+#
+# @param default             the port to return if "unscanned_closed" is set to "no" and no ports have been found open
+# @param ignore_broken       returns the ports even if they are known to be "broken"
+# @param ignore_cgi_disabled returns the ports even if CGI scanning is disabled
+#
+# @return the open / found HTTP ports or the port passed via the default parameter in the case of no found ports and "unscanned_closed" is set to "no"
+#
 function get_http_port( default, ignore_broken, ignore_cgi_disabled ) {
 
-  local_var default, port, p, ignore_broken, ignore_cgi_disabled, optimize;
+  local_var default, port, p, ignore_broken, ignore_cgi_disabled;
+  # nb: http_cgi_disabled and optimize_test_enabled are global vars
 
-  if( ! default ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#default#-#get_http_port" );
+  if( ! default ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#default#-#get_http_port" );
 
   port = get_kb_item( "Services/www" );
   if( port ) default = port;
@@ -145,18 +191,16 @@ function get_http_port( default, ignore_broken, ignore_cgi_disabled ) {
   if( http_is_fragile_port( port:default ) ) exit( 0 );
 
   if( ! ignore_cgi_disabled ) {
-    if( get_kb_item( "Settings/disable_cgi_scanning" ) ) {
-      optimize = get_preference( "optimize_test" );
-
-      if( optimize && "yes" >< optimize ) {
-        set_kb_item( name: "nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#get_http_port" );
+    if( http_cgi_disabled ) {
+      if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
+        set_kb_item( name:"nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#get_http_port" );
       }
       exit( 0 );
     }
   }
 
   if( ! ignore_broken ) {
-    p = get_kb_item( "Services/www/" + default + "/broken" );
+    p = http_is_marked_broken( port:default );
     if( p ) exit( 0 );
   }
 
@@ -196,25 +240,43 @@ function php_ver_match( banner, pattern ) {
   return( 0 );
 }
 
+# @brief This function checks if the remote web server is responding
+#        to an HTTP GET request.
+#
+# @param port  the port of the remote server to check
+# @param retry the amount of retries until the check is considered as failed.
+#              This parameter is optional and defaults to 2 retries and is
+#              limited to a max. of 5 retries.
+#
+# @return TRUE if the remote web server is not responding, FALSE otherwise
+#
 function http_is_dead( port, retry ) {
 
-  local_var soc, url, req, code, h, h2, b, i;
+  local_var port, retry, i, soc, url, req, code, h, h2, b;
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_is_dead" );
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#http_is_dead" );
+    return FALSE;
+  }
 
-  if( ! retry ) retry = 2;
+  if( ! retry )   retry = 2;
+  if( retry > 5 ) retry = 5; # nb: Limit the amount of retries to a sane default
+
+  # nb: http_head does not work against SWAT & VNC (& probably others...)
+  # nb: Always keep http_get() before http_open_socket() as the first could
+  # fork with multiple vhosts and the childs would share the same socket
+  # causing race conditions and similar.
+  url = strcat( "/OpenVASTest", rand(), ".html" );
+  req = http_get( item:url, port:port );
 
   i = 0;
   soc = http_open_socket( port );
   while( ! soc && i++ < retry ) {
-    sleep( 1 ); # Should we use sleep(i) ?
+    sleep( i );
     soc = http_open_socket( port );
-    #display("i = ", i, "\n");
+    if( _http_debug ) display( "DEBUG: i = ", i, "\n" );
   }
-  if( ! soc ) return( 1 );
-  # NB: http_head does not work against SWAT & VNC (& probably others...)
-  url = strcat( "/OpenVASTest", rand(), ".html" );
-  req = http_get( item:url, port:port );
+  if( ! soc ) return TRUE;
 
   send( socket:soc, data:req );
   code = recv_line( socket:soc, length:1024 );
@@ -224,59 +286,92 @@ function http_is_dead( port, retry ) {
     b = http_recv_body( socket:soc, headers:h2 );
   }
   http_close_socket( soc );
-  if( ! code ) return( 1 );
+  if( ! code ) return TRUE;
+
   # 500: internal server error
   # 501: not implemented = unsupported method...
   # 502: Bad gateway = upstream server sends an invalid response
   # 503: service unavailable = temporary overloading...
   # 504: gateway timeout = no timely response from upstream server
-  if( ereg( pattern:"^HTTP/1\.[01] +50[234]", string:code ) ) return( 1 );
-  return( 0 );
+  if( ereg( pattern:"^HTTP/1\.[01] +50[234]", string:code ) ) return TRUE;
+
+  return FALSE;
 }
 
-# This function was originally written by SecurITeam in
-# badblue_directory_traversal.nasl
-# I (=MA) enhanced it.
-# NB: it works with AUTOEXEC.BAT, WIN.INI and BOOT.INI
-# quickcheck should be set to 0 if the server does not return clean 404 code,
-# i.e., if "www/no404/"+port is defined in the KB
-
+# @brief This function requests a specified URL and checks the response if it
+#        is containing pattern for windows related files (autoexec.bat, win.ini
+#        and boot.ini).
+#
+# @param port        the port of the remote server to check
+# @param url         the URL to check
+# @param quickcheck  if set to TRUE the response is only checked for an existing HTTP 200 status code
+#
+# @return TRUE if the remote web server has responded with the expected pattern, FALSE otherwise and
+#              NULL in the case where no connection to the target could be established or not all
+#              required parameters where passed.
+#
 function do_check_win_dir_trav( port, url, quickcheck ) {
 
+  local_var port, url, quickcheck;
   local_var soc, req, cod, buf;
 
-  if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#do_check_win_dir_trav" );
-  if( ! url ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#do_check_win_dir_trav" );
-
-  #display("check_win_dir_trav(port=", port, ", url=", url, ", quickcheck=", quickcheck, ")\n");
-  soc = http_open_socket( port );
-  if( ! soc ) {
-    # display("check_win_dir_trav: cannot open socket to ", port, "\n");
-    return( 0 );
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#do_check_win_dir_trav" );
+    return NULL;
+  }
+  if( ! url ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#url#-#do_check_win_dir_trav" );
+    return NULL;
   }
 
+  if( _http_debug ) display( "DEBUG: check_win_dir_trav(port=", port, ", url=", url, ", quickcheck=", quickcheck, ")\n" );
+
+  # nb: Always keep http_get() before http_open_socket() as the first could
+  # fork with multiple vhosts and the childs would share the same socket
+  # causing race conditions and similar.
   req = http_get( item:url, port:port );
+  soc = http_open_socket( port );
+  if( ! soc ) {
+    if( _http_debug ) display( "DEBUG: check_win_dir_trav: cannot open socket to ", port, "\n" );
+    return NULL;
+  }
+
   send( socket:soc, data:req );
   cod = recv_line( socket:soc, length:80 );
   buf = http_recv( socket:soc, code:cod );
+  http_close_socket( soc );
 
   if( "content-encoding: gzip" >< tolower( buf ) )
     buf = http_gunzip( buf:buf );
 
-  http_close_socket( soc );
-
   if( quickcheck ) {
-    if( " 200 " >< cod ) return( 1 );
-    return( 0 );
+    if( " 200 " >< cod ) return TRUE;
+    return FALSE;
   }
 
   if( "; for 16-bit app support" >< buf || "[boot loader]" >< buf ) {
-    return( 1 );
+    return TRUE;
   }
-  return( 0 );
+  return FALSE;
 }
 
+# @brief This function requests a specified URL and checks the response if it
+#        is containing pattern for windows related files (autoexec.bat, win.ini
+#        and boot.ini). It is an extension to the do_check_win_dir_trav function
+#        and is additionally checking if the web server is responding with the
+#        expected pattern on a non-existent random file.
+#
+# @param port        the port of the remote server to check
+# @param url         the URL to check
+# @param quickcheck  if set to TRUE the response is only checked for an existing HTTP 200 status code
+#
+# @return TRUE if the remote web server has responded with the expected pattern, FALSE otherwise and
+#              NULL in the case where no connection to the target could be established, not all
+#              required parameters where passed or if the web server is responding with the expected
+#              pattern on a non-existent random file.
+#
 function check_win_dir_trav( port, url, quickcheck ) {
+  local_var port, url, quickcheck;
   if( do_check_win_dir_trav( port:port, url:url + rand(), quickcheck:quickcheck ) )
     return NULL;
   else
@@ -354,10 +449,10 @@ function http_recv_body( socket, headers, length ) {
   if( l >= 0 ) min = int( l );
   if( l >= max || min >= max ) max = l;
   if( max < 0 ) {
-    #display("http_recv_body: bogus or no Content-length field, and no 'length' paramater set! Defaulting to 32 KB\n");
+    if( _http_debug ) display( "DEBUG: http_recv_body: bogus or no Content-length field, and no 'length' parameter set! Defaulting to 32 KB\n" );
     max = 32768;
   }
-  #display("http_recv_body: min=", min, "; max=", max, "\n");
+  if( _http_debug ) display( "DEBUG: http_recv_body: min=", min, "; max=", max, "\n" );
   if( min > 0 ) {
     x = recv( socket:socket, length:max, min:min );
   } else {
@@ -367,7 +462,7 @@ function http_recv_body( socket, headers, length ) {
       n = recv( socket:socket, length:max );
       x += n;
       if( strlen( x ) > 1048576 ) {
-        #display( "http_recv_body: read stopped after 1 MB!\n" );
+        if( _http_debug ) display( "DEBUG: http_recv_body: read stopped after 1 MB!\n" );
         break;
       }
     }
@@ -451,13 +546,13 @@ function http_send_recv( port, data ) {
 function cgi_dirs( port ) {
 
   local_var port, kb, optimize, usercgis;
+  # nb: http_cgi_disabled and optimize_test_enabled are global vars
 
   if( ! port ) set_kb_item( name: "nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#cgi_dirs" );
 
-  if( get_kb_item( "Settings/disable_cgi_scanning" ) ) {
-    optimize = get_preference( "optimize_test" );
-    if( optimize && "yes" >< optimize ) {
-      set_kb_item( name: "nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#cgi_dirs()" );
+  if( http_cgi_disabled ) {
+    if( optimize_test_enabled && "yes" >< optimize_test_enabled ) {
+      set_kb_item( name:"nvt_cgi_scanning_disabled/" + get_script_oid(), value:get_script_oid() + "#-#cgi_dirs()" );
     }
     #return NULL; # Old behaviour
     exit( 0 ); # Throws a "nasl_array_iterator: unhandled type 57" message if cgi_dirs() is called within a foreach but not within a make_list()
@@ -781,34 +876,34 @@ function extract_location_from_redirect( port, data, debug ) {
   location = egrep( string:data, pattern:"^Location: ", icase:TRUE );
   if( ! location ) return;
 
-  if( debug ) display( 'DEBUG: Location header is: "' + location + '"\n' );
+  if( debug || _http_debug ) display( 'DEBUG: Location header is: "' + location + '"\n' );
 
   # Grab everything after Location:
   location -= string( "\r\n" );
   location = ereg_replace( string:location, pattern:"Location: (.*)$", replace:"\1", icase:TRUE );
 
-  if( debug ) display( 'DEBUG: Location header after cleanup is: "' + location + '"\n' );
+  if( debug || _http_debug ) display( 'DEBUG: Location header after cleanup is: "' + location + '"\n' );
 
   # Handle "https://", "http://" and "//" links in the location header
   if( location =~ "^(https:|http:)?//" ) {
 
     location_host = ereg_replace( string:location, pattern:"(https:|http:)?//([^/]*)/.*", replace:"\2", icase:TRUE );
 
-    if( debug ) display( 'DEBUG: Location header is pointing to host/ip: "' + location_host + '"\n' );
+    if( debug || _http_debug ) display( 'DEBUG: Location header is pointing to host/ip: "' + location_host + '"\n' );
 
     # The location header is pointing to the same hostname / ip
     if( host >< location_host || ip >< location_host ) {
       loc = ereg_replace( string:location, pattern:"(https:|http:)?//[^/]*/([^?]*)", replace:"/\2", icase:TRUE );
-      if( debug ) display( 'DEBUG: Location header is pointing to "' + location + '" on the same host/ip. Returning this location.\n' );
+      if( debug || _http_debug ) display( 'DEBUG: Location header is pointing to "' + location + '" on the same host/ip. Returning this location.\n' );
       return loc;
     # If its not pointing to the same hostname / ip we can't follow it
     } else {
-      if( debug ) display( 'DEBUG: Location header is pointing to "' + location + '" NOT on the same host/ip. NOT returning this location.\n' );
+      if( debug || _http_debug ) display( 'DEBUG: Location header is pointing to "' + location + '" NOT on the same host/ip. NOT returning this location.\n' );
       return;
     }
   # Handle redirects like "Location: /foo"
   } else {
-    if( debug ) display( 'DEBUG: Location header is pointing to "' + location + '" on the same host/ip. Returning this location.\n' );
+    if( debug || _http_debug ) display( 'DEBUG: Location header is pointing to "' + location + '" on the same host/ip. Returning this location.\n' );
     return location;
   }
 }
@@ -870,4 +965,67 @@ function create_exploit_req( cgiArray, ex ) {
     urls = make_list( urls, url + "&" );
   }
   return urls;
+}
+
+# Returns an array containing the following index:
+# basic_auth = TRUE/FALSE if Basic Auth is available/found
+# realm      = A string containing the Basic Auth realm or "Undefined/Unknown" if none found
+function extract_basic_auth( data ) {
+
+  local_var data, header, infos, realm;
+
+  infos = make_array( "basic_auth", FALSE,
+                      "realm", "Undefined/Unknown" );
+
+  if( ! data ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#data#-#extract_basic_auth" );
+    return infos;
+  }
+
+  if( ! header = egrep( pattern:"^WWW-Authenticate: Basic", string:data, icase:TRUE ) )
+    return infos;
+
+  infos["basic_auth"] = TRUE;
+
+  realm = eregmatch( pattern:"realm=(.*)", string:header, icase:TRUE );
+  if( realm[1] ) infos["realm"] = chomp( realm[1] );
+
+  return infos;
+}
+
+# @brief This function returns the info if a remote web server was internally
+#        (in the KB) marked as "broken". It will also save the information in
+#        an internal array to avoid that redis is queried.
+#
+# @param port        the port of the remote server
+#
+# @return TRUE if the remote web server was marked as broken, FALSE otherwise and
+#              NULL in the case where the port parameter wasn't passed.
+#
+function http_is_marked_broken( port ) {
+
+  local_var port, marked_broken;
+  # nb: _http_is_broken_array is a global_var (see on top)
+
+  if( ! port ) {
+    set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#extract_location_from_redirect" );
+    return NULL;
+  }
+
+  # Used to not query redis with the get_kb_item below
+  # to save some requests.
+  if( ! isnull( _http_is_broken_array[port] ) ) {
+    if( _http_is_broken_array[port] )
+      return TRUE;
+    else
+      return FALSE;
+  }
+
+  marked_broken = get_kb_item( "Services/www/" + port + "/broken" );
+  if( marked_broken )
+    _http_is_broken_array[port] = TRUE;
+  else
+    _http_is_broken_array[port] = FALSE;
+
+  return marked_broken;
 }

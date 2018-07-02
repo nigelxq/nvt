@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_powerfolder_detection.nasl 6701 2017-07-12 13:04:06Z cfischer $
+# $Id: gb_powerfolder_detection.nasl 10017 2018-05-30 07:17:29Z cfischer $
 #
 # Powerfolder Detection
 #
@@ -27,9 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.107009");
-  script_version("$Revision: 6701 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-12 15:04:06 +0200 (Wed, 12 Jul 2017) $");
-  script_tag(name:"qod_type", value:"remote_banner");
+  script_version("$Revision: 10017 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-30 09:17:29 +0200 (Wed, 30 May 2018) $");
   script_tag(name:"creation_date", value:"2016-06-07 06:40:16 +0200 (Tue, 07 Jun 2016)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -41,57 +40,47 @@ if(description)
   script_require_ports("Services/www", 8080);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
-  script_tag(name:"summary", value:"Detection of installed version of PowerFolder
+  script_tag(name:"summary", value:"Detection of installed version of PowerFolder.
 
-  The script detects the version of PowerFolder on remote host and sets the KB.");
+  The script detects the version of PowerFolder on the remote host and sets the KB entries.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
   exit(0);
 }
 
-
 include("http_func.inc");
 include("http_keepalive.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-appPort = get_http_port( default:80);
-banner = get_http_banner( port:appPort );
+appPort = get_http_port( default:8080 );
 
-url = '/login/index.html';
-sndReq = http_get( item: url, port:appPort );
-rcvRes = http_keepalive_send_recv( port: appPort, data:sndReq, bodyonly:FALSE );
+url = "/login";
+rcvRes = http_get_cache( item:url, port:appPort );
 
-if ( rcvRes !~ "HTTP/1\.. 200|302" || "powerfolder" >!< tolower( banner ) )
-{
- url = '/login/extern/index.html';
- sndReq = http_get( item:url, port:appPort );
- rcvRes = http_keepalive_send_recv( port:appPort, data:sndReq, bodyonly:FALSE);
- if ( rcvRes !~ "HTTP/1\.. 200|302" || "powerfolder" >!< tolower(banner))
- {
-   exit(0);
- }
+if ( rcvRes =~ "HTTP/1\.. 200" && "powerfolder/util.js" >< rcvRes && "Please enable Javascript to use PowerFolder properly" >< rcvRes ) {
+  set_kb_item( name:"powerfolder/installed", value:TRUE );
+  powfolVer = "unknown";
+
+  tmpVer = eregmatch( pattern:"Program version: ([0-9.]+)",
+                      string:rcvRes );
+  if ( tmpVer[1] ) {
+    powfolVer = tmpVer[1];
+    set_kb_item( name:"www/" + appPort + "/powerfolder", value:powfolVer );
+  }
+
+  cpe = build_cpe(value:powfolVer, exp:"^([0-9.]+)", base:"cpe:/a:powerfolder:powerfolder:");
+  if ( !cpe )
+    cpe = 'cpe:/a:powerfolder:powerfolder';
+  register_product( cpe:cpe, location:"/", port:appPort );
+  log_message( data:build_detection_report( app:"PowerFolder",
+                                            version:powfolVer,
+                                            install:"/",
+                                            cpe:cpe,
+                                            concluded:tmpVer[0],
+                                            concludedUrl: report_vuln_url( port:appPort, url:url, url_only:TRUE ) ),
+                                            port:appPort );
 }
-tmpVer = eregmatch( pattern:"Program version: ([0-9]+\.[0-9]+\.+[0-9]+?)",
-                    string:rcvRes );
-if(tmpVer[1] ) {
-  powfolVer = tmpVer[1];
-  set_kb_item( name:"www/" + appPort + "/powerfolder", value:powfolVer );
-} 
 
-set_kb_item( name:"powerfolder/installed", value:TRUE );
-cpe = build_cpe(value:powfolVer, exp:"^([0-9.]+)", base:"cpe:/a:power:folder:");
-if(!cpe)
-  cpe = 'cpe:/a:power:folder';
-register_product( cpe:cpe, location:appPort + '/tcp',port: appPort );
-log_message( data:build_detection_report( app:"PowerFolder",
-                                          version:powfolVer,
-                                          install:appPort + '/tcp',
-                                          cpe:cpe, concluded: tmpVer[0] ),
-                                          port:appPort);
-
-exit( 0 );
-		 
-
-
+exit(0);

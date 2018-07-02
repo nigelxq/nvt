@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_1899_1.nasl 8672 2018-02-05 16:39:18Z teissa $
+# $Id: gb_ubuntu_USN_1899_1.nasl 9650 2018-04-27 08:51:00Z cfischer $
 #
 # Ubuntu Update for linux USN-1899-1
 #
@@ -25,27 +25,12 @@
 ###############################################################################
 
 include("revisions-lib.inc");
-tag_insight = "Dmitry Monakhov reported a race condition flaw the Linux ext4 filesystem
-  that can expose stale data. An unprivileged user could exploit this flaw to
-  cause an information leak. (CVE-2012-4508)
-
-  An information leak was discovered in the Linux kernel's tkill and tgkill
-  system calls when used from compat processes. A local user could exploit
-  this flaw to examine potentially sensitive kernel memory. (CVE-2013-2141)
-
-  A format string vulnerability was discovered in Broadcom B43 wireless
-  driver for the Linux kernel. A local user could exploit this flaw to gain
-  administrative privileges. (CVE-2013-2852)";
-
-
-tag_affected = "linux on Ubuntu 10.04 LTS";
-tag_solution = "Please Install the Updated Packages.";
 
 if(description)
 {
-  script_id(841493);
-  script_version("$Revision: 8672 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-05 17:39:18 +0100 (Mon, 05 Feb 2018) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.841493");
+  script_version("$Revision: 9650 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:51:00 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-07-05 13:16:34 +0530 (Fri, 05 Jul 2013)");
   script_cve_id("CVE-2012-4508", "CVE-2013-2141", "CVE-2013-2852");
   script_tag(name:"cvss_base", value:"6.9");
@@ -59,10 +44,20 @@ if(description)
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "solution" , value : tag_solution);
-  script_tag(name : "insight" , value : tag_insight);
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU10\.04 LTS");
+  script_tag(name : "affected" , value : "linux on Ubuntu 10.04 LTS");
+  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
+  script_tag(name : "insight" , value : "Dmitry Monakhov reported a race condition flaw the Linux ext4 filesystem
+  that can expose stale data. An unprivileged user could exploit this flaw to
+  cause an information leak. (CVE-2012-4508)
+
+  An information leak was discovered in the Linux kernel's tkill and tgkill
+  system calls when used from compat processes. A local user could exploit
+  this flaw to examine potentially sensitive kernel memory. (CVE-2013-2141)
+
+  A format string vulnerability was discovered in Broadcom B43 wireless
+  driver for the Linux kernel. A local user could exploit this flaw to gain
+  administrative privileges. (CVE-2013-2852)");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -165,6 +160,6 @@ if(release == "UBUNTU10.04 LTS")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

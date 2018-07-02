@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_sonatype_2016_06_20_nexus.nasl 7585 2017-10-26 15:03:01Z cfischer $
+# $Id: gb_sonatype_2016_06_20_nexus.nasl 9978 2018-05-28 08:52:24Z cfischer $
 #
 # Sonatype Nexus Repository Manager Remote Code Execution Vulnerability
 #
@@ -30,7 +30,7 @@ CPE = "cpe:/a:sonatype:nexus";
 if (description)
 {
  script_oid("1.3.6.1.4.1.25623.1.0.105819");
- script_version ("$Revision: 7585 $");
+ script_version ("$Revision: 9978 $");
  script_tag(name:"cvss_base", value:"10.0");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
 
@@ -47,14 +47,13 @@ if (description)
 
  script_tag(name:"qod_type", value:"remote_banner");
 
- script_tag(name:"last_modification", value:"$Date: 2017-10-26 17:03:01 +0200 (Thu, 26 Oct 2017) $");
+ script_tag(name:"last_modification", value:"$Date: 2018-05-28 10:52:24 +0200 (Mon, 28 May 2018) $");
  script_tag(name:"creation_date", value:"2016-07-21 12:28:37 +0200 (Thu, 21 Jul 2016)");
  script_category(ACT_GATHER_INFO);
  script_family("Web application abuses");
  script_copyright("This script is Copyright (C) 2016 Greenbone Networks GmbH");
  script_dependencies("gb_sonatype_nexus_detect.nasl");
  script_require_ports("Services/www", 8081);
- script_exclude_keys("Settings/disable_cgi_scanning");
  script_mandatory_keys("nexus/installed");
 
  exit(0);
@@ -66,15 +65,13 @@ include("http_keepalive.inc");
 include("version_func.inc");
 
 if( ! port = get_app_port( cpe:CPE ) ) exit( 0 );
-if( ! get_port_state( port ) ) exit( 0 );
-
 if( vers =  get_app_version( cpe:CPE, port:port ) )
 {
   if( version_is_less( version: vers, test_version: "2.11.2.01" ) )
   {
-      report = report_fixed_ver( installed_version:vers, fixed_version:'2.11.2.01' );
-      security_message( port:port, data:report );
-      exit (0 );
+    report = report_fixed_ver( installed_version:vers, fixed_version:'2.11.2.01' );
+    security_message( port:port, data:report );
+    exit( 0 );
   }
 }
 

@@ -44,9 +44,9 @@ tag_affected = "cups on CentOS 5";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.centos.org/pipermail/centos-announce/2010-March/016547.html");
-  script_id(880660);
-  script_version("$Revision: 6653 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:46:53 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.880660");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-08-09 08:20:34 +0200 (Tue, 09 Aug 2011)");
   script_tag(name:"cvss_base", value:"5.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:P");
@@ -54,7 +54,7 @@ if(description)
   script_cve_id("CVE-2010-0302", "CVE-2009-3553");
   script_name("CentOS Update for cups CESA-2010:0129 centos5 i386");
 
-  script_summary("Check for the Version of cups");
+  script_tag(name:"summary", value:"Check for the Version of cups");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

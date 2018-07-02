@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_rhinosoft_serv-u_detect.nasl 8146 2017-12-15 13:40:59Z cfischer $
+# $Id: gb_rhinosoft_serv-u_detect.nasl 9885 2018-05-17 12:31:41Z jschulte $
 #
 # Rhino Software Serv-U SSH and FTP Server Version Detection (Remote)
 #
@@ -27,16 +27,21 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.801117");
-  script_version("$Revision: 8146 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 14:40:59 +0100 (Fri, 15 Dec 2017) $");
+  script_version("$Revision: 9885 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-17 14:31:41 +0200 (Thu, 17 May 2018) $");
   script_tag(name:"creation_date", value:"2009-10-20 14:26:56 +0200 (Tue, 20 Oct 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
+
+  # Now known as Solarwinds Serv-U FTP Server
+  # http://clearygull.com/project/rhino-software-inc-sold-to-solarwinds/
+  # https://www.solarwinds.com/de/serv-u-managed-file-transfer-server
   script_name("Rhino Software Serv-U SSH and FTP Server Version Detection (Remote)");
+
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 Greenbone Networks GmbH");
-  script_family("Service detection");
-  script_dependencies("find_service.nasl", "find_service_3digits.nasl", "ftpserver_detect_type_nd_version.nasl", "ssh_detect.nasl");
+  script_family("Product detection");
+  script_dependencies("ftpserver_detect_type_nd_version.nasl", "ssh_detect.nasl");
   script_require_ports("Services/ftp", 21, "Services/ssh", 22);
 
   script_tag(name:"summary", value:"This script detects the installed version of Rhino Software
@@ -66,6 +71,7 @@ foreach port( ftpPorts ) {
 
       vers = "unknown";
       set_kb_item( name:"Serv-U/FTP/installed", value:TRUE );
+      replace_kb_item( name:"Serv-U/detected", value:TRUE );
       install = port + '/tcp';
 
       version = eregmatch( pattern:"Serv-U FTP Server v([0-9.]+)", string:banner );
@@ -82,7 +88,7 @@ foreach port( ftpPorts ) {
           set_kb_item( name:"ftp/" + port + "/Serv-U", value:vers );
         }
       }
-      ## build cpe and store it as host_detail
+
       cpe = build_cpe( value:vers, exp:"^([0-9.]+)", base:"cpe:/a:rhinosoft:serv-u:" );
       if( isnull( cpe ) )
         cpe = 'cpe:/a:rhinosoft:serv-u';
@@ -93,7 +99,7 @@ foreach port( ftpPorts ) {
                                                 version:vers,
                                                 install:install,
                                                 cpe:cpe,
-                                                concluded:version[0] ),
+                                                concluded:banner ),
                                                 port:port );
     }
   }
@@ -106,6 +112,7 @@ if( banner && "serv-u" >< tolower( banner ) ) {
 
   vers = "unknown";
   set_kb_item( name:"Serv-U/SSH/installed", value:TRUE );
+  replace_kb_item( name:"Serv-U/detected", value:TRUE );
   install = sshPort + '/tcp';
 
   version = eregmatch( pattern:"Serv-U_([0-9.]+)", string:banner );
@@ -115,7 +122,6 @@ if( banner && "serv-u" >< tolower( banner ) ) {
     set_kb_item( name:"ssh/" + sshPort + "/Serv-U", value:vers );
   }
 
-  ## build cpe and store it as host_detail
   cpe = build_cpe( value:vers, exp:"^([0-9.]+)", base:"cpe:/a:rhinosoft:serv-u:" );
   if( isnull( cpe ) )
     cpe = 'cpe:/a:rhinosoft:serv-u';
@@ -126,7 +132,7 @@ if( banner && "serv-u" >< tolower( banner ) ) {
                                             version:vers,
                                             install:install,
                                             cpe:cpe,
-                                            concluded:version[0] ),
+                                            concluded:banner ),
                                             port:sshPort );
 }
 

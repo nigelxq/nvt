@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_logitech_media_server_mult_stored_xss_vuln.nasl 8367 2018-01-11 07:32:43Z cfischer $
+# $Id: gb_logitech_media_server_mult_stored_xss_vuln.nasl 9895 2018-05-18 04:24:05Z ckuersteiner $
 #
 # Logitech Media Server Multiple Persistent XSS Vulnerabilities
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:logitech:media_server";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811895");
-  script_version("$Revision: 8367 $");
+  script_version("$Revision: 9895 $");
   script_cve_id("CVE-2017-16568", "CVE-2017-16567");
   script_tag(name:"cvss_base", value:"3.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:S/C:N/I:P/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-11 08:32:43 +0100 (Thu, 11 Jan 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-18 06:24:05 +0200 (Fri, 18 May 2018) $");
   script_tag(name:"creation_date", value:"2017-11-07 14:00:28 +0530 (Tue, 07 Nov 2017)");
   script_name("Logitech Media Server Multiple Persistent XSS Vulnerabilities");
 
@@ -56,10 +56,8 @@ if(description)
 
   script_tag(name:"affected", value:"Logitech Media Server version 7.9.0");
 
-  script_tag(name:"solution", value:"No solution or patch is available as of
-  13th November, 2017. Information regarding this issue will be updated once 
-  solution details are available. For updates refer to https://www.logitech.com.");
-
+  script_tag(name:"solution", value:"No known solution is available as of 18th May, 2018. Information regarding
+this issue will be updated once solution details are available.");
 
   script_tag(name:"solution_type", value:"NoneAvailable");
 
@@ -75,16 +73,11 @@ if(description)
   exit(0);
 }
 
-
 include("version_func.inc");
 include("host_details.inc");
 
-logPort = "";
-logVer = "";
-
-if(!logPort = get_app_port(cpe:CPE)){
+if(!logPort = get_app_port(cpe:CPE))
   exit(0);
-}
 
 if(!infos = get_app_version_and_location(cpe:CPE, port:logPort, exit_no_version:TRUE)) exit(0);
 logVer = infos['version'];

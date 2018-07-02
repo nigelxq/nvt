@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wireshark_dos_vuln_win.nasl 8747 2018-02-09 14:42:20Z asteins $
+# $Id: gb_wireshark_dos_vuln_win.nasl 9747 2018-05-07 12:56:58Z asteins $
 #
 # Wireshark Denial of Service Vulnerability (Windows)
 #
@@ -29,11 +29,11 @@ CPE = "cpe:/a:wireshark:wireshark";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112213");
-  script_version("$Revision: 8747 $");
+  script_version("$Revision: 9747 $");
   script_cve_id("CVE-2018-6836");
-  script_tag(name:"cvss_base", value:"4.3");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:N/I:N/A:P");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-09 15:42:20 +0100 (Fri, 09 Feb 2018) $");
+  script_tag(name:"cvss_base", value:"7.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-07 14:56:58 +0200 (Mon, 07 May 2018) $");
   script_tag(name:"creation_date", value:"2018-02-09 15:34:57 +0100 (Fri, 09 Feb 2018)");
 
   script_name("Wireshark Denial of Service Vulnerability (Windows)");
@@ -54,12 +54,13 @@ if(description)
 
   script_tag(name:"affected", value: "Wireshark up to and including version 2.4.4 on Windows.");
 
-  script_tag(name:"solution", value: "No solution available as of 9th February, 2018. Information regarding this issue will be updated once the solution details are available.
-  For updates refer to https://www.wireshark.org");
+  script_tag(name:"solution", value: "Update to version 2.6.0 or later.");
 
+  script_xref(name:"URL", value:"https://code.wireshark.org/review/#/c/25660/");
   script_xref(name:"URL", value:"https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=14397");
+  script_xref(name:"URL", value:"https://code.wireshark.org/review/gitweb?p=wireshark.git;a=commit;h=28960d79cca262ac6b974f339697b299a1e28fef");
 
-  script_tag(name:"solution_type", value:"NoneAvailable");
+  script_tag(name:"solution_type", value:"VendorFix");
   script_tag(name:"qod_type", value:"registry");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2018 Greenbone Networks GmbH");
@@ -69,18 +70,20 @@ if(description)
   exit(0);
 }
 
-
 include("version_func.inc");
 include("host_details.inc");
 
-infos = get_app_version_and_location(cpe:CPE, exit_no_version:TRUE);
-ver = infos['version'];
-path = infos['location'];
-
-if(version_is_less_equal(version:ver, test_version:"2.4.4")) {
-  report = report_fixed_ver(installed_version:ver, fixed_version:"NoneAvailable", install_path:path);
-  security_message(data:report);
+if(!infos = get_app_version_and_location(cpe:CPE, exit_no_version:TRUE)) {
   exit(0);
 }
 
-exit(0);
+vers = infos['version'];
+path = infos['location'];
+
+if(version_is_less_equal(version:vers, test_version:"2.4.4")) {
+  report = report_fixed_ver(installed_version:vers, fixed_version:"2.6.0", install_path:path);
+  security_message(port:0, data:report);
+  exit(0);
+}
+
+exit(99);

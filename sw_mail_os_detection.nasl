@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: sw_mail_os_detection.nasl 8446 2018-01-17 15:50:57Z cfischer $
+# $Id: sw_mail_os_detection.nasl 9931 2018-05-23 08:44:55Z cfischer $
 #
 # SMTP/POP3/IMAP Server OS Identification
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.111068");
-  script_version("$Revision: 8446 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-17 16:50:57 +0100 (Wed, 17 Jan 2018) $");
+  script_version("$Revision: 9931 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-23 10:44:55 +0200 (Wed, 23 May 2018) $");
   script_tag(name:"creation_date", value:"2015-12-11 14:00:00 +0100 (Fri, 11 Dec 2015)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -68,6 +68,7 @@ foreach port( ports ) {
     if( ! banner || banner == "" || isnull( banner ) ) continue;
 
     if( "ESMTP" >< banner ) {
+
       if( "(Gentoo Linux" >< banner || "(GENTOO/GNU)" >< banner || "(Gentoo/GNU)" >< banner ||
           "(Gentoo powered" >< banner || "(Gentoo)" >< banner || " Gentoo" >< banner || "(Gentoo/Linux" >< banner) {
         register_and_report_os( os:"Gentoo", cpe:"cpe:/o:gentoo:linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
@@ -215,6 +216,53 @@ foreach port( ports ) {
         register_and_report_os( os:"Slackware", cpe:"cpe:/o:slackware:slackware_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
         continue;
       }
+
+      # Runs only on Unix-like OS variants
+      if( " ESMTP Exim " >< banner ) {
+        register_and_report_os( os:"Linux/Unix", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        continue;
+      }
+
+      # 220 example.com ESMTP IceWarp 11.4.6.0 x64; Tue, 22 May 2018 15:53:07 +0200
+      # 220 example.com ESMTP IceWarp 11.1.2.0 RHEL6 x64; Tue, 22 May 2018 20:39:53 +0700
+      # 220 example.com ESMTP IceWarp 11.1.2.0 x64; Tue, 22 May 2018 15:43:25 +0200
+      # 220 example.com ESMTP IceWarp 10.0.7; Tue, 22 May 2018 20:58:03 +0700
+      # 220 example.com ESMTP IceWarp 9.4.2; Tue, 22 May 2018 07:12:52 -0700
+      if( " IceWarp " >< banner ) {
+        # This makes sure that we're catching the RHEL6 (and similar) from above while we don't
+        # report an unknown OS banner for the other variants without OS info.
+        if( os_info = eregmatch( pattern:"IceWarp ([^ ;]+) ([^ ;]+) ([^ ;]+); ", string:banner, icase:FALSE ) ) {
+          if( "RHEL" >< os_info[2] ) {
+            version = eregmatch( pattern:"RHEL([0-9.]+)", string:os_info[2] );
+            if( ! isnull( version[1] ) ) {
+              register_and_report_os( os:"Red Hat Enterprise Linux", version:version[1], cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            } else {
+              register_and_report_os( os:"Red Hat Enterprise Linux", cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            }
+            continue;
+          } else if( "DEB" >< os_info[2] ) {
+            version = eregmatch( pattern:"DEB([0-9.]+)", string:os_info[2] );
+            if( ! isnull( version[1] ) ) {
+              register_and_report_os( os:"Debian GNU/Linux", version:version[1], cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            } else {
+              register_and_report_os( os:"Debian GNU/Linux", cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            }
+            continue;
+          } else if( "UBUNTU" >< os_info[2] ) {
+            version = eregmatch( pattern:"UBUNTU([0-9.]+)", string:os_info[2] );
+            if( ! isnull( version[1] ) ) {
+              version = ereg_replace( pattern:"^([0-9]{1,2})(04|10)$", string:version[1], replace:"\1.\2" );
+              register_and_report_os( os:"Ubuntu", version:version, cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            } else {
+              register_and_report_os( os:"Ubuntu", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            }
+            continue;
+          }
+          # nb: No continue here as we want to report an unknown OS later...
+        } else {
+          continue; # No OS info so just skip this IceWarp banner...
+        }
+      }
     }
 
     # Cisco Unity Connection
@@ -235,9 +283,7 @@ foreach port( ports ) {
       }
       continue;
     }
-
     register_unknown_os_banner( banner:banner, banner_type_name:banner_type, banner_type_short:"smtp_banner", port:port );
-
   }
 }
 
@@ -360,7 +406,7 @@ foreach port( ports ) {
           register_and_report_os( os:"CentOS", version:version[2], cpe:"cpe:/o:centos:centos", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
         } else {
           register_and_report_os( os:"CentOS", cpe:"cpe:/o:centos:centos", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-        }  
+        }
         continue;
       } else if( "CentOS release" >< banner ) {
         version = eregmatch( pattern:"CentOS release ([0-9.]+)", string:banner );
@@ -368,7 +414,7 @@ foreach port( ports ) {
           register_and_report_os( os:"CentOS", version:version[1], cpe:"cpe:/o:centos:centos", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
         } else {
           register_and_report_os( os:"CentOS", cpe:"cpe:/o:centos:centos", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-        }  
+        }
         continue;
       } else if( "Red Hat Enterprise Linux" >< banner ) {
         version = eregmatch( pattern:"Red Hat Enterprise Linux (Server|ES|AS|Client) release ([0-9.]+)", string:banner );
@@ -376,7 +422,7 @@ foreach port( ports ) {
           register_and_report_os( os:"Red Hat Enterprise Linux " + version[1], version:version[2], cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
         } else {
           register_and_report_os( os:"Red Hat Enterprise Linux", cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-        }  
+        }
         continue;
       } else if( '"OpenBSD"' >< banner ) {
         version = eregmatch( pattern:'"os-version"(, | )"([0-9.]+)', string:banner );
@@ -415,11 +461,54 @@ foreach port( ports ) {
         # Zimbra runs only on Unix-like systems
         register_and_report_os( os:'Linux', cpe:'cpe:/o:linux:kernel', banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
         continue;
+      # Runs only on Unix-like OS variants
+      } else if( " Dovecot ready." >< banner ) {
+        register_and_report_os( os:"Linux/Unix", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        continue;
+      }
+
+      # * OK IceWarp 12.0.4.0 RHEL7 x64 IMAP4rev1 Tue, 22 May 2018 14:06:46 +0000
+      # * OK IceWarp 11.1.2.0 RHEL6 x64 IMAP4rev1 Tue, 22 May 2018 20:46:21 +0700
+      # * OK IceWarp 11.1.2.0 x64 IMAP4rev1 Tue, 22 May 2018 15:43:26 +0200
+      # * OK IceWarp 9.4.0 IMAP4rev1 Tue, 22 May 2018 21:14:00 +0700
+      if( " IceWarp " >< banner ) {
+        # This makes sure that we're catching the RHEL6 (and similar) from above while we don't
+        # report an unknown OS banner for the other variants without OS info.
+        if( os_info = eregmatch( pattern:"IceWarp ([^ ]+) ([^ ]+) ([^ ]+) IMAP4rev1 ", string:banner, icase:FALSE ) ) {
+          if( "RHEL" >< os_info[2] ) {
+            version = eregmatch( pattern:"RHEL([0-9.]+)", string:os_info[2] );
+            if( ! isnull( version[1] ) ) {
+              register_and_report_os( os:"Red Hat Enterprise Linux", version:version[1], cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            } else {
+              register_and_report_os( os:"Red Hat Enterprise Linux", cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            }
+            continue;
+          } else if( "DEB" >< os_info[2] ) {
+            version = eregmatch( pattern:"DEB([0-9.]+)", string:os_info[2] );
+            if( ! isnull( version[1] ) ) {
+              register_and_report_os( os:"Debian GNU/Linux", version:version[1], cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            } else {
+              register_and_report_os( os:"Debian GNU/Linux", cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            }
+            continue;
+          } else if( "UBUNTU" >< os_info[2] ) {
+            version = eregmatch( pattern:"UBUNTU([0-9.]+)", string:os_info[2] );
+            if( ! isnull( version[1] ) ) {
+              version = ereg_replace( pattern:"^([0-9]{1,2})(04|10)$", string:version[1], replace:"\1.\2" );
+              register_and_report_os( os:"Ubuntu", version:version, cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            } else {
+              register_and_report_os( os:"Ubuntu", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+            }
+          }
+          # nb: No continue here as we want to report an unknown OS later...
+        } else {
+          continue; # No OS info so just skip this IceWarp banner...
+        }
       }
     }
 
     if( "The Microsoft Exchange IMAP4 service is ready" >< banner || "Microsoft Exchange Server" >< banner || "for Windows ready" >< banner ||
-        ( "service is ready" >< banner && ( "(Windows/x64)" >< banner || "(Windows/x86)" >< banner ) ) || 
+        ( "service is ready" >< banner && ( "(Windows/x64)" >< banner || "(Windows/x86)" >< banner ) ) ||
         "Winmail Mail Server" >< banner ) {
       register_and_report_os( os:"Microsoft Windows", cpe:"cpe:/o:microsoft:windows", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"windows" );
       continue;
@@ -436,7 +525,7 @@ banner_type = "POP3 banner";
 
 if( "Cyrus POP3" >< banner || "Dovecot" >< banner ||
     "POP3 Server" >< banner || "Mail Server" >< banner ||
-    "POP3 server" >< banner ) {
+    "POP3 server" >< banner || " POP3 " >< banner ) {
 
   if( "(Ubuntu)" >< banner || "ubuntu" >< banner ) {
     register_and_report_os( os:"Ubuntu", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
@@ -501,6 +590,52 @@ if( "Cyrus POP3" >< banner || "Dovecot" >< banner ||
   if( "Zimbra POP3 server ready" >< banner ) {
     register_and_report_os( os:"Linux", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
     exit( 0 );
+  }
+
+  # Runs only on Unix-like OS variants
+  if( "OK Dovecot ready." >< banner ) {
+    register_and_report_os( os:"Linux/Unix", cpe:"cpe:/o:linux:kernel", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+    exit( 0 );
+  }
+
+  # +OK example.com IceWarp 9.2.1 POP3 Tue, 22 May 2018 17:24:54 +0300 <20180522172454@example.com>
+  # +OK example.com IceWarp 11.1.2.0 RHEL6 x64 POP3 Tue, 22 May 2018 20:46:22 +0700 <20180522204622@example.com>
+  # +OK example.com IceWarp 11.1.2.0 x64 POP3 Tue, 22 May 2018 15:43:26 +0200 <20180522154326@example.com>
+  # +OK example.com IceWarp 12.0.4.0 RHEL7 x64 POP3 Tue, 22 May 2018 15:49:41 +0200 <20180522154941@example.com>
+  if( " IceWarp " >< banner ) {
+    # This makes sure that we're catching the RHEL6 (and similar) from above while we don't
+    # report an unknown OS banner for the other variants without OS info.
+    if( os_info = eregmatch( pattern:"IceWarp ([^ ]+) ([^ ]+) ([^ ]+) POP3 ", string:banner, icase:FALSE ) ) {
+      if( "RHEL" >< os_info[2] ) {
+        version = eregmatch( pattern:"RHEL([0-9.]+)", string:os_info[2] );
+        if( ! isnull( version[1] ) ) {
+          register_and_report_os( os:"Red Hat Enterprise Linux", version:version[1], cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        } else {
+          register_and_report_os( os:"Red Hat Enterprise Linux", cpe:"cpe:/o:redhat:enterprise_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        }
+        exit( 0 );
+      } else if( "DEB" >< os_info[2] ) {
+        version = eregmatch( pattern:"DEB([0-9.]+)", string:os_info[2] );
+        if( ! isnull( version[1] ) ) {
+          register_and_report_os( os:"Debian GNU/Linux", version:version[1], cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        } else {
+          register_and_report_os( os:"Debian GNU/Linux", cpe:"cpe:/o:debian:debian_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        }
+        exit( 0 );
+      } else if( "UBUNTU" >< os_info[2] ) {
+        version = eregmatch( pattern:"UBUNTU([0-9.]+)", string:os_info[2] );
+        if( ! isnull( version[1] ) ) {
+          version = ereg_replace( pattern:"^([0-9]{1,2})(04|10)$", string:version[1], replace:"\1.\2" );
+          register_and_report_os( os:"Ubuntu", version:version, cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        } else {
+          register_and_report_os( os:"Ubuntu", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:banner_type, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+        }
+        exit( 0 );
+      }
+      # nb: No exit here as we want to report an unknown OS later...
+    } else {
+      exit( 0 ); # No OS info so just skip this IceWarp banner...
+    }
   }
 }
 

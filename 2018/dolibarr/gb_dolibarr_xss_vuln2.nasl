@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_dolibarr_xss_vuln2.nasl 8757 2018-02-12 08:44:48Z asteins $
+# $Id: gb_dolibarr_xss_vuln2.nasl 9813 2018-05-14 05:19:41Z ckuersteiner $
 #
-# Dolibarr XSS Vulnerability
+# Dolibarr <= 6.0.2 XSS Vulnerability
 #
 # Authors:
 # Adrian Steins <adrian.steins@greenbone.net>
@@ -30,19 +30,19 @@ CPE = "cpe:/a:dolibarr:dolibarr";
 if (description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.112215");
-  script_version("$Revision: 8757 $");
-  script_tag(name: "last_modification", value: "$Date: 2018-02-12 09:44:48 +0100 (Mon, 12 Feb 2018) $");
+  script_version("$Revision: 9813 $");
+  script_tag(name: "last_modification", value: "$Date: 2018-05-14 07:19:41 +0200 (Mon, 14 May 2018) $");
   script_tag(name: "creation_date", value: "2018-02-12 09:37:40 +0100 (Mon, 12 Feb 2018)");
-  script_tag(name: "cvss_base", value: "4.3");
-  script_tag(name: "cvss_base_vector", value: "AV:N/AC:M/Au:N/C:N/I:P/A:N");
+  script_tag(name:"cvss_base", value:"3.5");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:S/C:N/I:P/A:N");
 
   script_cve_id("CVE-2017-1000509");
 
-  script_tag(name: "qod_type", value: "remote_banner");
+  script_tag(name: "qod_type", value: "remote_banner_unreliable");
 
-  script_tag(name: "solution_type", value: "NoneAvailable");
+  script_tag(name: "solution_type", value: "VendorFix");
 
-  script_name("Dolibarr XSS Vulnerability");
+  script_name("Dolibarr <= 6.0.2 XSS Vulnerability");
 
   script_category(ACT_GATHER_INFO);
 
@@ -60,8 +60,7 @@ The payload is saved with no interference from the detector. When visiting the p
 
   script_tag(name: "affected", value: "Dolibarr ERP/CRM version 6.0.2.");
 
-  script_tag(name: "solution", value: "No solution or patch is available as of 12th February, 2018. Information
-regarding this issue will be updated once the solution details are available.");
+  script_tag(name: "solution", value: "Update to version 7.0 or later.");
 
   script_xref(name: "URL", value: "https://github.com/Dolibarr/dolibarr/issues/7727");
 
@@ -78,7 +77,7 @@ if (!version = get_app_version(cpe: CPE, port: port))
   exit(0);
 
 if (version_is_less_equal(version: version, test_version: "6.0.2")) {
-  report = report_fixed_ver(installed_version: version, fixed_version: "None");
+  report = report_fixed_ver(installed_version: version, fixed_version: "7.0");
   security_message(port: port, data: report);
   exit(0);
 }

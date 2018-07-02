@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ms_kb3203391.nasl 6479 2017-06-29 07:59:07Z teissa $
+# $Id: gb_ms_kb3203391.nasl 9313 2018-04-05 06:23:26Z cfischer $
 #
 # Microsoft Office Web Apps 2013 Service Pack 1 Multiple Vulnerabilities (KB3203391)
 #
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811301");
-  script_version("$Revision: 6479 $");
+  script_version("$Revision: 9313 $");
   script_cve_id("CVE-2017-8509", "CVE-2017-8511", "CVE-2017-8512");
   script_bugtraq_id(98812, 98815, 98816);
   script_tag(name:"cvss_base", value:"9.3");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2017-06-29 09:59:07 +0200 (Thu, 29 Jun 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-05 08:23:26 +0200 (Thu, 05 Apr 2018) $");
   script_tag(name:"creation_date", value:"2017-06-14 16:43:44 +0530 (Wed, 14 Jun 2017)");
-  script_name(" Microsoft Office Web Apps 2013 Service Pack 1 Multiple Vulnerabilities (KB3203391)");
+  script_name("Microsoft Office Web Apps 2013 Service Pack 1 Multiple Vulnerabilities (KB3203391)");
 
   script_tag(name:"summary", value:"This host is missing an important security
   update according to Microsoft KB3203391");
@@ -63,6 +63,7 @@ if(description)
   script_tag(name:"solution", value:"Run Windows Update and update the
   listed hotfixes or download and update mentioned hotfixes in the advisory
   from the below link,
+
   https://support.microsoft.com/en-us/help/3203391");
 
   script_tag(name:"solution_type", value:"VendorFix");
@@ -77,25 +78,13 @@ if(description)
   exit(0);
 }
 
-
 include("smb_nt.inc");
 include("host_details.inc");
 include("version_func.inc");
 include("secpod_smb_func.inc");
 
-## Variable Initialization
-webappVer = "";
-dllVer = "";
-path = "";
-
-if( ! infos = get_app_version_and_location( cpe:'cpe:/a:microsoft:office_web_apps') ) exit( 0 );
-
-## Get Version
+if( ! infos = get_app_version_and_location( cpe:'cpe:/a:microsoft:office_web_apps', exit_no_version:TRUE ) ) exit( 0 );
 webappVer = infos['version'];
-if(!webappVer){
-  exit(0);
-}
-
 path = infos['location'];
 if(!path || "Could not find the install location" >< path){
   exit(0);
@@ -119,4 +108,5 @@ if(webappVer =~ "^(15\.)")
     }
   }
 }
-exit(0);
+
+exit(99);

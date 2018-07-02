@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_canon_printers_detect.nasl 8141 2017-12-15 12:43:22Z cfischer $
+# $Id: gb_canon_printers_detect.nasl 10247 2018-06-19 07:14:03Z santu $
 #
 # Canon Printer Detection
 #
@@ -28,23 +28,25 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.803719");
-  script_version("$Revision: 8141 $");
+  script_version("$Revision: 10247 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-19 09:14:03 +0200 (Tue, 19 Jun 2018) $");
+  script_tag(name:"creation_date", value:"2013-06-20 13:42:47 +0530 (Thu, 20 Jun 2013)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 13:43:22 +0100 (Fri, 15 Dec 2017) $");
-  script_tag(name:"creation_date", value:"2013-06-20 13:42:47 +0530 (Thu, 20 Jun 2013)");
   script_name("Canon Printer Detection");
   script_category(ACT_GATHER_INFO);
   script_family("Product detection");
   script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
-  script_dependencies("find_service.nasl", "http_version.nasl");
+  # nb: Don't use http_version.nasl as the Detection should run as early
+  # as possible if the printer should be marked dead as requested.
+  script_dependencies("find_service.nasl", "httpver.nasl");
   script_require_ports("Services/www", 80);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
-  script_tag(name:"summary", value :"Detection of Canon Printers.
+  script_tag(name:"summary", value:"Detection of Canon Printers.
 
-  The script sends a connection request to the remote host and attempts
-  to detect if the remote host is a Canon printer.");
+  The script sends a connection request to the remote host and
+  attempts to detect if the remote host is a Canon printer.");
 
   script_tag(name:"qod_type", value:"remote_banner");
 
@@ -55,56 +57,80 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("host_details.inc");
 
-port = "";
-req = "";
-buf = "";
-firm_ver = "";
-printer_model = "";
+port = get_http_port( default:80 );
+buf  = http_get_cache( item:"/index.html", port:port );
+buf2 = http_get_cache( item:"/", port:port );
 
-port = get_http_port(default:80);
-
-buf = http_get_cache(item:"/index.html", port:port);
-
-## Confirm the application
-# If updating here please also update check in dont_print_on_printers.nasl
-if(('>Canon' >< buf && ">Copyright CANON INC" ><  buf && "Printer" >< buf) || "CANON HTTP Server" >< buf)
+# If updating here please also update the check in dont_print_on_printers.nasl
+if( ( '>Canon' >< buf && ">Copyright CANON INC" >< buf && "Printer" >< buf ) ||
+    "CANON HTTP Server" >< buf || ( "erver: Catwalk" >< buf2 && "com.canon.meap.service" >< buf2 ) ||
+    ( (('canonlogo.gif" alt="CANON"' >< buf2) || ('canonlogo.gif" alt=' >< buf2) || ("canonlogo.gif" >< buf2 && "Series</title>" >< buf2)) &&
+       ">Copyright CANON INC" >< buf2 ) ) 
 {
-   set_kb_item(name:"target_is_printer", value:1);
-   set_kb_item(name:"canon_printer/installed", value:1);
-   set_kb_item(name:"canon_printer/port", value: port);
+  set_kb_item( name:"target_is_printer", value:TRUE );
+  set_kb_item( name:"canon_printer/installed", value:TRUE );
+  set_kb_item( name:"canon_printer/port", value:port );
 
-   pref = get_kb_item("global_settings/exclude_printers");
-   if( pref  == "yes" )
-   {
-       set_kb_item( name:"Host/dead", value:TRUE );
-       log_message( port:port, data:'The remote host is a printer. The scan has been disabled against this host.\nIf you want to scan the remote host, uncheck the "Exclude printers from scan" option and re-scan it.');
-   }
+  printer_model = eregmatch( pattern:">(Canon.[A-Z0-9]+).[A-Za-z]+<", string:buf );
+  if( printer_model[1] ) {
+    model = printer_model[1];
+    set_kb_item( name:"canon_printer_model", value:model );
+    cpe_printer_model = tolower( model );
+    cpe = "cpe:/h:canon:" + cpe_printer_model;
+    cpe = str_replace( string:cpe, find:" ", replace:"_" );
+  }
 
-   ## Get the model name
-   printer_model = eregmatch(pattern:">(Canon.[A-Z0-9]+).[A-Za-z]+<", string: buf);
-   if(printer_model[1])
-   {
-     set_kb_item(name:"canon_printer_model", value:printer_model[1]);
+  if( ! model ) {
+    # <span id="deviceName">MF210&nbsp;Series&nbsp;-&nbsp;Admin&nbsp;office / MF210 Series / </span>
+    printer_model = eregmatch( pattern:'<span id="deviceName".* / ([A-Za-z0-9 ]+) / ', string:buf2 );
+    if(!printer_model[1] )
+    {
+      # <span id="deviceName">iR-ADV C3330  / iR-ADV C3330 /  </span>
+      # <span id="deviceName">iR-ADV C5235 - JWC04988  / iR-ADV C5235 /  VIetnam</span>
+      # <span id="deviceName">iR-ADV C5255  / iR-ADV C5255 /  </span>
+      # <span id="deviceName">iR-ADV 8595 / iR-ADV 8595 / </span>
+      printer_model = eregmatch( pattern:'<span id="deviceName">([^/<]+)', string:buf2 );
+    }
+    if( printer_model[1] ) 
+    {
+      ##Remove Non-Breaking SPace
+      if("&nbsp;" >< printer_model[1]){
+        canon_model = ereg_replace(pattern:"&nbsp;", replace:" ", string:printer_model[1]);
+      } else {
+        canon_model =  printer_model[1] ;
+      }
+      
+      model = chomp( canon_model );
 
-     cpe_printer_model = tolower(printer_model[1]);
-     cpe = 'cpe:/h:canon:' + cpe_printer_model;
-     cpe = str_replace(string:cpe,find:" ", replace:"_");
+      set_kb_item( name:"canon_printer_model", value:model );
+      cpe_printer_model = tolower( model );
+      cpe = "cpe:/h:canon:" + cpe_printer_model;
+      cpe = str_replace( string:cpe, find:" ", replace:"_" );
+    }
+  }
 
-     ## Get the Firmware version
-     firm_ver = eregmatch(pattern:"nowrap>([0-9.]+)</td>", string: buf);
-     if(firm_ver[1])
-     {
-       set_kb_item(name:"canon_printer/firmware_ver", value: firm_ver[1]);
-       cpe = cpe + ":" + firm_ver[1];
-     }
+  if( ! model ) {
+    model = "Unknown Canon model";
+    cpe = "cpe:/h:canon:unknown_model";
+  }
 
-     register_product(cpe:cpe, location:port + '/tcp', port:port);
+  firm_ver = eregmatch( pattern:"nowrap>([0-9.]+)</td>", string:buf );
+  if( firm_ver[1] ) {
+    set_kb_item( name:"canon_printer/firmware_ver", value:firm_ver[1] );
+    cpe = cpe + ":" + firm_ver[1];
+  }
 
-     log_message(data: "The remote Host is a  " + printer_model[1] +
-                 " printer device.\nCPE: " + cpe + "\nConcluded: " +
-                 printer_model[1], port:port);
+  register_product( cpe:cpe, location:port + "/tcp", port:port );
+  log_message(data:build_detection_report(app:"Canon " + model + " Printer Device",
+                                            version: firm_ver[1],
+                                            install:port + "/tcp",
+                                            cpe:cpe,
+                                            concluded:printer_model[0]));
 
-      exit(0);
-
+  pref = get_kb_item( "global_settings/exclude_printers" );
+  if( pref == "yes" ) {
+    log_message( port:port, data:'The remote host is a printer. The scan has been disabled against this host.\nIf you want to scan the remote host, uncheck the "Exclude printers from scan" option and re-scan it.');
+    set_kb_item( name:"Host/dead", value:TRUE );
   }
 }
+exit( 0 );

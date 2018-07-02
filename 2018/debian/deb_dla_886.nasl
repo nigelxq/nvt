@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: deb_dla_886.nasl 8453 2018-01-18 00:06:22Z teissa $
+# $Id: deb_dla_886.nasl 10219 2018-06-15 12:00:55Z cfischer $
 #
 # Auto-generated from advisory DLA 886-1 using nvtgen 1.0
 # Script version:1.0
@@ -31,10 +31,9 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.890886");
-  script_version("$Revision: 8453 $");
-  
-  script_name("Debian Lts Announce DLA 886-1 ([SECURITY] [DLA 886-1] tzdata new upstream version)");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-18 01:06:22 +0100 (Thu, 18 Jan 2018) $");
+  script_version("$Revision: 10219 $");
+  script_name("Debian LTS Advisory ([SECURITY] [DLA 886-1] tzdata new upstream version)");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-15 14:00:55 +0200 (Fri, 15 Jun 2018) $");
   script_tag(name:"creation_date", value:"2018-01-17 00:00:00 +0100 (Wed, 17 Jan 2018)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -48,7 +47,7 @@ if(description)
   script_copyright("Copyright (c) 2018 Greenbone Networks GmbH http://greenbone.net");
   script_family("Debian Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages");
+  script_mandatory_keys("ssh/login/debian_linux", "ssh/login/packages", re:"ssh/login/release=DEB7\.[0-9]+");
   script_tag(name:"affected", value:"tzdata on Debian Linux");
   script_tag(name:"insight", value:"This package contains data required for the implementation of
 standard local time for many representative locations around the
@@ -61,11 +60,17 @@ daylight-saving rules.");
 We recommend that you upgrade your tzdata packages.");
   script_tag(name:"summary",  value:"This update includes the changes in tzdata 2017b. Notable
 changes are:
-- Haiti resumed observance of DST in 2017.");
+- Haiti resumed observance of DST in 2017.
+
+  This NVT has been deprecated as it doesn't have any security relevance.");
   script_tag(name:"vuldetect", value:"This check tests the installed software version using the apt package manager.");
+
+  script_tag(name:"deprecated", value:TRUE);
 
   exit(0);
 }
+
+exit(66);
 
 include("revisions-lib.inc");
 include("pkg-lib-deb.inc");
@@ -82,5 +87,5 @@ if ((res = isdpkgvuln(pkg:"tzdata-java", ver:"2017b-0+deb7u1", rls_regex:"DEB7\.
 if (report != "") {
   security_message(data:report);
 } else if (__pkg_match) {
-  exit(99); # Not vulnerable.
+  exit(99);
 }

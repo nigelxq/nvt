@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: ssh_func.inc 8144 2017-12-15 13:19:55Z cfischer $
+# $Id: ssh_func.inc 10266 2018-06-20 10:19:52Z cfischer $
 #
 # Methods for handling SSH
 #
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 8144 $
+# $Revision: 10266 $
 #
 ###############################################################################
 
@@ -55,32 +55,6 @@ ssh_host_key_algos = make_list( "ssh-rsa",
 
                                 #"rsa-sha2-256", # Those two seems to be currently unsupported in libssh
                                 #"rsa-sha2-512" );
-
-# ssh_hex2raw() copied from misc_func.inc as we don't want to taint ssh_func.inc with
-# a third-party include
-function ssh_hex2raw(s)
-{
- local_var i, j, ret, l;
-
- s = chomp(s);  # remove trailing blanks, CR, LF...
- l = strlen(s);
- #if (l % 2 ) display("ssh_hex2raw: odd string: ", s, "\n");
- for(i=0;i<l;i+=2)
- {
-  if(ord(s[i]) >= ord("0") && ord(s[i]) <= ord("9"))
-        j = int(s[i]);
-  else
-        j = int((ord(s[i]) - ord("a")) + 10);
-
-  j *= 16;
-  if(ord(s[i+1]) >= ord("0") && ord(s[i+1]) <= ord("9"))
-        j += int(s[i+1]);
-  else
-        j += int((ord(s[i+1]) - ord("a")) + 10);
-  ret += raw_string(j);
- }
- return ret;
-}
 
 function kb_ssh_login() {
   return string( get_kb_item( "Secret/SSH/login" ) );
@@ -214,11 +188,11 @@ function raw_int32(i)
  local_var buf;
 
  buf = raw_string (
-		 (i>>24) & 255,
+        (i>>24) & 255,
         (i>>16) & 255,
         (i>>8) & 255,
         (i) & 255
-		 );
+                  );
  return buf;
 }
 
@@ -231,7 +205,7 @@ function raw_int8(i)
 
  buf = raw_string (
         (i) & 255
-		 );
+                  );
  return buf;
 }
 
@@ -679,18 +653,18 @@ function putbignum(buffer)
 function ssh_rsa_verify(e, n, signature, data)
 {
  local_var hash, id_sha1, sigtype, nlen,
-	next, tmp_sig, siglen, len, sig,
-	hdecoid, hshaoid, hhash, decrypted ;
+           next, tmp_sig, siglen, len, sig,
+           hdecoid, hshaoid, hhash, decrypted ;
 
 #comes directly from OpenBSD
  id_sha1 = raw_string(
-	0x30, 0x21,
-	0x30, 0x09,
-	0x06, 0x05,
-	0x2b, 0x0e, 0x03, 0x02, 0x1a,
-	0x05, 0x00,
-	0x04, 0x14
-	);
+        0x30, 0x21,
+        0x30, 0x09,
+        0x06, 0x05,
+        0x2b, 0x0e, 0x03, 0x02, 0x1a,
+        0x05, 0x00,
+        0x04, 0x14
+        );
 
  if (!n)
    return 0;
@@ -842,7 +816,7 @@ function dh_gen_key(p, g)
  if (!p)
    return keys;
 
- # { "blowfish-cbc", 	SSH_CIPHER_SSH2, 8, 16, EVP_bf_cbc }
+ # { "blowfish-cbc", SSH_CIPHER_SSH2, 8, 16, EVP_bf_cbc }
  # hash = sha1 = 20 (len) = 20 * 8 (bits)
  need = 20 * 8;
 
@@ -1198,35 +1172,35 @@ function ssh_kex2(socket,server_version)
 
  # hash data
  to_hash =
-	# client version
-	putstring(buffer:client_version) +
-	# server version
-	putstring(buffer:server_version) +
-	# client cookie (cookielen,SSH_MSG_KEXINIT,cookie)
-	raw_int32(i:(strlen(cinit)+1)) + raw_int8(i:20) + cinit +
-	# server cookie (cookielen,SSH_MSG_KEXINIT,cookie)
-	raw_int32(i:(strlen(sinit)+1)) + raw_int8(i:20) + sinit +
-	# server host key blob
-	putstring(buffer:server_host_key_blob);
+        # client version
+        putstring(buffer:client_version) +
+        # server version
+        putstring(buffer:server_version) +
+        # client cookie (cookielen,SSH_MSG_KEXINIT,cookie)
+        raw_int32(i:(strlen(cinit)+1)) + raw_int8(i:20) + cinit +
+        # server cookie (cookielen,SSH_MSG_KEXINIT,cookie)
+        raw_int32(i:(strlen(sinit)+1)) + raw_int8(i:20) + sinit +
+        # server host key blob
+        putstring(buffer:server_host_key_blob);
 
  if (groupex)
  {
   to_hash +=
-	# min,wantbits,max
-	raw_string(0x00,0x00,0x04,0x00,0x00,0x00,0x08,0x00,0x00,0x00,0x20,0x00) +
-	# p bignum
-	putbignum(buffer:p) +
-	# g bignum
-	putbignum(buffer:g);
+        # min,wantbits,max
+        raw_string(0x00,0x00,0x04,0x00,0x00,0x00,0x08,0x00,0x00,0x00,0x20,0x00) +
+        # p bignum
+        putbignum(buffer:p) +
+        # g bignum
+        putbignum(buffer:g);
  }
 
  to_hash +=
-	# public key bignum
-	putbignum(buffer:dh_pub) +
-	# server dh public key bignum
-	putbignum(buffer:server_dh_public_key) +
-	# shared bignum
-	putbignum(buffer:shared);
+        # public key bignum
+        putbignum(buffer:dh_pub) +
+        # server dh public key bignum
+        putbignum(buffer:server_dh_public_key) +
+        # shared bignum
+        putbignum(buffer:shared);
 
  hash = SHA1(to_hash);
 
@@ -1295,7 +1269,7 @@ function ssh_userauth2(socket, server_user, password, pub, priv, passphrase)
  # code 50 (SSH_MSG_USERAUTH_REQUEST)
  # none request: we need to know what authentication server supports
  payload = putstring(buffer:server_user) + putstring(buffer:"ssh-connection") +
-	putstring(buffer:"none");
+           putstring(buffer:"none");
  send_ssh_packet(socket:socket, payload:payload, code:raw_int8(i:50));
 
  # (51 == SSH_MSG_USERAUTH_FAILURE)
@@ -1345,8 +1319,7 @@ function ssh_userauth2(socket, server_user, password, pub, priv, passphrase)
   ###### need extra pad !!!! ######
   ###### Is it useful ?? #####
   payload = putstring(buffer:server_user) + putstring(buffer:"ssh-connection") +
-	putstring(buffer:"password") + raw_int8(i:0) + putstring(buffer:password)
-	;
+            putstring(buffer:"password") + raw_int8(i:0) + putstring(buffer:password);
 
   send_ssh_packet(socket:socket, payload:payload, code:raw_int8(i:50));
 
@@ -1365,8 +1338,7 @@ function ssh_userauth2(socket, server_user, password, pub, priv, passphrase)
  {
   # code 50 (SSH_MSG_USERAUTH_REQUEST)
   payload = putstring(buffer:server_user) + putstring(buffer:"ssh-connection") +
-	putstring(buffer:"keyboard-interactive") + putstring(buffer:"en-US") + putstring(buffer:"")
-	;
+            putstring(buffer:"keyboard-interactive") + putstring(buffer:"en-US") + putstring(buffer:"");
 
   send_ssh_packet(socket:socket, payload:payload, code:raw_int8(i:50));
 
@@ -1417,11 +1389,11 @@ function ssh_userauth2(socket, server_user, password, pub, priv, passphrase)
 
   # From draft-ietf-secsh-auth-kbdinteract-06.txt document :
   # Server should now send SSH_MSG_USERAUTH_INFO_REQUEST.
-  # REQUEST can ask additionnal informations (like a new password).
+  # REQUEST can ask additional information (like a new password).
   # But if all is correct num-prompts is set to 0 and client must
   # reply with an empty SSH_MSG_USERAUTH_INFO_RESPONSE.
   # So we just send an empty response and look if authentication
-  # works. If remote server asked for additionnal informations,
+  # works. If remote server asked for additional information,
   # authentication will just failed.
   if (ord(payload[0]) == 60)
   {
@@ -1468,8 +1440,8 @@ function ssh_userauth2(socket, server_user, password, pub, priv, passphrase)
   {
     # OpenSSH Public key file format
     public = ereg_replace(pattern:"[^ ]* ([^ ]*) [^ ]*$",
-	                  string:pub,
-		          replace:"\1");
+                          string:pub,
+                          replace:"\1");
   }
 
   blobpub = base64decode(str:public);
@@ -1479,7 +1451,7 @@ function ssh_userauth2(socket, server_user, password, pub, priv, passphrase)
   ###### Is it useful ?? #####
 
   payload = putstring(buffer:server_user) + putstring(buffer:"ssh-connection") +
-	putstring(buffer:"publickey") + raw_int8(i:1) ;
+            putstring(buffer:"publickey") + raw_int8(i:1);
 
   to_hash = putstring(buffer:session_id) + raw_int8(i:50);
 
@@ -1623,7 +1595,7 @@ function ssh_open_channel(socket)
  l_window_size = 32768;
  received_size = 0;
  payload = putstring(buffer:"session") + raw_int32(i:local_channel) +
-	raw_int32(i:32768) + raw_int32(i:32768);
+           raw_int32(i:32768) + raw_int32(i:32768);
 
  # SSH_MSG_CHANNEL_OPEN == 90
  send_ssh_packet(socket:socket, payload:payload, code:raw_int8(i:90));
@@ -1653,7 +1625,7 @@ function ssh_open_channel(socket)
    for (i=local_channel+1; i < 11; i++)
    {
       payload = putstring(buffer:"session") + raw_int32(i:i) +
-	  raw_int32(i:32768) + raw_int32(i:32768);
+                raw_int32(i:32768) + raw_int32(i:32768);
 
       send_ssh_packet(socket:socket, payload:payload, code:raw_int8(i:90));
 
@@ -1920,7 +1892,7 @@ function ssh_cmd( socket, cmd, timeout, nosh, return_errors, pty, pattern, retry
 
   if( get_kb_item( "ssh/no_linux_shell" ) ) {
     nosh = TRUE;
-    if( cmd =~ "^(/bin|/sbin|cat |perl |cmd /|netstat |find |which |whereis |locate |/opt/slad)" ) return FALSE; # don't run find, which ... if target doesn't support it
+    if( cmd =~ "^(/bin|/sbin|cat |perl |cmd /|netstat |find |which |whereis |locate |/opt/slad|dmidecode )" ) return FALSE; # don't run find, which ... if target doesn't support it
   }
 
   if( ! nosh ) {
@@ -1939,6 +1911,8 @@ function ssh_cmd( socket, cmd, timeout, nosh, return_errors, pty, pattern, retry
       ret_ssh_buf = ssh_cmd_pty( sess:sess, cmd:cmd, pattern:pattern, timeout:timeout, retry:retry, clear_buffer:clear_buffer );
     else
       ret_ssh_buf = ssh_request_exec( sess, cmd:cmd, stdout:0, stderr:0 );
+
+    ret_ssh_buf = ssh_clean_cmd_from_err( data:ret_ssh_buf );
 
     if( get_kb_item( "global_settings/ssh/debug" ) ) {
       debug_str = 'SSH DEBUG: ' + get_host_ip() + ':\n' +
@@ -1990,7 +1964,7 @@ function ssh_cmd( socket, cmd, timeout, nosh, return_errors, pty, pattern, retry
  }
 
  payload = raw_int32(i:remote_channel) + putstring(buffer:"exec") + raw_int8(i:0) +
-	   putstring(buffer:cmd);
+           putstring(buffer:cmd);
 
  # SSH_MSG_CHANNEL_REQUEST == 98
  send_ssh_packet(socket:socket, payload:payload, code:raw_int8(i:98));
@@ -2240,11 +2214,11 @@ function ssh_reconnect( sock ) {
     set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#default#-#get_ssh_port" );
     return;
   }
- 
+
   ssh_disconnect( ssh_session_id_from_sock( sock ) );
   sleep( 1 );
   sock = ssh_login_or_reuse_connection();
-  
+
   if( ! sock ) return;
 
   return sock;
@@ -2308,9 +2282,8 @@ function ssh_broken_random_login( port ) {
     user = "Anonymous";
     pass = "";
   } else {
-    if( ! defined_func( "rand_str" ) ) include( "misc_func.inc" );
-    user = rand_str( length:8, charset:"abcdefghiklmnopqrstuvwxyz" );
-    pass = rand_str( length:8, charset:"ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz" );
+    user = ssh_rand_str( length:8, charset:"abcdefghiklmnopqrstuvwxyz" );
+    pass = ssh_rand_str( length:8, charset:"ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz" );
   }
 
   if( ! soc = open_sock_tcp( port ) ) return;
@@ -2577,4 +2550,58 @@ function get_ssh_server_banner( port ) {
   }
 
   return banner;
+}
+
+# @brief This function cleans a passed string from various known messages
+#        returned by the ssh_cmd() function which might interfere with various
+#        detection pattern relying on a string without those messages.
+#
+# @param data the string to clean
+#
+# @return the cleaned string
+#
+function ssh_clean_cmd_from_err( data ) {
+
+  local_var data;
+
+  # uname: Could not chdir to home directory /home/test: No such file or directory
+  # Could not chdir to home directory /home/test: No such file or directory
+  # Could not chdir to home directory /home/test: Permission denied
+  #
+  # Those messages itself might show up if a user for the SSH connection is used without e.g. a
+  # home directory on the target host.
+  #
+  # nb: Keep the pattern in single quotes...
+  data = ereg_replace( string:data, pattern:'^([a-zA-Z]+: )?Could not chdir to home directory [^:]+: (No such file or directory|Permission denied)[\r\n]*', replace:"" );
+
+  # Returned on Mac OS X if the subversion binary is called with the --version parameter.
+  # It is unknown why some systems behaving like this and which other applications/binaries are affected.
+  #
+  # xcode-select: error: no developer tools were found at '/Applications/Xcode.app', and no install could be requested (perhaps no UI is present), please install manually from 'developer.apple.com'.
+  #
+  # nb: Keep the pattern in single quotes...
+  data = ereg_replace( string:data, pattern:'^xcode-select: error: no developer tools were found at \'/Applications/Xcode\\.app\', and no install could be requested \\(perhaps no UI is present\\), please install manually from \'developer\\.apple\\.com\'\\.[\r\n]*', replace:"" );
+
+  return data;
+}
+
+# copied from misc_func.inc as we don't want to taint ssh_func.inc with
+# a third-party include
+# TODO: Remove and use rand_str() from misc_func.inc once openvas-nasl-lint
+# can handle .inc includes using a function from another include.
+function ssh_rand_str( length, charset ) {
+
+  local_var l, i, s, n, length, charset;
+
+  if( ! charset )
+    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+  if( isnull( length ) )
+    length = 8;
+  l = strlen( charset );
+  s = "";
+  for( i = 0; i < length; i++ ) {
+    n = rand() % l;
+    s += charset[n];
+  }
+  return s;
 }

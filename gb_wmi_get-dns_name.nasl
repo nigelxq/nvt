@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_wmi_get-dns_name.nasl 6893 2017-08-10 13:46:00Z cfischer $
+# $Id: gb_wmi_get-dns_name.nasl 9633 2018-04-26 14:07:08Z jschulte $
 #
 # Get the DNS Name over WMI
 #
@@ -28,18 +28,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-SCRIPT_OID = "1.3.6.1.4.1.25623.1.0.96216";
-SCRIPT_DESC = "Get the DNS Name over WMI";
-
 if(description)
 {
-  script_oid(SCRIPT_OID);
-  script_version("$Revision: 6893 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-08-10 15:46:00 +0200 (Thu, 10 Aug 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.96216");
+  script_version("$Revision: 9633 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-10-21 12:47:04 +0200 (Mon, 21 Oct 2013)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
-  script_name(SCRIPT_DESC);
+  script_name("Get the DNS Name over WMI");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2012 Greenbone Networks GmbH");
   script_family("Windows");
@@ -90,13 +87,13 @@ if( DNS ) {
 
   if( DNSRole == 1 || DNSRole > 2 ) {
     if( ! isnull( DNSName ) && ! isnull( FQDNSName ) ) {
-      register_host_detail( name:"DNS-via-WMI-FQDNS", value:DNSName + "." + FQDNSName, nvt:SCRIPT_OID, desc:SCRIPT_DESC );
+      register_host_detail( name:"DNS-via-WMI-FQDNS", value:DNSName + "." + FQDNSName, desc:"Get the DNS Name over WMI" );
       set_kb_item( name:"DNS-via-WMI-FQDNS", value: DNSName + "." + FQDNSName );
     }
   }
 
   if( ! isnull( DNSName ) ) {
-    register_host_detail( name:"DNS-via-WMI-DNS", value:DNSName, nvt:SCRIPT_OID, desc:SCRIPT_DESC );
+    register_host_detail( name:"DNS-via-WMI-DNS", value:DNSName, desc:"Get the DNS Name over WMI" );
     set_kb_item( name:"DNS-via-WMI-DNS", value:DNSName );
   }
 }

@@ -52,9 +52,9 @@ tag_solution = "Please Install the Updated Packages.";
 if(description)
 {
   script_xref(name : "URL" , value : "http://lists.centos.org/pipermail/centos-announce/2013-March/019662.html");
-  script_id(881696);
-  script_version("$Revision: 6655 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-07-10 13:48:58 +0200 (Mon, 10 Jul 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.881696");
+  script_version("$Revision: 9372 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:56:37 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-03-22 10:40:44 +0530 (Fri, 22 Mar 2013)");
   script_cve_id("CVE-2013-0254");
   script_tag(name:"cvss_base", value:"3.6");
@@ -62,7 +62,7 @@ if(description)
   script_xref(name: "CESA", value: "2013:0669");
   script_name("CentOS Update for phonon-backend-gstreamer CESA-2013:0669 centos6 ");
 
-  script_summary("Check for the Version of phonon-backend-gstreamer");
+  script_tag(name:"summary", value:"Check for the Version of phonon-backend-gstreamer");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("CentOS Local Security Checks");

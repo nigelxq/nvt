@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: os_eol.inc 8743 2018-02-09 13:10:26Z cfischer $
+# $Id: os_eol.inc 10056 2018-06-04 06:29:53Z cfischer $
 #
 # Authors:
 # Michael Meyer <michael.meyer@greenbone.net>
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 8743 $
+# $Revision: 10056 $
 #
 ###############################################################################
 
@@ -60,6 +60,118 @@ eol_cpes['cpe:/o:novell:opensuse:11.1'] = '2010-12-31';
 eol_cpes['cpe:/o:novell:opensuse:11.0'] = '2010-06-30';
 eol_cpes['cpe:/o:novell:opensuse:10.3'] = '2009-10-31';
 eol_cpes['cpe:/o:novell:opensuse:10.2'] = '2008-11-30';
+
+# Mac OS X
+os_x_note  = "Apple doesn't provide any official EOL announcement. However it is known that Apple is only supporting the most recent Mac OS X / macOS ";
+os_x_note += "release (currently 10.13) and the two previous ones (currently 10.12 and 10.11) with security updates. Based on this information the ";
+os_x_note += "date of the last update for a release (e.g. July 19, 2017 for 10.10.5) + one day is assumed as the EOL date.";
+eol_urls['cpe:/o:apple:mac_os_x'] = os_x_note;
+eol_names['cpe:/o:apple:mac_os_x'] = 'Mac OS X / macOS';
+# https://en.wikipedia.org/wiki/Mac_OS_X_10.0
+eol_cpes['cpe:/o:apple:mac_os_x:10.0'] = '2001-03-25';
+eol_cpes['cpe:/o:apple:mac_os_x:10.0.1'] = '2001-04-15';
+eol_cpes['cpe:/o:apple:mac_os_x:10.0.2'] = '2001-05-02';
+eol_cpes['cpe:/o:apple:mac_os_x:10.0.3'] = '2001-05-10';
+eol_cpes['cpe:/o:apple:mac_os_x:10.0.4'] = '2001-06-22';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_10.1
+eol_cpes['cpe:/o:apple:mac_os_x:10.1'] = '2001-09-26';
+eol_cpes['cpe:/o:apple:mac_os_x:10.1.1'] = '2001-11-13';
+eol_cpes['cpe:/o:apple:mac_os_x:10.1.2'] = '2001-12-22';
+eol_cpes['cpe:/o:apple:mac_os_x:10.1.3'] = '2002-02-20';
+eol_cpes['cpe:/o:apple:mac_os_x:10.1.4'] = '2002-04-18';
+eol_cpes['cpe:/o:apple:mac_os_x:10.1.5'] = '2002-06-06';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_10.2
+eol_cpes['cpe:/o:apple:mac_os_x:10.2'] = '2002-08-25';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.1'] = '2002-09-19';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.2'] = '2002-11-12';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.3'] = '2002-12-20';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.4'] = '2003-02-14';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.5'] = '2003-04-11';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.6'] = '2003-05-07';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.7'] = '2003-09-23';
+eol_cpes['cpe:/o:apple:mac_os_x:10.2.8'] = '2003-10-04';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_Panther
+eol_cpes['cpe:/o:apple:mac_os_x:10.3'] = '2003-10-25';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.1'] = '2003-11-11';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.2'] = '2003-12-18';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.3'] = '2004-03-16';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.4'] = '2004-05-27';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.5'] = '2004-08-10';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.6'] = '2004-11-06';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.7'] = '2004-12-16';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.8'] = '2005-02-10';
+eol_cpes['cpe:/o:apple:mac_os_x:10.3.9'] = '2005-04-16';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_Tiger
+eol_cpes['cpe:/o:apple:mac_os_x:10.4'] = '2005-04-30';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.1'] = '2005-05-20';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.2'] = '2005-10-20';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.3'] = '2005-11-01';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.4'] = '2006-01-11';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.5'] = '2006-02-15';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.6'] = '2006-04-04';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.7'] = '2006-08-08';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.8'] = '2006-09-30';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.9'] = '2007-03-14';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.10'] = '2007-06-21';
+eol_cpes['cpe:/o:apple:mac_os_x:10.4.11'] = '2007-11-15';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_Leopard
+eol_cpes['cpe:/o:apple:mac_os_x:10.5'] = '2007-10-27';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.1'] = '2007-11-16';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.2'] = '2008-02-12';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.3'] = '2008-05-29';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.4'] = '2008-07-01';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.5'] = '2008-09-16';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.6'] = '2009-01-07';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.7'] = '2009-05-13';
+eol_cpes['cpe:/o:apple:mac_os_x:10.5.8'] = '2009-08-06';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_Snow_Leopard
+eol_cpes['cpe:/o:apple:mac_os_x:10.6'] = '2009-08-29';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.1'] = '2009-09-11';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.2'] = '2009-11-10';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.3'] = '2010-04-14';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.4'] = '2010-06-16';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.5'] = '2010-11-11';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.6'] = '2011-01-07';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.7'] = '2011-05-05';
+eol_cpes['cpe:/o:apple:mac_os_x:10.6.8'] = '2011-07-26';
+
+# https://en.wikipedia.org/wiki/Mac_OS_X_Lion
+eol_cpes['cpe:/o:apple:mac_os_x:10.7'] = '2011-07-21';
+eol_cpes['cpe:/o:apple:mac_os_x:10.7.1'] = '2011-08-17';
+eol_cpes['cpe:/o:apple:mac_os_x:10.7.2'] = '2011-10-13';
+eol_cpes['cpe:/o:apple:mac_os_x:10.7.3'] = '2012-02-02';
+eol_cpes['cpe:/o:apple:mac_os_x:10.7.4'] = '2012-05-10';
+eol_cpes['cpe:/o:apple:mac_os_x:10.7.5'] = '2012-10-05';
+
+# https://en.wikipedia.org/wiki/OS_X_Mountain_Lion
+eol_cpes['cpe:/o:apple:mac_os_x:10.8'] = '2012-07-26';
+eol_cpes['cpe:/o:apple:mac_os_x:10.8.1'] = '2012-08-24';
+eol_cpes['cpe:/o:apple:mac_os_x:10.8.2'] = '2012-11-30';
+eol_cpes['cpe:/o:apple:mac_os_x:10.8.3'] = '2013-03-15';
+eol_cpes['cpe:/o:apple:mac_os_x:10.8.4'] = '2013-09-26';
+eol_cpes['cpe:/o:apple:mac_os_x:10.8.5'] = '2015-08-14';
+
+# https://en.wikipedia.org/wiki/OS_X_Mavericks
+eol_cpes['cpe:/o:apple:mac_os_x:10.9'] = '2013-10-23';
+eol_cpes['cpe:/o:apple:mac_os_x:10.9.1'] = '2013-12-17';
+eol_cpes['cpe:/o:apple:mac_os_x:10.9.2'] = '2014-04-23';
+eol_cpes['cpe:/o:apple:mac_os_x:10.9.3'] = '2014-05-16';
+eol_cpes['cpe:/o:apple:mac_os_x:10.9.4'] = '2014-07-01';
+eol_cpes['cpe:/o:apple:mac_os_x:10.9.5'] = '2016-07-19';
+
+# https://en.wikipedia.org/wiki/OS_X_Yosemite
+eol_cpes['cpe:/o:apple:mac_os_x:10.10'] = '2014-10-17';
+eol_cpes['cpe:/o:apple:mac_os_x:10.10.1'] = '2014-11-18';
+eol_cpes['cpe:/o:apple:mac_os_x:10.10.2'] = '2015-03-21';
+eol_cpes['cpe:/o:apple:mac_os_x:10.10.3'] = '2015-04-17';
+eol_cpes['cpe:/o:apple:mac_os_x:10.10.4'] = '2016-03-22';
+eol_cpes['cpe:/o:apple:mac_os_x:10.10.5'] = '2017-07-20';
 
 # SUSE Linux (http://en.opensuse.org/Lifetime)
 eol_urls['cpe:/o:novell:suse_linux'] = 'http://en.opensuse.org/Lifetime';
@@ -108,6 +220,7 @@ eol_cpes['cpe:/o:suse:linux_enterprise:9']    = '2005-12-15';
 # Ubuntu (https://wiki.ubuntu.com/Releases)
 eol_urls['cpe:/o:canonical:ubuntu_linux'] = 'https://wiki.ubuntu.com/Releases';
 eol_names['cpe:/o:canonical:ubuntu_linux'] = 'Ubuntu';
+eol_cpes['cpe:/o:canonical:ubuntu_linux:17.04'] = '2018-01-13';
 eol_cpes['cpe:/o:canonical:ubuntu_linux:16.10'] = '2017-07-20';
 eol_cpes['cpe:/o:canonical:ubuntu_linux:15.10'] = '2016-07-28';
 eol_cpes['cpe:/o:canonical:ubuntu_linux:15.04'] = '2016-02-04';
@@ -161,6 +274,7 @@ eol_cpes['cpe:/o:centos:centos:2'] = '2009-05-31';
 # Fedora (https://fedoraproject.org/wiki/End_of_life?rd=LifeCycle/EOL)
 eol_urls['cpe:/o:fedoraproject:fedora'] = 'https://fedoraproject.org/wiki/End_of_life?rd=LifeCycle/EOL';
 eol_names['cpe:/o:fedoraproject:fedora'] = 'Fedora';
+eol_cpes['cpe:/o:fedoraproject:fedora:25'] = '2017-12-12';
 eol_cpes['cpe:/o:fedoraproject:fedora:24'] = '2017-08-08';
 eol_cpes['cpe:/o:fedoraproject:fedora:23'] = '2016-12-20';
 eol_cpes['cpe:/o:fedoraproject:fedora:22'] = '2016-07-19';
@@ -191,6 +305,19 @@ eol_cpes['cpe:/o:fedoraproject:fedora_core:1'] = '2004-09-20';
 # Debian (https://en.wikipedia.org/wiki/List_of_Debian_releases#Release_table)
 eol_urls['cpe:/o:debian:debian_linux'] = 'https://en.wikipedia.org/wiki/List_of_Debian_releases#Release_table';
 eol_names['cpe:/o:debian:debian_linux'] = 'Debian GNU/Linux';
+eol_cpes['cpe:/o:debian:debian_linux:7.11'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.10'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.9'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.8'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.7'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.6'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.5'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.4'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.3'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.2'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.1'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7.0'] = '2018-05-31';
+eol_cpes['cpe:/o:debian:debian_linux:7'] = '2018-05-31';
 eol_cpes['cpe:/o:debian:debian_linux:6.0'] = '2016-02-29';
 eol_cpes['cpe:/o:debian:debian_linux:5.0'] = '2012-02-06';
 eol_cpes['cpe:/o:debian:debian_linux:4.0'] = '2010-02-15';
@@ -203,8 +330,8 @@ eol_cpes['cpe:/o:debian:debian_linux:1.3'] = 'unknown';
 eol_cpes['cpe:/o:debian:debian_linux:1.2'] = 'unknown';
 eol_cpes['cpe:/o:debian:debian_linux:1.1'] = 'unknown';
 
-# Mandriva (https://en.wikipedia.org/wiki/Mandriva_Linux#Table_of_versions)
-eol_urls['cpe:/o:mandriva:linux'] = 'https://en.wikipedia.org/wiki/Mandriva_Linux#Table_of_versions';
+# Mandriva (https://en.wikipedia.org/wiki/Mandriva_Linux#Versions)
+eol_urls['cpe:/o:mandriva:linux'] = 'https://en.wikipedia.org/wiki/Mandriva_Linux#Versions';
 eol_names['cpe:/o:mandriva:linux'] = 'Mandriva Linux';
 eol_cpes['cpe:/o:mandriva:linux:2011.0'] = '2013-02-29';
 eol_cpes['cpe:/o:mandriva:linux:2010.2'] = 'unknown';
@@ -217,7 +344,7 @@ eol_cpes['cpe:/o:mandriva:linux:2008.0'] = '2010-10-09';
 eol_cpes['cpe:/o:mandriva:linux:2007.1'] = 'unknown';
 eol_cpes['cpe:/o:mandriva:linux:2007.0'] = 'unknown';
 eol_cpes['cpe:/o:mandriva:linux:2006.0'] = 'unknown';
-eol_urls['cpe:/o:mandriva:enterprise_server'] = 'https://en.wikipedia.org/wiki/Mandriva_Linux#Table_of_versions';
+eol_urls['cpe:/o:mandriva:enterprise_server'] = 'https://en.wikipedia.org/wiki/Mandriva_Linux#Versions';
 eol_names['cpe:/o:mandriva:enterprise_server'] = 'Mandriva Enterprise Server';
 eol_cpes['cpe:/o:mandriva:enterprise_server:5.2'] = 'unknown';
 eol_cpes['cpe:/o:mandriva:enterprise_server:5.1'] = 'unknown';
@@ -289,7 +416,8 @@ eol_cpes['cpe:/a:connectiva:linux:9.0'] = 'unknown';
 # Univention Corporate Server (http://wiki.univention.de/index.php?title=Maintenance_Cycle_for_UCS)
 eol_urls['cpe:/o:univention:univention_corporate_server'] = 'http://wiki.univention.de/index.php?title=Maintenance_Cycle_for_UCS';
 eol_names['cpe:/o:univention:univention_corporate_server'] = 'Univention Corporate Server (UCS)';
-eol_cpes['cpe:/o:univention:univention_corporate_server:4.1'] = '2018-04-30';
+eol_cpes['cpe:/o:univention:univention_corporate_server:4.2'] = '2019-03-15';
+eol_cpes['cpe:/o:univention:univention_corporate_server:4.1'] = '2018-04-05';
 eol_cpes['cpe:/o:univention:univention_corporate_server:4.0'] = '2016-05-31';
 eol_cpes['cpe:/o:univention:univention_corporate_server:3.3'] = '2016-12-31';
 eol_cpes['cpe:/o:univention:univention_corporate_server:3.2'] = '2016-11-30';
@@ -343,7 +471,10 @@ eol_cpes['cpe:/o:fortinet:fortios:3.3'] = '2009-10-02';
 # Xenserver (https://www.citrix.de/support/product-lifecycle/product-matrix.html)
 eol_urls['cpe:/a:citrix:xenserver'] = 'https://www.citrix.de/support/product-lifecycle/product-matrix.html';
 eol_names['cpe:/a:citrix:xenserver'] = 'Xenserver';
+eol_cpes['cpe:/a:citrix:xenserver:7.4'] = '2018-08-27';
+eol_cpes['cpe:/a:citrix:xenserver:7.3'] = '2018-06-12';
 eol_cpes['cpe:/a:citrix:xenserver:7.2'] = '2018-03-16';
+eol_cpes['cpe:/a:citrix:xenserver:7.1'] = '2022-08-22';
 eol_cpes['cpe:/a:citrix:xenserver:7.0'] = '2021-05-19';
 eol_cpes['cpe:/a:citrix:xenserver:6.5'] = '2018-06-26';
 eol_cpes['cpe:/a:citrix:xenserver:6.2'] = '2018-06-26';
@@ -358,6 +489,7 @@ eol_cpes['cpe:/a:citrix:xenserver:5.0'] = '2013-09-15';
 eol_urls['cpe:/o:paloaltonetworks:pan-os'] = 'https://www.paloaltonetworks.com/services/support/end-of-life-announcements/end-of-life-summary';
 eol_names['cpe:/o:paloaltonetworks:pan-os'] = 'Palo Alto PAN-OS';
 eol_regex['cpe:/o:paloaltonetworks:pan-os'] = '^([0-9]+\\.[0-9]+)';
+eol_cpes['cpe:/o:paloaltonetworks:pan-os:8.1'] = '2022-03-01';
 eol_cpes['cpe:/o:paloaltonetworks:pan-os:8.0'] = '2019-01-29';
 eol_cpes['cpe:/o:paloaltonetworks:pan-os:7.1'] = '2020-03-29';
 eol_cpes['cpe:/o:paloaltonetworks:pan-os:7.0'] = '2017-12-04';
@@ -473,6 +605,7 @@ eol_cpes['cpe:/o:freebsd:freebsd:9.3'] = '2016-12-31';
 # eol_cpes['cpe:/o:freebsd:freebsd:10.0'] = '2015-02-28'; # nb: Don't add 10.0 for now as gb_ssh_os_detection.nasl can't detect the differences between 10.x and would throw false positives
 eol_cpes['cpe:/o:freebsd:freebsd:10.1'] = '2016-12-31';
 eol_cpes['cpe:/o:freebsd:freebsd:10.2'] = '2016-12-31';
+# eol_cpes['cpe:/o:freebsd:freebsd:11.0'] = '2017-12-30'; # nb: Same as above
 
 # NetBSD (https://en.wikipedia.org/wiki/NetBSD#Releases)
 eol_urls['cpe:/o:netbsd:netbsd'] = 'https://en.wikipedia.org/wiki/NetBSD#Releases';
@@ -542,6 +675,7 @@ eol_cpes['cpe:/o:openbsd:openbsd:5.7'] = '2016-03-29';
 eol_cpes['cpe:/o:openbsd:openbsd:5.8'] = '2016-09-01';
 eol_cpes['cpe:/o:openbsd:openbsd:5.9'] = '2017-04-11';
 eol_cpes['cpe:/o:openbsd:openbsd:6.0'] = '2017-10-09';
+eol_cpes['cpe:/o:openbsd:openbsd:6.1'] = '2018-04-15';
 
 # https://en.wikipedia.org/wiki/Solaris_(operating_system)#Version_history
 eol_urls['cpe:/o:sun:sunos'] = 'https://en.wikipedia.org/wiki/Solaris_(operating_system)#Version_history';
@@ -573,6 +707,15 @@ eol_cpes['cpe:/o:greenbone:greenbone_os:2.1'] = '2014-05-31';
 eol_cpes['cpe:/o:greenbone:greenbone_os:2.0'] = '2014-01-31';
 eol_cpes['cpe:/o:greenbone:greenbone_os:1.7'] = '2013-06-30';
 eol_cpes['cpe:/o:greenbone:greenbone_os:1.6'] = 'unknown';
+
+# Oracle Linux (http://www.oracle.com/us/support/library/elsp-lifetime-069338.pdf)
+# nb: Use the "Extended support Ends" date
+eol_urls['cpe:/o:oracle:linux'] = 'http://www.oracle.com/us/support/library/elsp-lifetime-069338.pdf';
+eol_names['cpe:/o:oracle:linux'] = 'Oracle Linux';
+eol_regex['cpe:/o:oracle:linux'] = '^([0-9]+)';
+eol_cpes['cpe:/o:oracle:linux:5'] = '2018-06-30';
+eol_cpes['cpe:/o:oracle:linux:4'] = '2013-02-28';
+eol_cpes['cpe:/o:oracle:linux:3'] = '2011-10-31';
 
 # General notes for windows: https://support.microsoft.com/en-us/help/13853/windows-lifecycle-fact-sheet
 
@@ -857,13 +1000,35 @@ eol_cpes['cpe:/o:microsoft:windows_vista::sp2:x86'] = '2017-04-11';
 eol_cpes['cpe:/o:microsoft:windows_vista::sp2:x64'] = '2017-04-11';
 
 #Windows 10 (https://support.microsoft.com/en-US/help/13853/windows-lifecycle-fact-sheet)
+#nb: Enterprise and Education editions for versions 1511, 1607, 1703 and 1709 will receive an additional 6 months of servicing after the end of service date.
 eol_urls['cpe:/o:microsoft:windows_10'] = 'https://support.microsoft.com/en-US/help/13853/windows-lifecycle-fact-sheet';
 eol_names['cpe:/o:microsoft:windows_10'] = 'Windows 10';
-eol_cpes['cpe:/o:microsoft:windows_10:1507'] = '2017-05-09';
-eol_cpes['cpe:/o:microsoft:windows_10:1511'] = '2017-10-10';
-#eol_cpes['cpe:/o:microsoft:windows_10:1607'] = '2018-03-01'; # Tentatively March 2018
-#eol_cpes['cpe:/o:microsoft:windows_10:1703'] = '2018-09-01'; # Tentatively September 2018
-#eol_cpes['cpe:/o:microsoft:windows_10:1709'] = '2019-03-01'; # Tentatively March 2019
+
+# nb: This is the Windows 10 Enterprise 2015 LTSB branch which
+# has support until October 13, 2025. As we currently can't differ
+# between CB and LTS in the CPE the following is commented out:
+# eol_cpes['cpe:/o:microsoft:windows_10:1507'] = '2017-05-09';
+
+# CB Home: October 10, 2017
+# CB Enterprise/Eductaion: + 6 month
+eol_cpes['cpe:/o:microsoft:windows_10:1511'] = '2018-04-10';
+
+# CB Home: April 10, 2018
+# CB Enterprise/Eductaion: + 6 month
+# nb: This is the Windows 10 Enterprise 2016 LTSB branch which
+# has support until October 13, 2026. As we currently can't differ
+# between CB and LTS in the CPE the following is commented out:
+# eol_cpes['cpe:/o:microsoft:windows_10:1607'] = '2018-10-10';
+
+# CB Home: October 9, 2018
+# CB Enterprise/Eductaion: + 6 month
+eol_cpes['cpe:/o:microsoft:windows_10:1703'] = '2019-04-09'; 
+
+# CB Home: April 9, 2019
+# CB Enterprise/Eductaion: + 6 month
+eol_cpes['cpe:/o:microsoft:windows_10:1709'] = '2019-10-09';
+
+eol_cpes['cpe:/o:microsoft:windows_10:1803'] = '2019-11-12';
 
 function os_reached_eol( cpe, debug ) {
 
@@ -895,7 +1060,7 @@ function os_reached_eol( cpe, debug ) {
       return;
     } else {
       final_cpe = base_cpe + ":" + v[0];
-      if( debug ) display( "DEBUG: Final CPE to check agains EOL versions: " + final_cpe + " ." );
+      if( debug ) display( "DEBUG: Final CPE to check against EOL versions: " + final_cpe + " ." );
     }
   # Full match for a CPE
   } else {
@@ -924,7 +1089,7 @@ function get_eol_url( cpe ) {
     pattern = eol_regex[base_cpe];
     version = get_version_from_cpe( cpe:cpe );
     v = eregmatch( pattern:pattern, string:version );
-    if( !isnull(v[0])) {
+    if( ! isnull( v[0] ) ) {
       _cpe = base_cpe + ":" + v[0];
       if( eol_urls[_cpe] )
         return eol_urls[_cpe];
@@ -947,11 +1112,22 @@ function get_eol_url( cpe ) {
 
 function get_eol_date( cpe ) {
 
-  local_var cpe, eol_date;
+  local_var cpe, base_cpe, pattern, version, v, eol_date;
 
   if( ! cpe ) {
     set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#cpe#-#get_eol_date" );
     return FALSE;
+  }
+
+  base_cpe = get_base_cpe( cpe:cpe );
+
+  if( eol_regex[base_cpe] ) {
+    pattern = eol_regex[base_cpe];
+    version = get_version_from_cpe( cpe:cpe );
+    v = eregmatch( pattern:pattern, string:version );
+    if( ! isnull( v[0] ) ) {
+      cpe = base_cpe + ":" + v[0];
+    }
   }
 
   if( ! eol_cpes[cpe] ) return FALSE;

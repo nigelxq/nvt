@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ssh_authentication_info.nasl 8324 2018-01-08 14:59:58Z cfischer $
+# $Id: gb_ssh_authentication_info.nasl 9954 2018-05-25 06:20:37Z cfischer $
 #
 # SSH Authenticated Scan Info Consolidation
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108162");
-  script_version("$Revision: 8324 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-08 15:59:58 +0100 (Mon, 08 Jan 2018) $");
+  script_version("$Revision: 9954 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-25 08:20:37 +0200 (Fri, 25 May 2018) $");
   script_tag(name:"creation_date", value:"2017-10-17 10:31:0 +0200 (Tue, 17 Oct 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -55,7 +55,15 @@ info_array = make_array();
 # nb: key is the KB item, value the description used in the report
 # The order doesn't matter, this will be sorted later in text_format_table()
 kb_array = make_array( "ssh/login/uname", "Response to 'uname -a' command",
-                       "login/SSH/success", "Login successfull",
+                       "ssh/login/freebsdpatchlevel", "FreeBSD patchlevel",
+                       "ssh/login/freebsdrel", "FreeBSD release",
+                       "ssh/login/openbsdversion", "OpenBSD version",
+                       "ssh/login/osx_name", "Mac OS X release name",
+                       "ssh/login/osx_build", "Mac OS X build",
+                       "ssh/login/osx_version", "Mac OS X version",
+                       "ssh/login/solhardwaretype", "Solaris hardware type",
+                       "ssh/login/solosversion", "Solaris version",
+                       "login/SSH/success", "Login successful",
                        "ssh/no_linux_shell", "Login on a system without common commands like 'cat' or 'find'",
                        "ssh/locate/available", "locate: Command available",
                        "ssh/force/clear_buffer", "Clear received buffer before sending a command",
@@ -90,6 +98,8 @@ foreach kb_item( keys( kb_array ) ) {
       info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "None/Empty";
     } else if( kb_item == "ssh/lsc/find_timeout" ) {
       info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "None";
+    } else if( kb_item =~ "ssh/login/(freebsd|openbsd|osx|sol)" ) {
+      info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "Not applicable for target";
     } else {
       info_array[kb_array[kb_item] + " (" + kb_item + ")"] = "FALSE";
       if( kb_item == "ssh/locate/available" ) {
@@ -105,7 +115,7 @@ foreach kb_item( keys( kb_array ) ) {
 info_array["Port used for authenciated scans (kb_ssh_transport())"] = kb_ssh_transport() + "/tcp";
 info_array["User used for authenciated scans (kb_ssh_login())"] = kb_ssh_login();
 
-report += text_format_table( array:info_array, columnheader:make_list( "Description (Knowledge base entry)", "Value/Content" ) );
+report = text_format_table( array:info_array, columnheader:make_list( "Description (Knowledge base entry)", "Value/Content" ) );
 if( locate_broken ) {
   report += '\n\nNOTE: The locate command seems to be unavailable for this user/account/system. ';
   report += "This command is highly recommended for authenticated scans. ";

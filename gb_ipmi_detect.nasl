@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ipmi_detect.nasl 8236 2017-12-22 10:28:23Z cfischer $
+# $Id: gb_ipmi_detect.nasl 9608 2018-04-25 13:33:05Z jschulte $
 #
 # Detection of IPMI
 #
@@ -24,32 +24,28 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "An IPMI Service is running at this host.
-
-The Intelligent Platform Management Interface (IPMI) is a standardized computer system
-interface used by system administrators for out-of-band management of computer systems
-and monitoring of their operation.";
-
-SCRIPT_OID  = '1.3.6.1.4.1.25623.1.0.103835';
-
 if (description)
 {
- script_oid(SCRIPT_OID);
+ script_oid("1.3.6.1.4.1.25623.1.0.103835");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8236 $");
- script_tag(name:"last_modification", value:"$Date: 2017-12-22 11:28:23 +0100 (Fri, 22 Dec 2017) $");
+ script_version("$Revision: 9608 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-04-25 15:33:05 +0200 (Wed, 25 Apr 2018) $");
  script_tag(name:"creation_date", value:"2013-11-26 11:39:47 +0100 (Tue, 26 Nov 2013)");
  script_tag(name:"cvss_base", value:"0.0");
 
 
- script_name("IPMI Detection");  
+ script_name("IPMI Detection");
  script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"remote_banner");
  script_family("Service detection");
  script_copyright("This script is Copyright (C) 2013 Greenbone Networks GmbH");
  script_require_udp_ports(623);
 
- script_tag(name : "summary" , value : tag_summary);
+ script_tag(name : "summary" , value : "An IPMI Service is running at this host.
+
+The Intelligent Platform Management Interface (IPMI) is a standardized computer system
+interface used by system administrators for out-of-band management of computer systems
+and monitoring of their operation.");
 
  exit(0);
 
@@ -96,13 +92,13 @@ foreach req (reqs) {
 
     if(auth_support[7] == 1) {
       set_kb_item(name:"ipmi/no_auth_supported", value:TRUE);
-    }  
+    }
 
     if(auth_support[6] == 1) {
       set_kb_item(name:"ipmi/md2_supported", value:TRUE);
-    }  
+    }
 
-  }  
+  }
 
   ipmi_version = dec2bin(dec:ord(recv[24]));
   ipmi_vers_str = 'v1.5';
@@ -112,8 +108,8 @@ foreach req (reqs) {
       set_kb_item(name:"ipmi/version/2.0", value:TRUE);
       ipmi_vers_str += ' v2.0';
     }
-  }  
- 
+  }
+
   non_null = dec2bin(dec:ord(recv[23]));
 
   if(non_null) {
@@ -124,13 +120,13 @@ foreach req (reqs) {
     if(non_null[6] == 1)
       set_kb_item(name:"ipmi/null_username", value: TRUE);
 
-  }  
+  }
 
   register_service(port: port, ipproto:"udp", proto: 'ipmi', message:'An IPMI service is running at this port. Supported IPMI version(s): ' + ipmi_vers_str + '\n');
   log_message(data:'An IPMI service is running at this port. Supported IPMI version(s): ' + ipmi_vers_str + '\n', port:623, proto:"udp");
 
   exit(0);
- 
+
 }
 
 exit(0);

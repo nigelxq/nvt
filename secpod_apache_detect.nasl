@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: secpod_apache_detect.nasl 8140 2017-12-15 12:08:32Z cfischer $
+# $Id: secpod_apache_detect.nasl 10290 2018-06-21 14:28:42Z cfischer $
 #
-# Apache Web Server Version Detection
+# Apache Web Server Detection
 #
 # Authors:
 # Sujit Ghosal <sghosal@secpod.com>
@@ -27,12 +27,12 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.900498");
-  script_version("$Revision: 8140 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-15 13:08:32 +0100 (Fri, 15 Dec 2017) $");
+  script_version("$Revision: 10290 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-21 16:28:42 +0200 (Thu, 21 Jun 2018) $");
   script_tag(name:"creation_date", value:"2009-04-30 06:40:16 +0200 (Thu, 30 Apr 2009)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
-  script_name("Apache Web Server Version Detection");
+  script_name("Apache Web Server Detection");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (C) 2009 SecPod");
   script_family("Product detection");
@@ -40,7 +40,7 @@ if(description)
   script_require_ports("Services/www", 80);
   script_exclude_keys("Settings/disable_cgi_scanning");
 
-  script_tag(name:"summary", value:"Detection of installed version of Apache Web Server
+  script_tag(name:"summary", value:"Detects the installed version of Apache Web Server
 
   The script detects the version of Apache HTTP Server on remote host and sets the KB.");
 
@@ -142,7 +142,7 @@ if( installed ) {
 
   set_kb_item( name:"www/" + port + "/Apache", value:version );
   set_kb_item( name:"apache/installed", value:TRUE );
-   
+
   cpe = build_cpe( value:version, exp:"^([0-9.]+)", base:"cpe:/a:apache:http_server:" );
   if( isnull( cpe ) )
     cpe = "cpe:/a:apache:http_server";

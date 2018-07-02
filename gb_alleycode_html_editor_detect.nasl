@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_alleycode_html_editor_detect.nasl 8168 2017-12-19 07:30:15Z teissa $
+# $Id: gb_alleycode_html_editor_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
 #
 # Alleycode HTML Editor Version Detection
 #
@@ -24,15 +24,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This script detects the installed version of Alleycode HTML Editor
-  and sets the result in KB.";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.801126");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 8168 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-19 08:30:15 +0100 (Tue, 19 Dec 2017) $");
+ script_version("$Revision: 9633 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
   script_tag(name:"creation_date", value:"2009-10-23 16:18:41 +0200 (Fri, 23 Oct 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Alleycode HTML Editor Version Detection");
@@ -43,7 +40,8 @@ if(description)
   script_dependencies("secpod_reg_enum.nasl");
   script_mandatory_keys("SMB/WindowsVersion");
   script_require_ports(139, 445);
-  script_tag(name : "summary" , value : tag_summary);
+  script_tag(name : "summary" , value : "This script detects the installed version of Alleycode HTML Editor
+  and sets the result in KB.");
   exit(0);
 }
 
@@ -52,8 +50,6 @@ include("smb_nt.inc");
 include("cpe.inc");
 include("host_details.inc");
 
-## Constant values
-SCRIPT_OID  = "1.3.6.1.4.1.25623.1.0.801126";
 SCRIPT_DESC = "Alleycode HTML Editor Version Detection";
 
 if(!get_kb_item("SMB/WindowsVersion")){
@@ -71,11 +67,10 @@ if("Alleycode HTML Editor" >< aheName)
     set_kb_item(name:"Alleycode-HTML-Editor/Ver", value:aheVer[1]);
     log_message(data:"Alleycode HTML Editor version " + aheVer[1] +
                        " was detected on the host");
-  
-    ## build cpe and store it as host_detail
+
     cpe = build_cpe(value:aheVer[1], exp:"^([0-9.]+)", base:"cpe:/a:konae:alleycode_html_editor:");
     if(!isnull(cpe))
-       register_host_detail(name:"App", value:cpe, nvt:SCRIPT_OID, desc:SCRIPT_DESC);
- 
+       register_host_detail(name:"App", value:cpe, desc:SCRIPT_DESC);
+
   }
 }

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mysql_mariadb_os_detection.nasl 7669 2017-11-06 15:08:30Z cfischer $
+# $Id: gb_mysql_mariadb_os_detection.nasl 9672 2018-04-29 08:24:10Z cfischer $
 #
 # MySQL/MariaDB Server OS Identification
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108192");
-  script_version("$Revision: 7669 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-11-06 16:08:30 +0100 (Mon, 06 Nov 2017) $");
+  script_version("$Revision: 9672 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-29 10:24:10 +0200 (Sun, 29 Apr 2018) $");
   script_tag(name:"creation_date", value:"2017-07-17 09:13:48 +0100 (Mon, 17 Jul 2017)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -59,27 +59,114 @@ port = infos['port'];
 
 if( ! banner = get_kb_item( "mysql_mariadb/full_banner/" + port ) ) exit( 0 );
 
-if( "ubuntu" >< banner ) {
-  if( "ubuntu0.14.04" >< banner ) {
-    register_and_report_os( os:"Ubuntu", version:"14.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-  } else if( "ubuntu0.16.04" >< banner ) {
-    register_and_report_os( os:"Ubuntu", version:"16.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-  } else if( "ubuntu0.17.04" >< banner ) {
-    register_and_report_os( os:"Ubuntu", version:"17.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-  } else if( "ubuntu0.17.10" >< banner ) {
-    register_and_report_os( os:"Ubuntu", version:"17.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-  } else {
-    register_and_report_os( os:"Ubuntu", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
-  }
+# 5.1.45-89.jaunty.35-log
+# 5.5.5-10.1.26-MariaDB-1~xenial
+# 5.5.5-10.2.14-MariaDB-10.2.14+maria~xenial-log
+# 5.5.5-10.1.24-MariaDB-1~yakkety
+# 5.5.5-10.2.8-MariaDB-10.2.8+maria~yakkety-log
+# nb: It might be possible that some of the banners below doesn't exist
+# on newer or older Ubuntu versions. Still keep them in here as we can't know...
+if( "ubuntu0.04.10" >< banner || "~warty" >< banner || ".warty." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"4.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.05.04" >< banner || "~hoary" >< banner || ".hoary." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"5.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.05.10" >< banner || "~breezy" >< banner || ".breezy." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"5.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.06.06" >< banner || "~dapper" >< banner || ".dapper." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"6.06", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.06.10" >< banner || "~edgy" >< banner || ".edgy." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"6.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.07.04" >< banner || "~feisty" >< banner || ".feisty." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"7.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.07.10" >< banner || "~gutsy" >< banner || ".gutsy." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"7.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.08.04" >< banner || "~hardy" >< banner || ".hardy." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"8.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.08.10" >< banner || "~intrepid" >< banner || ".intrepid." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"8.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.09.04" >< banner || "~jaunty" >< banner || ".jaunty." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"9.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.09.10" >< banner || "~karmic" >< banner || ".karmic." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"9.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.10.04" >< banner || "~lucid" >< banner || ".lucid." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"10.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.10.10" >< banner || "~maverick" >< banner || ".maverick." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"10.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.11.04" >< banner || "~natty" >< banner || ".natty." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"11.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.11.10" >< banner || "~oneiric" >< banner || ".oneiric." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"11.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.12.04" >< banner || "~precise" >< banner || ".precise." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"12.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.12.10" >< banner || "~quantal" >< banner || ".quantal." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"12.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.13.04" >< banner || "~raring" >< banner || ".raring." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"13.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.13.10" >< banner || "~saucy" >< banner || ".saucy." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"13.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.14.04" >< banner || "~trusty" >< banner || ".trusty." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"14.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.14.10" >< banner || "~utopic" >< banner || ".utopic." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"14.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.15.04" >< banner || "~vivid" >< banner || ".vivid." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"15.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.15.10" >< banner || "~wily" >< banner || ".wily." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"15.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.16.04" >< banner || "~xenial" >< banner || ".xenial." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"16.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.16.10" >< banner || "~yakkety" >< banner || ".yakkety." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"16.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.17.04" >< banner || "~zesty" >< banner || ".zesty." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"17.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.17.10" >< banner || "~artful" >< banner || ".artful." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"17.10", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+} else if( "ubuntu0.18.04" >< banner || "~bionic" >< banner || ".bionic." >< banner ) {
+  register_and_report_os( os:"Ubuntu", version:"18.04", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
   exit( 0 );
 }
 
+if( "ubuntu" >< banner ) {
+  register_and_report_os( os:"Ubuntu", cpe:"cpe:/o:canonical:ubuntu_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  exit( 0 );
+}
+
+# 5.0.32-Debian_7etch12-log
 if( "+deb" >< banner || "~jessie" >< banner || "~wheezy" >< banner || "~stretch" >< banner ||
+    "etch" >< banner || "-Debian" >< banner ||
     "squeeze" >< banner || "lenny" >< banner || # squeeze has .squeeze or ~squeeze versions, lenny as well
     "~bpo" >< banner ) { # Banners for debian backports like 5.6.30-1~bpo8+1-log
 
   # nb: The order matters in case of backports which might have something like +deb9~bpo8
-  if( "lenny" >< banner ) {
+  if( "etch" >< banner ) {
+    register_and_report_os( os:"Debian GNU/Linux", version:"4.0", cpe:"cpe:/o:debian:debian_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
+  } else if( "lenny" >< banner ) {
     register_and_report_os( os:"Debian GNU/Linux", version:"5.0", cpe:"cpe:/o:debian:debian_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );
   } else if( "squeeze" >< banner ) {
     register_and_report_os( os:"Debian GNU/Linux", version:"6.0", cpe:"cpe:/o:debian:debian_linux", banner_type:BANNER_TYPE, port:port, banner:banner, desc:SCRIPT_DESC, runs_key:"unixoide" );

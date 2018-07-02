@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: host_details.inc 8720 2018-02-08 13:20:07Z cfischer $
+# $Id: host_details.inc 10296 2018-06-22 06:59:42Z asteins $
 #
-# Centralized and organized host informations base
+# Centralized and organized host information base
 #
 # Authors:
 # Henri Doreau <henri.doreau@greenbone.net>
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 8720 $
+# $Revision: 10296 $
 #
 ###############################################################################
 
@@ -103,6 +103,7 @@ OS_CPE_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.105659", # gb_cisco_ios_xe_version.nasl
     "1.3.6.1.4.1.25623.1.0.105155", # gb_mcafee_email_gateway_version.nasl
     "1.3.6.1.4.1.25623.1.0.140058", # gb_brocade_netiron_snmp_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.108335", # gb_brocade_fabricos_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.105244", # gb_arubaos_detect.nasl
     "1.3.6.1.4.1.25623.1.0.106864", # gb_cyberoam_umt_ngfw_detect.nasl
     "1.3.6.1.4.1.25623.1.0.106875", # gb_aerohive_hiveos_detect.nasl
@@ -111,15 +112,21 @@ OS_CPE_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.106096", # gb_simatic_s7_version.nasl
     "1.3.6.1.4.1.25623.1.0.140738", # gb_simatic_cp_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.140748", # gb_simatic_scalance_snmp_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.140811", # gb_siemens_ruggedcom_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.20285",  # ilo_detect.nasl
     "1.3.6.1.4.1.25623.1.0.106078", # gb_watchguard_fireware_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.108338", # gb_vibnode_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.108347", # gb_hyperip_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.96207",  # gb_windows_cpe_detect.nasl
     "1.3.6.1.4.1.25623.1.0.50282",  # gather-package-list.nasl
     "1.3.6.1.4.1.25623.1.0.105614", # gb_cisco_pis_version.nasl
     "1.3.6.1.4.1.25623.1.0.140454", # gb_checkpoint_fw_version.nasl
     "1.3.6.1.4.1.25623.1.0.103621", # gb_smb_windows_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.112309", # gb_nec_communication_platforms_detect.nasl
     "1.3.6.1.4.1.25623.1.0.105586", # gb_ssh_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.104000", # nmap_net.nasl
     "1.3.6.1.4.1.25623.1.0.103809", # gb_junos_snmp_version.nasl
+    "1.3.6.1.4.1.25623.1.0.105271", # gb_citrix_netscaler_version.nasl
     "1.3.6.1.4.1.25623.1.0.103429", # gb_snmp_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.108014", # gb_dns_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.105355", # gb_ftp_os_detection.nasl
@@ -142,6 +149,8 @@ OS_CPE_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.108044", # dcetest.nasl
     "1.3.6.1.4.1.25623.1.0.108284", # gb_hnap_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.14674",  # ident_process_owner.nasl
+    "1.3.6.1.4.1.25623.1.0.108342", # gb_pihole_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.105112", # gb_dropbear_ssh_detect.nasl
     "1.3.6.1.4.1.25623.1.0.108021", # gb_nmap_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.102002"  # os_fingerprint.nasl
 );
@@ -177,6 +186,8 @@ OS_TXT_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.106096", # gb_simatic_s7_version.nasl
     "1.3.6.1.4.1.25623.1.0.140738", # gb_simatic_cp_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.140748", # gb_simatic_scalance_snmp_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.140811", # gb_siemens_ruggedcom_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.20285",  # ilo_detect.nasl
     "1.3.6.1.4.1.25623.1.0.106078", # gb_watchguard_fireware_detect.nasl
     "1.3.6.1.4.1.25623.1.0.108307", # gb_netgear_prosafe_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.108311", # gb_hirschmann_consolidation.nasl
@@ -185,15 +196,20 @@ OS_TXT_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.105659", # gb_cisco_ios_xe_version.nasl
     "1.3.6.1.4.1.25623.1.0.105155", # gb_mcafee_email_gateway_version.nasl
     "1.3.6.1.4.1.25623.1.0.140058", # gb_brocade_netiron_snmp_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.108335", # gb_brocade_fabricos_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.105244", # gb_arubaos_detect.nasl
     "1.3.6.1.4.1.25623.1.0.106864", # gb_cyberoam_umt_ngfw_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.108338", # gb_vibnode_consolidation.nasl
+    "1.3.6.1.4.1.25623.1.0.108347", # gb_hyperip_consolidation.nasl
     "1.3.6.1.4.1.25623.1.0.96207",  # gb_windows_cpe_detect.nasl
     "1.3.6.1.4.1.25623.1.0.50282",  # gather-package-list.nasl
     "1.3.6.1.4.1.25623.1.0.105614", # gb_cisco_pis_version.nasl
     "1.3.6.1.4.1.25623.1.0.140454", # gb_checkpoint_fw_version.nasl
     "1.3.6.1.4.1.25623.1.0.103621", # gb_smb_windows_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.112309", # gb_nec_communication_platforms_detect.nasl
     "1.3.6.1.4.1.25623.1.0.105586", # gb_ssh_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.104000", # nmap_net.nasl
+    "1.3.6.1.4.1.25623.1.0.105271", # gb_citrix_netscaler_version.nasl
     "1.3.6.1.4.1.25623.1.0.103809", # gb_junos_snmp_version.nasl
     "1.3.6.1.4.1.25623.1.0.103429", # gb_snmp_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.108014", # gb_dns_os_detection.nasl
@@ -217,6 +233,8 @@ OS_TXT_SRC = make_list(
     "1.3.6.1.4.1.25623.1.0.108044", # dcetest.nasl
     "1.3.6.1.4.1.25623.1.0.108284", # gb_hnap_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.14674",  # ident_process_owner.nasl
+    "1.3.6.1.4.1.25623.1.0.108342", # gb_pihole_detect.nasl
+    "1.3.6.1.4.1.25623.1.0.105112", # gb_dropbear_ssh_detect.nasl
     "1.3.6.1.4.1.25623.1.0.108021", # gb_nmap_os_detection.nasl
     "1.3.6.1.4.1.25623.1.0.102002"  # os_fingerprint.nasl
 );
@@ -373,10 +391,10 @@ function host_runs() {
     if( isnull( best_os ) ) return "unknown";
   }
 
-  #nb: update this to include possible cpes and txt from ssh_detect.nasl, gb_ssh_os_detection.nasl, gather-package-list.nasl and and other *_os_detection.nasl
+  #nb: update this to include possible cpes and txt from ssh_detect.nasl, gb_ssh_os_detection.nasl, gather-package-list.nasl and other *_os_detection.nasl
   if( "linux" >< tolower( ospattern ) )
     ospattern = '(' + ospattern + '|apc:aos|ubuntu|debian|bsd|opensuse|fedora|suse|redhat|red hat|centos|mandriva|mandrake|mageia|slackware|connectiva|amazon|oracle|' +
-                'turbolinux|gentoo|cisco|apple|fortios|junos|screenos|univention|esx|xen|panos|pan-os|qnap|synology|greenbone)';
+                'turbolinux|gentoo|cisco|apple|fortios|junos|screenos|univention|esx|xen|panos|pan-os|qnap|synology|greenbone|hyperip|simatic|ruggedcom|vibnode)';
 
   if( eregmatch( pattern:ospattern, string:best_os, icase:TRUE ) )
     return "yes";
@@ -555,7 +573,7 @@ function get_app( cpe, loc ) {
 }
 
 # *NEVER* use get_app_version() and get_app_location() together in a single NVT.
-# If both informations are required, use get_app_version_and_location() or
+# If both information is required, use get_app_version_and_location() or
 # get_app_full()
 
 #
@@ -650,9 +668,9 @@ function get_highest_app_version( cpe ) {
   return ret_version;
 }
 
-function get_app_location( cpe, port, nofork ) {
+function get_app_location( cpe, port, nofork, skip_port ) {
 
-  local_var cpe, port, nofork;
+  local_var cpe, port, nofork, skip_port;
 
   # To report if get_app_version() and get_app_location() is used together in one single NVT
   _get_app_location_used = TRUE;
@@ -661,7 +679,7 @@ function get_app_location( cpe, port, nofork ) {
   }
 
   if( ! cpe ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#cpe#-#get_app_location" );
-  if( ! port ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_app_location" );
+  if( ! port && ! nofork && ! skip_port ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#port#-#get_app_location" );
 
   return get_app_details( cpe:cpe, typ:"location", port:port, nofork:nofork );
 }
@@ -771,12 +789,12 @@ function get_app_port( cpe, service, all ) {
   return;
 }
 
-function get_app_version_and_location( cpe, port, exit_no_version ) {
+function get_app_version_and_location( cpe, port, exit_no_version, version_regex) {
 
-  local_var cpe, port, exit_no_version;
+  local_var cpe, port, exit_no_version, version_regex;
 
   if( ! cpe ) set_kb_item( name:"nvt_debug_empty/" + get_script_oid(), value:get_script_oid() + "#-#cpe#-#get_app_version_and_location" );
-  return get_app_details( cpe:cpe, typ:"version_location", port:port, exit_no_version:exit_no_version );
+  return get_app_details( cpe:cpe, typ:"version_location", port:port, exit_no_version:exit_no_version , version_regex:version_regex);
 }
 
 function get_app_location_and_proto( cpe, port ) {
@@ -907,7 +925,7 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     ap = get_kb_list( "get_app/" + base_cpe );
     if( ! ap ) return;
     app_locations = make_list();
-    foreach dt ( ap ) {
+    foreach dt( ap ) {
       t = split( dt, sep:'#-#', keep:FALSE );
       t_oid = t[0];
       t_loc = t[2];
@@ -975,7 +993,12 @@ function get_app_details( cpe, typ, port, exit_no_version, service, nofork, vers
     if( ! app_versions && ! x_loc ) return;
 
     if( app_versions )
+    {
+      if( version_regex )
+        if( ! ereg( pattern:version_regex, string:app_versions ) ) return;
+
       ret_arr['version'] = app_versions;
+    }  
     else
       ret_arr['version'] = '';
 
@@ -1283,8 +1306,12 @@ function register_unknown_os_banner( banner, banner_type_name, banner_type_short
       banner == "Server: Embedthis-http" || # Is running under various OS variants
       banner == "Server: GoAhead-Webs" || # Is running under various OS variants
       banner == "Server: Mojolicious (Perl)" || # Cross-platform
+      banner == "Server: Java/0.0" || # Cross-platform, running on e.g. VIBNODE devices
       banner == "+OK POP3 ready" ||
+      banner == "+OK POP3" ||
+      banner == "* OK IMAPrev1" ||
       banner == "220 FTP server ready" ||
+      banner == "220 FTP server ready." ||
       banner == "Server: NessusWWW" || # Nessus could be running on Windows, Linux/Unix or MacOS
       banner == "X-Powered-By: Express" || # Express Framework is supported on Windows, Linux/Unix etc.
       banner == "Server: Embedded Web Server" ||
@@ -1331,7 +1358,6 @@ function register_unknown_os_banner( banner, banner_type_name, banner_type_short
       egrep( pattern:"^SSH-2\.0-RomSShell_([0-9.]+)$", string:banner ) || # Vendor: "Works with any OS vendor and will function without an OS if needed"
       egrep( pattern:"^([0-9.]+)$", string:banner ) || # Bind9 and MySQL. Both are often only sending e.g. 9.4.2
       egrep( pattern:"^([0-9.]+)(-[0-9.]+)?-(MariaDB|log)$", string:banner ) || # MariaDB, e.g. 5.5.5-10.1.19-MariaDB or 5.5.49-MariaDB, MySQL e.g. 5.5.54-38.6-log or 5.6.25-log
-      egrep( pattern:"^SSH-2\.0-dropbear_([0-9.]+)$", string:banner ) ||
       egrep( pattern:"^SSH-2\.0-Mocana SSH ([0-9.]+)$", string:banner ) || # platform independent
       egrep( pattern:"^SSH-1\.99-OpenSSH_([0-9.p]+)$", string:banner ) ||
       egrep( pattern:"^SSH-2\.0-OpenSSH_([0-9.p]+)-FIPS_hpn([0-9v]+)$", string:banner ) || # SSH-2.0-OpenSSH_6.1-FIPS_hpn13v11
@@ -1345,4 +1371,5 @@ function register_unknown_os_banner( banner, banner_type_name, banner_type_short
 
   set_kb_item( name:"os_detection_report/unknown_os_banner/" + oid + "/" + port + "/" + proto + "/" + banner_type_short + "/banner", value:banner );
   set_kb_item( name:"os_detection_report/unknown_os_banner/" + oid + "/" + port + "/" + proto + "/" + banner_type_short + "/type_full", value:banner_type_name );
+  set_kb_item( name:"unknown_os_or_service/available", value:TRUE ); # Used in gb_unknown_os_service_reporting.nasl
 }

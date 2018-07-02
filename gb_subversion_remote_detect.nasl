@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_subversion_remote_detect.nasl 5499 2017-03-06 13:06:09Z teissa $
+# $Id: gb_subversion_remote_detect.nasl 9608 2018-04-25 13:33:05Z jschulte $
 #
 # Subversion Server Detection Version Detection
 #
@@ -24,27 +24,22 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-SCRIPT_OID = "1.3.6.1.4.1.25623.1.0.804405";
-
 if(description)
 {
-  script_oid(SCRIPT_OID);
-  script_version("$Revision: 5499 $");
+  script_oid("1.3.6.1.4.1.25623.1.0.804405");
+  script_version("$Revision: 9608 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2017-03-06 14:06:09 +0100 (Mon, 06 Mar 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-25 15:33:05 +0200 (Wed, 25 Apr 2018) $");
   script_tag(name:"creation_date", value:"2014-04-03 15:54:53 +0530 (Thu, 03 Apr 2014)");
   script_tag(name:"qod_type", value:"remote_banner");
   script_name("Subversion Server Detection Version Detection");
 
-  tag_summary =
-"Detection of Subversion Server version.
+
+  script_tag(name : "summary" , value : "Detection of Subversion Server version.
 
 The script sends a connection request to the server and attempts to
-extract the version number from the reply.";
-
-
-  script_tag(name : "summary" , value : tag_summary);
+extract the version number from the reply.");
 
   script_category(ACT_GATHER_INFO);
   script_family("Product detection");
@@ -80,7 +75,6 @@ if(!soc){
 
 resp = recv(socket:soc, length:4096);
 
-## confirm the server
 if(resp =~ '^\\( success \\( [0-9] [0-9] \\(.*\\) \\(.*')
 {
   send(socket: soc, data:"( 2 ( edit-pipeline ) 24:svn://host/svn/OpenVAS0x ) \r\n");
@@ -93,13 +87,12 @@ if(resp =~ '^\\( success \\( [0-9] [0-9] \\(.*\\) \\(.*')
     set_kb_item(name:"Subversion/Server/Ver", value:subVer[1]);
     set_kb_item(name:"Subversion/installed",value:TRUE);
 
-    ## build cpe and store it as host_detail
     cpe = build_cpe(value:subVer[1], exp:"^([0-9.]+)", base:"cpe:/a:apache:subversion:");
     if(!cpe)
       cpe = 'cpe:/a:apache:subversion';
 
     ## register
-    register_product(cpe:cpe, location:"/", nvt:SCRIPT_OID, port:subPort);
+    register_product(cpe:cpe, location:"/", port:subPort);
     log_message(data: build_detection_report(app:"Subversion Server",
                                              version:subVer[1],
                                              install:"/",

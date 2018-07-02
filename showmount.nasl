@@ -1,6 +1,6 @@
 ###################################################################
-# OpenVAS Network Vulnerability Test
-# $Id: showmount.nasl 6164 2017-05-18 12:00:33Z cfi $
+# OpenVAS Vulnerability Test
+# $Id: showmount.nasl 9745 2018-05-07 11:45:41Z cfischer $
 #
 # NFS export
 #
@@ -29,10 +29,10 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.102014");
-  script_version("$Revision: 6164 $");
+  script_version("$Revision: 9745 $");
   script_cve_id("CVE-1999-0554", "CVE-1999-0548");
   script_name("NFS export");
-  script_tag(name:"last_modification", value:"$Date: 2017-05-18 14:00:33 +0200 (Thu, 18 May 2017) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-07 13:45:41 +0200 (Mon, 07 May 2018) $");
   script_tag(name:"creation_date", value:"2009-10-06 18:45:43 +0200 (Tue, 06 Oct 2009)");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
@@ -42,12 +42,10 @@ if(description)
   script_dependencies("secpod_rpc_portmap.nasl");
   script_require_keys("rpc/portmap");
 
-  tag_summary = "This plugin lists NFS exported shares, and warns if some of
+  script_tag(name:"summary", value:"This plugin lists NFS exported shares, and warns if some of
   them are readable.
 
-  It also warns if the remote NFS server is superfluous.";
-
-  script_tag(name:"summary", value:tag_summary);
+  It also warns if the remote NFS server is superfluous.");
 
   script_tag(name:"solution_type", value:"Mitigation");
   script_tag(name:"qod_type", value:"remote_analysis");
@@ -60,17 +58,16 @@ include("nfs_func.inc");
 include("byte_func.inc");
 
 #mountd program number and version
-
 RPC_MOUNTD = 100005;
 RPC_MOUNTD_VERSION = 1;
 RPC_NFSD = 100003;
+
 ####RPC MOUNT EXPORT function####
 #  PURPOSE: obtains the targets export list by sending an RPC CALL message to EXPORT procedure of mountd
 #  ARGUMENT: -port- on which the mountd daemon is listening
 #       -protocol- IPPROTO_UDP(default) or IPPROTO_TCP
 #  RETURN: returns the NFSd daemons export list as defined in rfc 1094 (Appendix A)
 #    null on error
-
 
 function rpc_mountd_export(port,protocol){
 
@@ -113,8 +110,8 @@ function rpc_mountd_export(port,protocol){
     if(isnull(tcp_sock)){
       return NULL;
     }
-                send(socket: tcp_sock, data: rpc_mountd_export_call);
-                rpc_mountd_export_reply = recv(socket: tcp_sock, length: MSS);
+    send(socket: tcp_sock, data: rpc_mountd_export_call);
+    rpc_mountd_export_reply = recv(socket: tcp_sock, length: MSS);
     close(tcp_sock);
   }else {
     return NULL;
@@ -138,8 +135,8 @@ function rpc_mountd_export(port,protocol){
     return NULL;
   }
   reply_verifier_flavor = substr(rpc_mountd_export_reply,12,15);
-        reply_verifier_length = substr(rpc_mountd_export_reply,16,19);
-        reply_accept_state = substr(rpc_mountd_export_reply,20,23);
+  reply_verifier_length = substr(rpc_mountd_export_reply,16,19);
+  reply_accept_state = substr(rpc_mountd_export_reply,20,23);
   if(reply_accept_state != raw_string(0x00, 0x00, 0x00, 0x00)){
     return NULL;
   }
@@ -161,7 +158,8 @@ if(isnull(export_list)){
   exit(-1);
 }else{
   VALUE_FOLLOWS = raw_string(0x00, 0x00, 0x00, 0x01);
-  LEFT = 0; RIGHT = 3;
+  LEFT = 0;
+  RIGHT = 3;
   export_value_follows = substr(export_list, LEFT, RIGHT);
   while(export_value_follows == VALUE_FOLLOWS){
     LEFT = RIGHT + 1;
@@ -176,21 +174,25 @@ if(isnull(export_list)){
     groups = "";
     while(groups_value_follows == VALUE_FOLLOWS){
       LEFT = RIGHT + 1;
-                  RIGHT = LEFT + 3;
+      RIGHT = LEFT + 3;
       groups_length = str2long(val: substr(export_list, LEFT,RIGHT), idx: 0);
       LEFT = RIGHT + 1;
-                  RIGHT = LEFT + groups_length - 1;
-                  groups = groups + substr(export_list, LEFT, RIGHT);
-                  LEFT = RIGHT + padsz(len: groups_length) + 1;
-                  RIGHT = LEFT + 3;
-                  groups_value_follows = substr(export_list, LEFT, RIGHT);
+      RIGHT = LEFT + groups_length - 1;
+      groups = groups + substr(export_list, LEFT, RIGHT);
+      LEFT = RIGHT + padsz(len: groups_length) + 1;
+      RIGHT = LEFT + 3;
+      groups_value_follows = substr(export_list, LEFT, RIGHT);
     }
     LEFT = RIGHT + 1;
-                RIGHT = LEFT + 3;
+    RIGHT = LEFT + 3;
     export_value_follows = substr(export_list, LEFT,RIGHT);
-    insstr(groups, '\0', strlen(groups) - 1);
+    if(strlen(groups) > 0) {
+      insstr(groups, '\0', strlen(groups) - 1);
+    } else {
+      groups = "empty/none";
+    }
     list += export_dirpath + ' ' + groups + '\n';
-          set_kb_item(name:"nfs/exportlist", value:export_dirpath);
+    set_kb_item(name:"nfs/exportlist", value:export_dirpath);
   }
 }
 

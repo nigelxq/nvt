@@ -55,9 +55,9 @@ tag_affected = "NetworkManager, wpa_supplicant, NetworkManager-gnome on openSUSE
 
 if(description)
 {
-  script_id(850172);
-  script_version("$Revision: 8041 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-08 08:28:21 +0100 (Fri, 08 Dec 2017) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.850172");
+  script_version("$Revision: 9371 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-06 10:55:06 +0200 (Fri, 06 Apr 2018) $");
   script_tag(name:"creation_date", value:"2011-12-05 12:16:08 +0530 (Mon, 05 Dec 2011)");
   script_tag(name:"cvss_base", value:"7.5");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:P/I:P/A:P");
@@ -65,7 +65,7 @@ if(description)
   script_cve_id("CVE-2006-7246");
   script_name("SuSE Update for NetworkManager, wpa_supplicant, NetworkManager-gnome SUSE-SA:2011:045");
 
-  script_summary("Check for the Version of NetworkManager, wpa_supplicant, NetworkManager-gnome");
+  script_tag(name:"summary", value:"Check for the Version of NetworkManager, wpa_supplicant, NetworkManager-gnome");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2011 Greenbone Networks GmbH");
   script_family("SuSE Local Security Checks");

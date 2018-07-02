@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_webMAID_detect.nasl 5736 2017-03-27 13:36:24Z cfi $
+# $Id: gb_webMAID_detect.nasl 9633 2018-04-26 14:07:08Z jschulte $
 #
 # webMAID Detection
 #
@@ -24,15 +24,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "This host is running webMAID CMS. webMAID CMS is a flatfile CMS system
-based on PHP and XML.";
-
 if(description)
 {
- script_id(100558);
+ script_oid("1.3.6.1.4.1.25623.1.0.100558");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
- script_version("$Revision: 5736 $");
- script_tag(name:"last_modification", value:"$Date: 2017-03-27 15:36:24 +0200 (Mon, 27 Mar 2017) $");
+ script_version("$Revision: 9633 $");
+ script_tag(name:"last_modification", value:"$Date: 2018-04-26 16:07:08 +0200 (Thu, 26 Apr 2018) $");
  script_tag(name:"creation_date", value:"2010-03-29 12:55:36 +0200 (Mon, 29 Mar 2010)");
  script_tag(name:"cvss_base", value:"0.0");
  script_name("webMAID Detection");
@@ -43,7 +40,8 @@ if(description)
  script_dependencies("find_service.nasl", "http_version.nasl");
  script_require_ports("Services/www", 80);
  script_exclude_keys("Settings/disable_cgi_scanning");
- script_tag(name : "summary" , value : tag_summary);
+ script_tag(name : "summary" , value : "This host is running webMAID CMS. webMAID CMS is a flatfile CMS system
+based on PHP and XML.");
  script_xref(name : "URL" , value : "http://code.google.com/p/webmaidcms/");
  exit(0);
 }
@@ -66,7 +64,6 @@ foreach dir( make_list_unique( "/cms", cgi_dirs( port:port ) ) ) {
  if(egrep(pattern: "Powered by <a [^>]+><b>webmaid CMS", string: buf, icase: TRUE))
  {
     vers = string("unknown");
-    ### try to get version 
     version = eregmatch(string: buf, pattern: "<b>webmaid CMS</b></a>.*v\.([^ ]+)",icase:TRUE);
 
     if ( !isnull(version[1]) ) {

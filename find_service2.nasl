@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: find_service2.nasl 8503 2018-01-23 16:49:56Z cfischer $
+# $Id: find_service2.nasl 10315 2018-06-25 12:19:08Z asteins $
 #
 # Service Detection with 'HELP' Request
 #
@@ -27,8 +27,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.11153");
-  script_version("$Revision: 8503 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-23 17:49:56 +0100 (Tue, 23 Jan 2018) $");
+  script_version("$Revision: 10315 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-25 14:19:08 +0200 (Mon, 25 Jun 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
@@ -561,6 +561,9 @@ if( ereg( pattern: "^:.* 451 .*:", string:r ) ) {
   exit( 0 );
 }
 
+# nb: Keep in sync with the second part in find_service1.nasl.
+# Daytime seems to be responding late or even not to the HELP
+# request here.
 if( ereg( pattern:"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Lun|Mar|Mer|Jeu|Ven|Sam|Dim) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|D[eé]c|F[eé]v|Avr|Mai|Ao[uû]) *(0?[0-9]|[1-3][0-9]) [0-9]+:[0-9]+(:[0-9]+)?( *[ap]m)?( +[A-Z]+)? [1-2][0-9][0-9][0-9].?.?$",
           string:r ) ||
     ereg( pattern:"^[0-9][0-9] +(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|D[eé]c|F[eé]v|Avr|Mai|Ao[uû]) +[1-2][0-9][0-9][0-9] +[0-9]+:[0-9]+:[0-9]+( *[ap]m)? [A-Z0-9]+.?.?$", string:r, icase:TRUE ) ||
@@ -569,7 +572,9 @@ if( ereg( pattern:"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Lun|Mar|Mer|Jeu|Ven|Sam|Dim) (J
     ereg( pattern:"^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (January|February|March|April|May|June|July|August|September|October|November|December) ([0-9]|[1-3][0-9]), [1-2][0-9][0-9][0-9] .*", string:r ) ||
     # MS flavor of daytime
     ereg(pattern:"^[0-9][0-9]?:[0-9][0-9]:[0-9][0-9] [AP]M [0-9][0-9]?/[0-9][0-9]?/[0-2][0-9][0-9][0-9].*$", string:r ) ||
-    r =~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] +(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[0-2]|3[01])/(19|20)[0-9][0-9][ \t\r\n]*$' ) {
+    r =~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] +(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[0-2]|3[01])/(19|20)[0-9][0-9][ \t\r\n]*$' ||
+    # e.g. 0:00:42 07.02.2018 or 14:07:03 16.01.2018
+    r =~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] +(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(19|20)[0-9][0-9][ \t\r\n]*$' ) {
   register_service( port:port, proto:"daytime" );
   log_message( port:port, data:"Daytime is running on this port" );
   exit( 0 );
@@ -968,9 +973,11 @@ if( "ESTABLISHED" >< r && "TCP" >< r ) {
   exit( 0 );
 }
 
-if( "Charles Dickens" >< r || "George Bernard Shaw" >< r || "(Berthold Brecht)" >< r ||
-    "(August von Kotzebue)" >< r || "(Mark Twain)" >< r || "(Bertrand Russell)" >< r || 
-    "(Helen Markel)" >< r || "(Federico Fellini)" >< r || "(Tschechisches Sprichwort)" >< r ) {
+# nb: It is expected to have the first authors with a leading space and without the round bracket
+if( r =~ " (A\. A\. Milne|Albert Einstein|Anonimo|Antico proverbio cinese|Autor desconocido|Charles Dickens|Francisco de Quevedo y Villegas|George Bernard Shaw|Jaime Balmes|Johann Wolfgang von Goethe|Jil Sander|Juana de Asbaje|Konfucius|Lord Philip Chesterfield|Montaigne|Petrarca|Ralph Waldo Emerson|Seneca|Syrus|Werner von Siemens)" ||
+    r =~ "\((Albert Einstein|Anatole France|August von Kotzebue|Berthold Brecht|Bertrand Russell|Federico Fellini|Fritz Muliar|Helen Markel|Mark Twain|Oscar Wilde|Tschechisches Sprichwort|Schweizer Sprichwort|Volksweisheit)\)" ||
+    "(Juliette Gr" >< r || "Dante (Inferno)" >< r || "Semel in anno licet insanire." >< r || "Oh the nerves, the nerves; the mysteries of this machine called man" >< r ||
+    "Metastasio (Ipermestra)" >< r || '"\r\nAnonimo' >< r ) {
   register_service( port:port, proto:"qotd" );
   log_message( port:port, data:"qotd (Quote of the Day) seems to be running on this port" );
   exit( 0 );
@@ -1358,7 +1365,13 @@ if( "cvs [pserver]" >< r ) {
   report_and_exit( port:port, data:"A CVS pserver is running on this port" );
 }
 
-if( "@ABCDEFGHIJKLMNOPQRSTUV" >< r ) {
+# Ensuring that at least 3 patterns match
+# In case a pattern is missing or doesn't make it into the response (due to it being slow), the service will still be reported
+chargen_found = 0;
+foreach chargen_pattern( make_list( '!"#$%&\'()*+,-./', "ABCDEFGHIJ", "abcdefg", "0123456789" ) ) {
+  if( chargen_pattern >< r ) chargen_found++;
+}
+if( chargen_found > 2 ) {
   register_service( port:port, proto:"chargen" );
   report_and_exit( port:port, data:"A chargen server is running on this port" );
 }

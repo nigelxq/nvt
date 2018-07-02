@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_fortianalyzer_FG-IR-14-018.nasl 6600 2017-07-07 09:58:31Z teissa $
+# $Id: gb_fortianalyzer_FG-IR-14-018.nasl 9415 2018-04-10 06:55:50Z cfischer $
 #
 # FortiOS: Multiple Vulnerabilities in OpenSSL
 #
@@ -33,11 +33,11 @@ if (description)
  script_cve_id("CVE-2014-0224","CVE-2014-0221","CVE-2014-0195");
  script_tag(name:"cvss_base", value:"6.8");
  script_tag(name:"cvss_base_vector", value:"AV:N/AC:M/Au:N/C:P/I:P/A:P");
- script_version ("$Revision: 6600 $");
+ script_version ("$Revision: 9415 $");
 
  script_name("FortiOS: Multiple Vulnerabilities in OpenSSL");
 
- script_xref(name:"URL", value:"http://www.fortiguard.com/advisory/FG-IR-14-018/");
+ script_xref(name:"URL", value:"https://fortiguard.com/psirt/FG-IR-14-018");
 
  script_tag(name: "impact" , value:"CVE-2014-0224 may allow an attacker with a privileged network position (man-in-the-middle) to decrypt SSL encrypted
 communications.
@@ -56,7 +56,7 @@ CVE-2014-0076 can be used to discover ECDSA nonces on multi-user systems by expl
 to Fortinet products. ");
 
  script_tag(name: "vuldetect" , value:"Check the version");
- script_tag(name: "solution" , value:" Upgrade to FortiAnalyzer 5.2.0/5.0.7 (build 321) or higher.");
+ script_tag(name: "solution" , value:"Upgrade to FortiAnalyzer 5.2.0/5.0.7 (build 321) or higher.");
 
  script_tag(name: "summary" , value:"Multiple Vulnerabilities in OpenSSL");
 
@@ -65,7 +65,7 @@ to Fortinet products. ");
 
  script_tag(name:"qod_type", value:"package");
 
- script_tag(name:"last_modification", value:"$Date: 2017-07-07 11:58:31 +0200 (Fri, 07 Jul 2017) $");
+ script_tag(name:"last_modification", value:"$Date: 2018-04-10 08:55:50 +0200 (Tue, 10 Apr 2018) $");
  script_tag(name:"creation_date", value:"2015-02-11 12:17:13 +0100 (Wed, 11 Feb 2015)");
  script_category(ACT_GATHER_INFO);
  script_family("FortiOS Local Security Checks");

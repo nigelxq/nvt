@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: smb_registry_access.nasl 7192 2017-09-20 05:47:24Z cfischer $
+# $Id: smb_registry_access.nasl 9851 2018-05-16 05:52:56Z cfischer $
 #
 # Check for SMB accessible registry
 #
@@ -24,20 +24,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# kb: Keep above the description part as it is used there
-include("gos_funcs.inc");
-include("version_func.inc");
-gos_version = get_local_gos_version();
-if( ! strlen( gos_version ) > 0 ||
-    version_is_less( version:gos_version, test_version:"4.2.4" ) ) {
-  old_routine = TRUE;
-}
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.10400");
-  script_version("$Revision: 7192 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-09-20 07:47:24 +0200 (Wed, 20 Sep 2017) $");
+  script_version("$Revision: 9851 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-05-16 07:52:56 +0200 (Wed, 16 May 2018) $");
   script_tag(name:"creation_date", value:"2008-09-10 10:22:48 +0200 (Wed, 10 Sep 2008)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -64,6 +55,14 @@ if(description)
 
 include("smb_nt.inc");
 include("host_details.inc");
+include("gos_funcs.inc");
+include("version_func.inc");
+
+gos_version = get_local_gos_version();
+if( ! strlen( gos_version ) > 0 ||
+    version_is_less( version:gos_version, test_version:"4.2.4" ) ) {
+  old_routine = TRUE;
+}
 
 lanman = get_kb_item( "SMB/NativeLanManager" );
 samba  = get_kb_item( "SMB/samba" );
@@ -119,7 +118,7 @@ if( ! tid ) {
   exit( 0 );
 }
 
-message = 'It was not possible to connect to the PIPE\\winreg on the remote host. If you intend to use OpenVAS to ' +
+message = 'It was not possible to connect to the PIPE\\winreg on the remote host. If you intend to use the Scanner to ' +
           'perform registry-based checks, the registry checks will not work because the \'Remote ' +
           'Registry\' service is not running or has been disabled on the remote host.' +
           '\n\nPlease either:\n' +
@@ -133,7 +132,7 @@ startErrors = get_kb_list( "RemoteRegistry/Win/Service/Manual/Failed" );
 if( startErrors ) {
   message += '\n- check the below error which might provide additional info.';
   message += '\n\nThe scanner tried to start the \'Remote Registry\' service but received the following errors:\n';
-  foreach startError ( startErrors ) {
+  foreach startError( startErrors ) {
     # Clean-up the logs from the wmiexec.py before reporting it to the end user
     startError = ereg_replace( string:startError, pattern:".*Impacket.*Core Security Technologies", replace:"" );
     message += startError + '\n';
@@ -147,6 +146,8 @@ if( ! r ) {
   # has the "Automatic (Trigger Start)" Startup Type set and the service wasn't running yet.
   r = smbntcreatex( soc:soc, uid:uid, tid:tid, name:"\winreg" );
   if( ! r ) {
+    # Saved for later use in gb_win_lsc_authentication_info.nasl
+    set_kb_item( name:"SMB/registry_access/error", value:message );
     log_message( port:0, data:message );
     close( soc );
     exit( 0 );
@@ -163,9 +164,12 @@ r = pipe_accessible_registry( soc:soc, uid:uid, tid:tid, pipe:pipe );
 close( soc );
 
 if( ! r ) {
+  # Saved for later use in gb_win_lsc_authentication_info.nasl
+  set_kb_item( name:"SMB/registry_access/error", value:message );
   log_message( port:0, data:message );
 } else {
   set_kb_item( name:"SMB/registry_access", value:TRUE );
+  set_kb_item( name:"SMB_or_WMI/access_successful", value:TRUE );
 }
 
 exit( 0 );

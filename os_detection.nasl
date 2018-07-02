@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: os_detection.nasl 8720 2018-02-08 13:20:07Z cfischer $
+# $Id: os_detection.nasl 10296 2018-06-22 06:59:42Z asteins $
 #
 # OS Detection Consolidation and Reporting
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.105937");
-  script_version("$Revision: 8720 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-08 14:20:07 +0100 (Thu, 08 Feb 2018) $");
+  script_version("$Revision: 10296 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-06-22 08:59:42 +0200 (Fri, 22 Jun 2018) $");
   script_tag(name:"creation_date", value:"2016-02-19 11:19:54 +0100 (Fri, 19 Feb 2016)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -55,14 +55,18 @@ if(description)
                       "gb_hirschmann_consolidation.nasl", "gb_mikrotik_router_routeros_consolidation.nasl",
                       "gb_xenserver_version.nasl", "gb_cisco_ios_xe_version.nasl",
                       "gb_mcafee_email_gateway_version.nasl", "gb_brocade_netiron_snmp_detect.nasl",
+                      "gb_brocade_fabricos_consolidation.nasl",
                       "gb_arubaos_detect.nasl", "gb_cyberoam_umt_ngfw_detect.nasl",
                       "gb_aerohive_hiveos_detect.nasl", "gb_qnap_nas_detect.nasl",
                       "gb_synology_dsm_detect.nasl", "gb_simatic_s7_version.nasl",
                       "gb_simatic_cp_consolidation.nasl", "gb_simatic_scalance_snmp_detect.nasl",
-                      "gb_watchguard_fireware_detect.nasl", "gb_windows_cpe_detect.nasl",
+                      "gb_siemens_ruggedcom_consolidation.nasl", "ilo_detect.nasl",
+                      "gb_watchguard_fireware_detect.nasl", "gb_vibnode_consolidation.nasl",
+                      "gb_hyperip_consolidation.nasl", "gb_windows_cpe_detect.nasl",
                       "gather-package-list.nasl", "gb_cisco_pis_version.nasl",
                       "gb_checkpoint_fw_version.nasl", "gb_smb_windows_detect.nasl",
-                      "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)
+                      "gb_nec_communication_platforms_detect.nasl", "gb_ssh_os_detection.nasl", # nmap_net.nasl not added as this is in ACT_SCANNER (and doesn't use register_and_report_os yet)
+                      "gb_citrix_netscaler_version.nasl",
                       "gb_junos_snmp_version.nasl", "gb_snmp_os_detection.nasl",
                       "gb_dns_os_detection.nasl", "gb_ftp_os_detection.nasl",
                       "smb_nativelanman.nasl", "gb_ucs_detect.nasl",
@@ -74,12 +78,13 @@ if(description)
                       "gb_sip_os_detection.nasl", "gb_check_mk_agent_detect.nasl",
                       "ms_rdp_detect.nasl", "gb_apache_activemq_detect.nasl",
                       "dcetest.nasl", "gb_hnap_os_detection.nasl",
-                      "ident_process_owner.nasl", "gb_nmap_os_detection.nasl",
-                      "os_fingerprint.nasl");
+                      "ident_process_owner.nasl", "gb_pihole_detect.nasl",
+                      "gb_dropbear_ssh_detect.nasl",
+                      "gb_nmap_os_detection.nasl", "os_fingerprint.nasl");
 
   script_tag(name:"summary", value:"This script consolidates the OS information detected by several NVTs and tries to find the best matching OS.
 
-  Furthermore it reports all previously collected information leading to this best matching OS. It also reports possible additional informations
+  Furthermore it reports all previously collected information leading to this best matching OS. It also reports possible additional information
   which might help to improve the OS detection.
 
   If any of this information is wrong or could be improved please consider to report these to openvas-plugins@wald.intevation.org.");
@@ -167,7 +172,8 @@ foreach oid( OS_CPE_SRC ) {
 }
 
 if( ! found_best ) {
-  report += "No Best matching OS identified.";
+  report += "No Best matching OS identified. Please see the NVT 'Unknown OS and Service Banner Reporting' (OID: 1.3.6.1.4.1.25623.1.0.108441) ";
+  report += "for possible ways to identify this OS.";
   # Setting the runs_key to unixoide makes sure that we still schedule NVTs using Host/runs_unixoide as a fallback
   set_kb_item( name:"Host/runs_unixoide", value:TRUE );
 } else {
@@ -184,36 +190,6 @@ if( ! found_best ) {
 
 if( found_os )
   report += '\n\nOther OS detections (in order of reliability):\n\n' + found_os;
-
-unknown_banners = get_kb_list( "os_detection_report/unknown_os_banner/*/banner" );
-if( unknown_banners ) {
-
-  if( ! found_best ) report += " Please see below for possible ways to identify this OS.";
-
-  report += '\n\nUnknown banners have been collected which might help to identify the OS running on this host. ';
-  report += 'If these banners containing information about the host OS please report the following information ';
-  report += 'to openvas-plugins@wald.intevation.org:';
-
-  # Sort to not report changes on delta reports if just the order is different
-  keys = sort( keys( unknown_banners ) );
-
-  foreach key( keys ) {
-    tmp = split( key, sep:"/", keep:FALSE );
-    oid = tmp[2];
-    port = tmp[3];
-    proto = tmp[4];
-    banner_type_short = tmp[5];
-
-    banner = get_kb_item( "os_detection_report/unknown_os_banner/" + oid + "/" + port + "/" + proto + "/" + banner_type_short + "/banner" );
-    type = get_kb_item( "os_detection_report/unknown_os_banner/" + oid + "/" + port + "/" + proto + "/" + banner_type_short + "/type_full" );
-
-    report += '\n\nBanner: ' + banner + '\n';
-    report += "Identified from: " + type;
-
-    if( port && port != "0" )
-      report += " on port " + port + "/" + proto;
-  }
-}
 
 log_message( port:0, data:report );
 
