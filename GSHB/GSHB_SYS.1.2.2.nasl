@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_SYS.1.2.2.nasl 9015 2018-03-02 15:20:47Z emoss $
+# $Id: GSHB_SYS.1.2.2.nasl 10682 2018-07-30 13:19:35Z cfischer $
 #
 # IT-Grundschutz Baustein: SYS.1.2.2 Windows Server 2012
 #
@@ -27,24 +27,24 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109035");
-  script_version("$Revision: 9015 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-03-02 16:20:47 +0100 (Fri, 02 Mar 2018) $");
+  script_version("$Revision: 10682 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-30 15:19:35 +0200 (Mon, 30 Jul 2018) $");
   script_tag(name:"creation_date", value:"2017-11-15 14:42:28 +0200 (Wed, 15 Nov 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
-  script_tag(name:"qod", value:"97");  
+  script_tag(name:"qod", value:"97");
   script_name('SYS.1.2.2 Windows Server 2012');
-
-  script_xref(name : "URL" , value : " https://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKompendium/bausteine/SYS/SYS_1_2_2_Windows_Server_2012.html ");
-  
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2017 Greenbone Networks GmbH");
   script_family("IT-Grundschutz");
   script_mandatory_keys("Compliance/Launch/GSHB-ITG");
   script_dependencies("GSHB/GSHB_WMI_OSInfo.nasl", "GSHB/EL15/GSHB_M4_097.nasl", "gb_ms_ie_detect.nasl");
-  script_tag(name : "summary" , value : 'Zielsetzung dieses Bausteins ist der Schutz von Informationen und Prozessen,
-      die durch Serversysteme auf Basis von Windows Server 2012 (R2) im Regelbetrieb verarbeitet bzw. gesteuert werden.');
-  
+
+  script_xref(name:"URL", value:" https://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKompendium/bausteine/SYS/SYS_1_2_2_Windows_Server_2012.html ");
+
+  script_tag(name:"summary", value:"Zielsetzung dieses Bausteins ist der Schutz von Informationen und Prozessen,
+  die durch Serversysteme auf Basis von Windows Server 2012 (R2) im Regelbetrieb verarbeitet bzw. gesteuert werden.");
+
   exit(0);
 }
 
@@ -64,12 +64,12 @@ if( "windows server 2012" >!< tolower(Windows_OSName) ){
 }
 
 host    = get_host_ip();
-usrname = kb_smb_login(); 
+usrname = kb_smb_login();
 domain  = kb_smb_domain();
 if( domain ){
   usrname = domain + '\\' + usrname;
 }
-passwd  = kb_smb_password();
+passwd = kb_smb_password();
 
 handle = wmi_connect(host:host, username:usrname, password:passwd);
 if( !handle ){
@@ -121,7 +121,7 @@ if( res == '' ){
       }
     }
   }
-  
+
   if( result == 'nicht erfüllt'){
     desc = 'Folgende lokale Accounts benötigen kein Passwort zum Log-In:\n' + InsecureLocalAccount;
   }else{
@@ -133,7 +133,6 @@ if( res == '' ){
 SYS_1_2_2_A3 += desc + '\n';
 set_kb_item(name:"GSHB/SYS.1.2.2.A3/result", value:result);
 set_kb_item(name:"GSHB/SYS.1.2.2.A3/desc", value:desc);
-
 
 # SYS.1.2.2.A4  Sichere Konfiguration von Windows Server 2012
 SYS_1_2_2_A4 = 'SYS.1.2.2.A4 Sichere Konfiguration von Windows Server 2012:\n';
@@ -147,7 +146,7 @@ if( Installed_IE ){
   if( registry_key_exists(key:reg_key, type:"HKLM") ){
     ESC_Admins = registry_get_dword(key:reg_key, item:"IsInstalled", type:"HKLM");
   }
-  
+
   if( ESC_Admins != '1' ){
     desc += 'Die Enhanced Security Configuration des Internet Explorers ist nicht für Administratoren aktiviert.\n';
     result = 'nicht erfüllt';
@@ -160,7 +159,7 @@ if( Installed_IE ){
   if( registry_key_exists(key:reg_key, type:"HKLM") ){
     ESC_Users = registry_get_dword(key:reg_key, item:"IsInstalled", type:"HKLM" );
   }
-  
+
   if( ESC_Users != '1' ){
     desc += 'Die Enhanced Security Configuration ist nicht für User aktiviert.\n';
     result = 'nicht erfüllt';
@@ -173,7 +172,7 @@ if( Installed_IE ){
   if( registry_key_exists(key:reg_key, type:"HKLM") ){
     EPM = registry_get_sz(key: reg_key, item:"Isolation", type:"HKLM");
   }
-  
+
   if( EPM != 'PMEM' ){
     desc += 'Der Enhanced Protected Mode wird nicht genutzt.\n';
     result = 'nicht erfüllt';
@@ -197,7 +196,7 @@ SYS_1_2_2_A6 += 'SYS.1.2.2.A6 Sichere Authentisierung und Autorisierung in Windo
 result = 'erfüllt';
 
 GROUPUSER = wmi_user_groupuser(handle:handle);
-GROUPUSER = split(GROUPUSER, sep:'\n', keep:FALSE);                                                                                                                                                                                                                        
+GROUPUSER = split(GROUPUSER, sep:'\n', keep:FALSE);
 foreach USER (GROUPUSER) {
   USER = split(USER, sep:'|', keep:FALSE);
   if( "Win32_UserAccount" >< USER[1] ){
@@ -248,7 +247,6 @@ SYS_1_2_2_A6 += desc + '\n';
 set_kb_item(name:"GSHB/SYS.1.2.2.A6/result", value:result);
 set_kb_item(name:"GSHB/SYS.1.2.2.A6/desc", value:desc);
 
-
 # SYS.1.2.2.A7 Sicherheitsprüfung von Windows Server 2012
 SYS_1_2_2_A7 = 'SYS.1.2.2.A7 Sicherheitsprüfung von Windows Server 2012:\n';
 SYS_1_2_2_A7 += 'Diese Maßnahme muss manuell überprüft werden.\n\n';
@@ -280,7 +278,6 @@ SYS_1_2_2_A8 += desc + '\n';
 set_kb_item(name:"GSHB/SYS.1.2.2.A8/result", value:result);
 set_kb_item(name:"GSHB/SYS.1.2.2.A8/desc", value:desc);
 
-
 # SYS.1.2.2.A9 Lokale Kommunikationsfilterung (CI)
 SYS_1_2_2_A9 = 'SYS_1_2_2_A9 Lokale Kommunikationsfilterung (CI):\n';
 Firewall_Private = "netsh advfirewall show private state";
@@ -288,37 +285,47 @@ Firewall_Public = "netsh advfirewall show public state";
 Firewall_Domain = "netsh advfirewall show domain state";
 result = 'erfüllt';
 
-usrname = get_kb_item("SMB/login");
-domain = get_kb_item("SMB/domain");
+usrname = kb_smb_login();
+domain = kb_smb_domain();
 if ( domain ){
   usrname = domain + '/' + usrname;
 }
 
-Firewall_Private_Stat = win_cmd_exec(cmd:Firewall_Private, password:passwd, username:usrname);
-Firewall_Private_Stat = eregmatch(string:Firewall_Private_Stat, pattern:'State[ ]+(ON|OFF)');
-if( Firewall_Private_Stat[1] ){
-  desc = 'Der Status des privaten Firewallprofils ist: ' + Firewall_Private_Stat[1] + '\n';
-}else{
+disabled_win_cmd_exec = get_kb_item("win/lsc/disable_win_cmd_exec");
+disabled_win_cmd_exec_report = "Die Verwendung der benoetigten win_cmd_exec Funktion wurde in 'Options for Local Security Checks (OID: 1.3.6.1.4.1.25623.1.0.100509)' manuell deaktiviert.";
+
+if( ! disabled_win_cmd_exec ){
+  Firewall_Private_Stat = win_cmd_exec(cmd:Firewall_Private, password:passwd, username:usrname);
+  Firewall_Private_Stat = eregmatch(string:Firewall_Private_Stat, pattern:'State[ ]+(ON|OFF)');
+  if( Firewall_Private_Stat[1] ){
+    desc = 'Der Status des privaten Firewallprofils ist: ' + Firewall_Private_Stat[1] + '\n';
+  }else{
+    desc = 'Das private Firewallprofil konnte nicht ermittelt werden.\n';
+    result = 'error';
+  }
+
+  Firewall_Public_Stat = win_cmd_exec(cmd:Firewall_Public, password:passwd, username:usrname);
+  Firewall_Public_Stat = eregmatch(string:Firewall_Public_Stat, pattern:'State[ ]+(ON|OFF)');
+  if( Firewall_Public_Stat[1] ){
+    desc += 'Der Status des öffentlichen Firewallprofils ist: ' + Firewall_Public_Stat[1] + '\n';
+  }else{
+    desc += 'Das öffentliche Firewallprofil konnte nicht ermittelt werden.\n';
+    result = 'error';
+  }
+
+  Firewall_Domain_Stat = win_cmd_exec(cmd:Firewall_Domain, password:passwd, username:usrname);
+  Firewall_Domain_Stat = eregmatch(string:Firewall_Domain_Stat, pattern:'State[ ]+(ON|OFF)');
+  if( Firewall_Domain_Stat[1] ){
+    desc += 'Der Status des Firewallprofils "Domäne" ist: ' + Firewall_Domain_Stat[1] + '\n';
+  }else{
+    desc += 'Das domänen Firewallprofil konnte nicht ermittelt werden.\n';
+    result = 'error';
+  }
+} else {
   desc = 'Das private Firewallprofil konnte nicht ermittelt werden.\n';
-  result = 'error';
-}
-
-
-Firewall_Public_Stat = win_cmd_exec(cmd:Firewall_Public, password:passwd, username:usrname);
-Firewall_Public_Stat = eregmatch(string:Firewall_Public_Stat, pattern:'State[ ]+(ON|OFF)');
-if( Firewall_Public_Stat[1] ){
-  desc += 'Der Status des öffentlichen Firewallprofils ist: ' + Firewall_Public_Stat[1] + '\n';
-}else{
-  desc += 'Das private Firewallprofil konnte nicht ermittelt werden.\n';
-  result = 'error';
-}
-
-Firewall_Domain_Stat = win_cmd_exec(cmd:Firewall_Domain, password:passwd, username:usrname);
-Firewall_Domain_Stat = eregmatch(string:Firewall_Domain_Stat, pattern:'State[ ]+(ON|OFF)');
-if( Firewall_Domain_Stat[1] ){
-  desc += 'Der Status des Firewallprofils "Domäne" ist: ' + Firewall_Domain_Stat[1] + '\n';
-}else{
+  desc += 'Das öffentliche Firewallprofil konnte nicht ermittelt werden.\n';
   desc += 'Das domänen Firewallprofil konnte nicht ermittelt werden.\n';
+  desc += disabled_win_cmd_exec_report + '\n';
   result = 'error';
 }
 
@@ -330,10 +337,19 @@ set_kb_item(name:"GSHB/SYS.1.2.2.A9/desc", value:desc);
 SYS_1_2_2_A10 = 'SYS.1.2.2.A10 Festplattenverschlüsselung bei Windows Server 2012 (C):\n';
 result = 'erfüllt';
 desc = '';
-cmd = "wmic logicaldisk get caption,drivetype";
-res = win_cmd_exec(cmd:cmd, password:passwd, username:usrname);
-if( "not recognized" >< res ){
-  desc = '"wmic" wurde auf dem Host nicht erkannt.\n\n';
+
+if( ! disabled_win_cmd_exec ){
+  cmd = "wmic logicaldisk get caption,drivetype";
+  res = win_cmd_exec(cmd:cmd, password:passwd, username:usrname);
+}
+
+if( "not recognized" >< res || disabled_win_cmd_exec ){
+  desc = "Der BitLocker status konnte nicht ermittelt werden. ";
+  if( disabled_win_cmd_exec ) {
+    desc += disabled_win_cmd_exec_report + '\n\n';
+  } else {
+    desc += '"wmic" wurde auf dem Host nicht erkannt.\n\n';
+  }
   result = 'error';
 }else{
   res = split(res, keep:FALSE);
@@ -359,10 +375,10 @@ if( "not recognized" >< res ){
       }
     }
   }
-}
-if( ! BitLockerInstalled ){
-  desc = 'BitLocker wird nicht verwendet.\n';
-  result = 'nicht erfüllt';
+  if( ! BitLockerInstalled ){
+    desc = 'BitLocker wird nicht verwendet.\n';
+    result = 'nicht erfüllt';
+  }
 }
 
 SYS_1_2_2_A10 += desc + '\n';
@@ -384,8 +400,6 @@ SYS_1_2_2_A13 += 'Diese Vorgabe muss manuell überprüft werden.\n\n';
 # SYS.1.2.2.A14 Herunterfahren verschlüsselter Server und virtueller Maschinen (CI)
 SYS_1_2_2_A14 = 'SYS.1.2.2.A14 Herunterfahren verschlüsselter Server und virtueller Maschinen (CI):\n';
 SYS_1_2_2_A14 += 'Diese Vorgabe muss manuell überprüft werden.\n\n';
-
-
 
 message += 'Basis-Absicherung:\n\n' + SYS_1_2_2_A1 + SYS_1_2_2_A2 + SYS_1_2_2_A3;
 LEVEL = get_kb_item("GSHB/level");

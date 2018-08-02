@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_M4_002.nasl 9365 2018-04-06 07:34:21Z cfischer $
+# $Id: GSHB_M4_002.nasl 10646 2018-07-27 07:00:22Z cfischer $
 #
 # IT-Grundschutz, 13. EL, Maßnahme 4.002
 #
@@ -27,34 +27,34 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.94103");
-  script_version("$Revision: 9365 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:34:21 +0200 (Fri, 06 Apr 2018) $");
+  script_version("$Revision: 10646 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-27 09:00:22 +0200 (Fri, 27 Jul 2018) $");
   script_tag(name:"creation_date", value:"2013-11-20 13:39:53 +0100 (Wed, 20 Nov 2013)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_name("IT-Grundschutz M4.002: Bildschirmsperre");
-  script_xref(name : "URL" , value : "http://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKataloge/Inhalt/_content/m/m04/m04002.html");
+  script_xref(name:"URL", value:"http://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKataloge/Inhalt/_content/m/m04/m04002.html");
   script_category(ACT_GATHER_INFO);
   script_tag(name:"qod_type", value:"registry");
   script_copyright("Copyright (c) 2013 Greenbone Networks GmbH");
   script_family("IT-Grundschutz-13");
-  script_mandatory_keys("Tools/Present/wmi");
-  script_mandatory_keys("Compliance/Launch/GSHB-13");
+  script_mandatory_keys("Compliance/Launch/GSHB-13", "Tools/Present/wmi");
   script_dependencies("GSHB/GSHB_WMI_ScreenSaver_Status.nasl", "GSHB/GSHB_WMI_OSInfo.nasl", "GSHB/GSHB_SSH_gnome_kde_screensaver.nasl");
   script_require_keys("WMI/Screensaver");
-  script_tag(name : "summary" , value :
-"IT-Grundschutz M4.002: Bildschirmsperre.
+  script_tag(name:"summary", value:"IT-Grundschutz M4.002: Bildschirmsperre.
 
-ACHTUNG: Dieser Test wird nicht mehr unterstützt. Er wurde ersetzt durch
-den entsprechenden Test der nun permanent and die aktuelle EL angepasst
-wird: OID 1.3.6.1.4.1.25623.1.0.94173
+  ACHTUNG: Dieser Test wird nicht mehr unterstützt. Er wurde ersetzt durch
+  den entsprechenden Test der nun permanent and die aktuelle EL angepasst
+  wird: OID 1.3.6.1.4.1.25623.1.0.94173
 
-Stand: 13. Ergänzungslieferung (13. EL).
+  Stand: 13. Ergänzungslieferung (13. EL).
 
-Hinweis:
-Windows: Kann nur für Lokale Konten getestet werden.
-Linux: Nur voreingestellte Bildschirmschoner bei Gnome und KDE.
-");
+  Hinweis:
+
+  Windows: Kann nur für Lokale Konten getestet werden.
+
+  Linux: Nur voreingestellte Bildschirmschoner bei Gnome und KDE.");
+
   script_tag(name:"deprecated", value:TRUE);
 
   exit(0);

@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_windows_services_start.nasl 8897 2018-02-21 09:04:23Z cfischer $
+# $Id: gb_windows_services_start.nasl 10563 2018-07-22 10:40:42Z cfischer $
 #
 # Windows Services Start
 #
@@ -46,10 +46,10 @@ if( defined_func( "get_local_gos_version" ) &&
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.804786");
-  script_version("$Revision: 8897 $");
+  script_version("$Revision: 10563 $");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-21 10:04:23 +0100 (Wed, 21 Feb 2018) $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-22 12:40:42 +0200 (Sun, 22 Jul 2018) $");
   script_tag(name:"creation_date", value:"2014-11-04 16:38:25 +0530 (Tue, 04 Nov 2014)");
   script_name("Windows Services Start");
   script_category(ACT_GATHER_INFO);
@@ -61,21 +61,20 @@ if(description)
   script_mandatory_keys("SMB/login", "SMB/password", "Tools/Present/wmi");
   script_exclude_keys("SMB/samba");
 
-  tag_summary = "This routine starts not running (but required) windows services before launching an
-  authenticated scan.";
-
   if( old_routine ) {
 
     script_add_preference(name:"Automatically enable the Remote Registry service (please see NOTE)", type:"checkbox", value:"no");
 
-    tag_summary += "
+    script_tag(name:"summary", value:"This routine starts not running (but required) windows services before launching an
+    authenticated scan.
 
     NOTE: This plugin is using the 'win_cmd_exec' command from openvas-smb which is deploying a
     service 'winexesvc.exe' to the target system. Because of this the plugin is disabled by default
-    to avoid modifications on the target system. Please see the script preferences on how to enable this.";
+    to avoid modifications on the target system. Please see the script preferences on how to enable this.");
+  } else {
+    script_tag(name:"summary", value:"This routine starts not running (but required) windows services before launching an
+    authenticated scan.");
   }
-
-  script_tag(name:"summary", value:tag_summary);
 
   script_tag(name:"qod_type", value:"registry");
 
@@ -91,9 +90,18 @@ if( old_routine ) {
 
 if( ! defined_func( "win_cmd_exec" ) ) exit( 0 );
 
+if( get_kb_item( "win/lsc/disable_win_cmd_exec" ) ) {
+  win_cmd_exec_disabled = TRUE;
+}
+
 function run_command( command, password, username, service ) {
 
   local_var command, password, username, service, serQueryRes, serStat;
+
+  if( win_cmd_exec_disabled ) {
+    set_kb_item( name:service + "/Win/Service/Manual/Failed", value:"Usage of win_cmd_exec required to start this service was disabled manually within 'Options for Local Security Checks (OID: 1.3.6.1.4.1.25623.1.0.100509)'." );
+    return;
+  }
 
   serQueryRes = win_cmd_exec( cmd:command, password:password, username:username );
 
@@ -126,10 +134,7 @@ function run_command( command, password, username, service ) {
   }
 }
 
-lanman = get_kb_item( "SMB/NativeLanManager" );
-samba  = get_kb_item( "SMB/samba" );
-
-if( samba || "samba" >< tolower( lanman ) ) exit( 0 );
+if( kb_smb_is_samba() ) exit( 0 );
 
 port = kb_smb_transport();
 if( ! port ) port = 139;

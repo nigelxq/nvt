@@ -1,6 +1,6 @@
 ##############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_SYS.2.2.3.nasl 8925 2018-02-22 13:39:46Z emoss $
+# $Id: GSHB_SYS.2.2.3.nasl 10682 2018-07-30 13:19:35Z cfischer $
 #
 # IT-Grundschutz Baustein: SYS.2.2.3 Clients unter Windows 10
 #
@@ -27,22 +27,23 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.109034");
-  script_version("$Revision: 8925 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-02-22 14:39:46 +0100 (Thu, 22 Feb 2018) $");
+  script_version("$Revision: 10682 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-30 15:19:35 +0200 (Mon, 30 Jul 2018) $");
   script_tag(name:"creation_date", value:"2017-12-13 07:42:28 +0200 (Wed, 13 Dec 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:L/AC:H/Au:S/C:N/I:N/A:N");
-  script_tag(name:"qod", value:"97");  
+  script_tag(name:"qod", value:"97");
   script_name('SYS.2.2.3 Clients unter Windows 10');
-  script_xref(name : "URL" , value : " https://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKompendium/bausteine/SYS/SYS_2_2_3_Clients_unter_Windows_10.html ");
+  script_xref(name:"URL", value:" https://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKompendium/bausteine/SYS/SYS_2_2_3_Clients_unter_Windows_10.html ");
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2017 Greenbone Networks GmbH");
   script_family("IT-Grundschutz");
   script_mandatory_keys("Compliance/Launch/GSHB-ITG");
-  script_dependencies("GSHB/GSHB_WMI_OSInfo.nasl", "GSHB_WMI_Antivir.nasl", "GSHB/GSHB_SMB_UAC_Config.nasl", "GSHB/GSHB_WMI_EFS.nasl");
-  script_tag(name : "summary" , value : 'Ziel dieses Bausteins ist der Schutz von Informationen, 
-      die durch und auf Windows 10-Clients verarbeiten werden.');
-  
+  script_dependencies("GSHB/GSHB_WMI_OSInfo.nasl", "GSHB/GSHB_WMI_Antivir.nasl", "GSHB/GSHB_SMB_UAC_Config.nasl", "GSHB/GSHB_WMI_EFS.nasl");
+
+  script_tag(name:"summary", value:"Ziel dieses Bausteins ist der Schutz von Informationen,
+  die durch und auf Windows 10-Clients verarbeiten werden.");
+
   exit(0);
 }
 
@@ -64,13 +65,13 @@ oder es konnte keine Verbindung zum Host hergestellt werden.");
 }
 
 host    = get_host_ip();
-usrname = kb_smb_login(); 
+usrname = kb_smb_login();
 domain  = kb_smb_domain();
 if( domain ){
   usrname_handle = domain + '\\' + usrname;
   usrname_WmiCmd = domain + '/' + usrname;
 }
-passwd  = kb_smb_password();
+passwd = kb_smb_password();
 handle = wmi_connect(host:host, username:usrname_handle, password:passwd, ns:'root\\rsop\\computer');
 if( !handle ){
   for( i=1; i<=25; i++){
@@ -81,6 +82,8 @@ if( !handle ){
   exit(0);
 }
 
+disabled_win_cmd_exec = get_kb_item("win/lsc/disable_win_cmd_exec");
+disabled_win_cmd_exec_report = "Die Verwendung der benoetigten win_cmd_exec Funktion wurde in 'Options for Local Security Checks (OID: 1.3.6.1.4.1.25623.1.0.100509)' manuell deaktiviert.";
 
 # SYS.2.2.3.A1 Planung des Einsatzes von Cloud-Diensten
 SYS_2_2_3_A1 = 'SYS.2.2.3.A1 Planung des Einsatzes von Cloud-Diensten:\n';
@@ -121,7 +124,7 @@ if( max_index(SecurityCenter2) <= 1 ){
 }else{
   desc = 'Folgende Schutzprogramme sind installiert:\n';
 
-  # get state of each AntiVir program (can be more than one)
+  # nb: get state of each AntiVir program (can be more than one)
   foreach line (SecurityCenter2){
     line = split(line, sep:'|', keep:FALSE);
 
@@ -196,7 +199,7 @@ if( ! SeDenyInteractiveLogonRight ){
     line = split(line, sep:'|', keep:FALSE);
     if( tolower(line[0]) == 'accountlist' ){
       continue;
-    }   
+    }
 
     for( y=0; y<=max_index(line)-3; y++ ){
       desc += line[y];
@@ -204,8 +207,8 @@ if( ! SeDenyInteractiveLogonRight ){
         desc += '\n';
       }else{
         desc += ', ';
-      }   
-    }   
+      }
+    }
   }
 }
 
@@ -220,7 +223,7 @@ if( ! SeInteractiveLogonRight ){
     line = split(line, sep:'|', keep:FALSE);
     if( tolower(line[0]) == 'accountlist' ){
       continue;
-    }   
+    }
 
     for( y=0; y<=max_index(line)-3; y++ ){
       desc += line[y];
@@ -228,15 +231,14 @@ if( ! SeInteractiveLogonRight ){
         desc += '\n';
       }else{
         desc += ', ';
-      }   
-    }   
+      }
+    }
   }
 }
 
 SYS_2_2_3_A6 += desc + '\n';
 set_kb_item(name:"GSHB/SYS.2.2.3.A6/result", value:result);
 set_kb_item(name:"GSHB/SYS.2.2.3.A6/desc", value:desc);
-
 
 # SYS.2.2.3.A7 Lokale Sicherheitsrichtlinien
 SYS_2_2_3_A7 = 'SYS.2.2.3.A7 Lokale Sicherheitsrichtlinien:\n';
@@ -253,14 +255,17 @@ SYS_2_2_3_A9 += 'Diese Vorgabe muss manuell überprüft werden.\n\n';
 # SYS.2.2.3.A10 Konfiguration zum Schutz von Anwendungen in Windows 10
 SYS_2_2_3_A10 = 'SYS.2.2.3.A10 Konfiguration zum Schutz von Anwendungen in Windows 10:\n';
 result = 'erfüllt';
-res = win_cmd_exec(cmd:"bcdedit /enum", password:passwd, username:usrname_WmiCmd);
-if( res ){
-  res = split(res, keep:FALSE);
-  foreach line ( res ){
-    nx_status = eregmatch(string:line, pattern:"nx[ ]+([a-z,A-Z]+)");
-    if( nx_status[1] ){
-      DEP = nx_status[1];
-      break;
+
+if( ! disabled_win_cmd_exec ){
+  res = win_cmd_exec(cmd:"bcdedit /enum", password:passwd, username:usrname_WmiCmd);
+  if( res ){
+    res = split(res, keep:FALSE);
+    foreach line ( res ){
+      nx_status = eregmatch(string:line, pattern:"nx[ ]+([a-z,A-Z]+)");
+      if( nx_status[1] ){
+        DEP = nx_status[1];
+        break;
+      }
     }
   }
 }
@@ -273,7 +278,11 @@ if( DEP ){
   }
   desc += '\n';
 }else{
-  desc = 'Die Einstellung der Dateiausführungsverhinderung konnte nicht bestimmt werden.\n';
+  desc = 'Die Einstellung der Dateiausführungsverhinderung konnte nicht bestimmt werden.';
+  if( disabled_win_cmd_exec ){
+    desc += " " + disabled_win_cmd_exec_report;
+  }
+  desc += '\n';
   result = 'error';
 }
 
@@ -522,12 +531,19 @@ set_kb_item(name:"GSHB/SYS.2.2.3.A18/desc", value:desc);
 
 # SYS.2.2.3.A19 Verwendung des Fernzugriffs über RDP [Benutzer]
 SYS_2_2_3_A19 += 'SYS.2.2.3.A19 Verwendung des Fernzugriffs über RDP:\n';
-RDP_User = win_cmd_exec(cmd:'net localgroup "Remote Desktop Users"', password:passwd, username:usrname_WmiCmd);
-Administrators = win_cmd_exec(cmd:'net localgroup "Administrators"', password:passwd, username:usrname_WmiCmd);
 result = 'erfüllt';
 
+if( ! disabled_win_cmd_exec ){
+  RDP_User = win_cmd_exec(cmd:'net localgroup "Remote Desktop Users"', password:passwd, username:usrname_WmiCmd);
+  Administrators = win_cmd_exec(cmd:'net localgroup "Administrators"', password:passwd, username:usrname_WmiCmd);
+}
+
 if( ! RDP_User ){
-  desc = 'Die Mitglieder der Gruppe "Remote Desktop Users" konnten nicht ausgelesen werden.\n';
+  desc = 'Die Mitglieder der Gruppe "Remote Desktop Users" konnten nicht ausgelesen werden.';
+  if( disabled_win_cmd_exec ){
+    desc += " " + disabled_win_cmd_exec_report;
+  }
+  desc += '\n';
   result = 'error';
 }else if( "is not recognized as an internal or external command" >< RDP_User ){
   desc = 'Die Mitglieder der Gruppe "Remote Desktop Users" konnten nicht ausgelesen werden.\n';
@@ -548,7 +564,11 @@ if( ! RDP_User ){
 }
 
 if( ! Administrators ){
-  desc += 'Die Mitglieder der Gruppe "Administrators" konnten nicht ausgelesen werden.\n';
+  desc += 'Die Mitglieder der Gruppe "Administrators" konnten nicht ausgelesen werden.';
+  if( disabled_win_cmd_exec ){
+    desc += " " + disabled_win_cmd_exec_report;
+  }
+  desc += '\n';
   result = 'error';
 }else if( "is not recognized as an internal or external command" >< Administrators ){
   desc += 'Die Mitglieder der Gruppe "Administrators" konnten nicht ausgelesen werden.\n';
@@ -755,17 +775,22 @@ if( SecureBoot == "1" ){
   }else{
     desc += 'Der geschützte Modus für LSASS ist nicht aktiviert. Dieser sollte aktiviert und der Status bei Systemstart überwacht werden.\n';
     result = 'nicht erfüllt';
-  } 
-}else{
-  BootOption = win_cmd_exec(cmd:'type C:\\Windows\\Panther\\setupact.log|find /i "Detected boot environment"', password:passwd, username:usrname_WmiCmd);
-  if( BootOption ){
-    UEFI = ereg(string:BootOption, pattern:"Detected boot environment: (EFI|UEFI)", icase:TRUE, multiline:TRUE);
   }
-  
-  desc += 'SecureBoot ist deaktiviert.\n';
-  if( UEFI ){
-    desc += 'Der Host ist ein UEFI-basiertes System. Dementsprechend sollte SecureBoot aktiviert werden.\n';
-    result = 'nicht erfüllt';
+}else{
+  if( ! disabled_win_cmd_exec ){
+    BootOption = win_cmd_exec(cmd:'type C:\\Windows\\Panther\\setupact.log|find /i "Detected boot environment"', password:passwd, username:usrname_WmiCmd);
+    if( BootOption ){
+      UEFI = ereg(string:BootOption, pattern:"Detected boot environment: (EFI|UEFI)", icase:TRUE, multiline:TRUE);
+    }
+
+    desc += 'SecureBoot ist deaktiviert.\n';
+    if( UEFI ){
+      desc += 'Der Host ist ein UEFI-basiertes System. Dementsprechend sollte SecureBoot aktiviert werden.\n';
+      result = 'nicht erfüllt';
+    }
+  } else {
+    desc = 'Es konnte nicht bestimmt werden ob es sich bei dem Host um ein UEFI-basiertes System handelt. ' + disabled_win_cmd_exec_report + '\n';
+    result = 'error';
   }
 }
 

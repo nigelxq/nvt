@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: gb_lantronix_device_detect_telnet.nasl 8000 2017-12-06 06:15:14Z cfischer $
+# $Id: gb_lantronix_device_detect_telnet.nasl 10541 2018-07-19 07:53:28Z mmartin $
 #
 # Lantronix Devices Detection (Telnet)
 #
@@ -28,8 +28,8 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.108302");
-  script_version("$Revision: 8000 $");
-  script_tag(name:"last_modification", value:"$Date: 2017-12-06 07:15:14 +0100 (Wed, 06 Dec 2017) $");
+  script_version("$Revision: 10541 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-19 09:53:28 +0200 (Thu, 19 Jul 2018) $");
   script_tag(name:"creation_date", value:"2017-11-29 08:03:31 +0100 (Wed, 29 Nov 2017)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
@@ -38,7 +38,8 @@ if(description)
   script_family("Product detection");
   script_copyright("Copyright (c) 2017 Greenbone Networks GmbH");
   script_dependencies("telnetserver_detect_type_nd_version.nasl");
-  script_require_ports(9999); # Its currently not possible to change the telnet port to something else
+  script_require_ports("Services/telnet", 23, 9999);
+  script_mandatory_keys("telnet/banner/available");
 
   script_tag(name:"summary", value:"This script performs Telnet based detection of Lantronix Devices.");
 
@@ -52,21 +53,31 @@ include("misc_func.inc");
 include("telnet_func.inc");
 include("host_details.inc");
 
-port   = 9999; # Its currently not possible to change the telnet port to something else
+port   = get_telnet_port( default:9999 ); # Most devices are running on 9999 but there are a few like MSS on 23/tcp
 banner = get_telnet_banner( port:port );
 
-if( ( "Lantronix" >< banner && ( "Password :" >< banner || ( "Press Enter" >< banner && "Setup Mode" >< banner ) ) ) || # A default bannner
-    ( "Software version " >< banner && "MAC address " >< banner ) ) { # Some branded devices not providing the "Lantronix" banner but still using their firmware
+# Lantronix MSS-VIA Version V3.6/3(000201)
+# Lantronix MSS4 Version B3.7/108(030909)
+# Lantronix SCS1600 Version 2.0/5(040701)
+# Default bannner, they might appear on e.g. 23/tcp or 9999/tcp
 
+if( egrep( string:banner, pattern:"^Lantronix .* Version ", icase:FALSE ) ||
+    # nb: Both are covered in a separate Detection-NVT
+    ( ( banner !~ "(IQinVision|IQEye) " ) && banner =~ 'Type HELP at the .* prompt for assistance' ) ||
+    ( "Lantronix" >< banner && ( "Password :" >< banner || ( "Press Enter" >< banner && "Setup Mode" >< banner ) ) ) ||
+    # Some branded devices not providing the "Lantronix" banner but still using their firmware.
+    # nb: Only use / report if this was detected on the (on some devices) hardcoded port 9999/tcp.
+    ( port == 9999 && "Software version " >< banner && "MAC address " >< banner ) ) {
+ 
   set_kb_item( name:"lantronix_device/detected", value:TRUE );
   set_kb_item( name:"lantronix_device/telnet/detected", value:TRUE );
   set_kb_item( name:"lantronix_device/telnet/port", value:port );
 
   version = "unknown";
 
-  vers = eregmatch( pattern:"Software version V([0-9.]+)", string:banner );
-  if( vers[1] ) {
-    version = vers[1];
+  vers = eregmatch( pattern:"(Software version|Version) [VB]?([0-9.]+)", string:banner );
+  if( vers[2] ) {
+    version = vers[2];
     set_kb_item( name:"lantronix_device/telnet/" + port + "/concluded", value:vers[0] );
   } else {
     set_kb_item( name:"lantronix_device/telnet/" + port + "/concluded", value:bin2string( ddata:banner, noprint_replacement:'' ) );
@@ -74,6 +85,7 @@ if( ( "Lantronix" >< banner && ( "Password :" >< banner || ( "Press Enter" >< ba
   set_kb_item( name:"lantronix_device/telnet/" + port + "/version", value:version );
 
   type = "unknown";
+
   if( "Lantronix" >!< banner && "Software version " >< banner && "MAC address " >< banner ) {
     type = "Branded";
   } else if( "Lantronix Inc. - Modbus Bridge" >< banner ) {
@@ -86,11 +98,47 @@ if( ( "Lantronix" >< banner && ( "Password :" >< banner || ( "Press Enter" >< ba
     type = "CoBox";
   } else if( "Sielox/Lantronix Network Adaptor" >< banner || "Checkpoint/Lantronix Network Adaptor" >< banner ) {
     type = "Branded";
-  } else if( type = eregmatch( pattern:"Lantronix ([A-Z0-9]+) ", string:banner ) ) {
-    type = type[1];
+  } else if( _type = eregmatch( pattern:"Lantronix ([A-Z0-9-]+) ", string:banner ) ) {
+    type = _type[1];
   }
-  set_kb_item( name:"lantronix_device/telnet/" + port + "/type", value:type );
+  
+  if ( type == "unknown" ) {
+    username = "login";
+    access = FALSE;
 
+    soc = open_sock_tcp( port );
+    if( soc ) {
+
+      recv1 = recv( socket:soc, length:2048, timeout:10 );
+
+      if ( "prompt for assistance" >< recv1 && "Username>" >< recv1 ) {
+        send( socket:soc, data:username + '\r\n' );
+        recv2 = recv( socket:soc, length:2048, timeout:10 );
+ 
+        if ( recv2 =~ "Local_.+>" ) {
+          access = TRUE;
+          set_kb_item(name:"lantronix_device/telnet/" + port + "/access", value:TRUE );      
+        }
+      }
+
+      if ( access ) {
+        send( socket:soc, data:'show server\r\n' );
+        recv3 = recv( socket:soc, length:2048, timeout:10 );
+        # Ident String: EPS100
+        typerecv = eregmatch( pattern: "Ident String: ([a-zA-Z0-9]+)", string:bin2string( ddata:recv3, noprint_replacement:'' ) );
+        if(!isnull(typerecv[1])){
+          type = typerecv[1];
+        }
+      }
+      close( soc );
+    }
+    # nb: We don't want to report other devices which might have the same "Type HELP"
+    # banner as Lantronix devices.
+    exit( 0 );
+  }
+
+  set_kb_item( name:"lantronix_device/telnet/" + port + "/type", value:type );
+  
   if( mac = eregmatch( pattern:"MAC address ([0-9a-fA-F]{12})", string:bin2string( ddata:banner, noprint_replacement:'' ) ) ) {
     plain_mac = mac[1];
     for( i = 0; i < 12; i++ ) {
@@ -99,8 +147,6 @@ if( ( "Lantronix" >< banner && ( "Password :" >< banner || ( "Press Enter" >< ba
     }
     register_host_detail( name:"MAC", value:full_mac, desc:"Get the MAC Address via Lantronix Telnet banner" );
     replace_kb_item( name:"Host/mac_address", value:full_mac );
-    info["MAC"] = mac;
   }
 }
-
 exit( 0 );

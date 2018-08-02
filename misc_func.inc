@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: misc_func.inc 10245 2018-06-19 06:43:31Z cfischer $
+# $Id: misc_func.inc 10707 2018-08-01 10:58:06Z cfischer $
 #
 # Miscellaneous support methods
 #
@@ -26,7 +26,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 10245 $
+# $Revision: 10707 $
 #
 ###############################################################################
 
@@ -874,12 +874,12 @@ function register_all_pjl_ports( ports ) {
   local_var ports, port;
 
   if( isnull( ports ) || typeof( ports ) != "array" ) {
-    ports = make_list( 9100, 9101, 9102, 9103, 9112, 9113, 9114, 9115, 9116 );
+    ports = make_list( 9100, 9101, 9102, 9103, 9104, 9105, 9106, 9107, 9112, 9113, 9114, 9115, 9116 );
   }
 
   foreach port( ports ) {
     if( get_port_state( port ) ) {
-      register_service( port:port, proto:"PJL" ); #TBD Use Services/jedirect like in 2008/pjl_detect.nasl?
+      register_service( port:port, proto:"hp-pjl" );
       register_service( port:port, proto:"fragile_port" );
       replace_kb_item( name:"BannerHex/" + port, value:"aeaeaeaeae" );
       replace_kb_item( name:"Banner/" + port, value:"ignore-this-banner" );
@@ -1441,29 +1441,32 @@ function get_all_udp_ports_list( ) {
   return ports;
 }
 
-# This function gets the hostname of the target via get_host_name()
-# and if no IPv4/IPv6 address was returned by this function it
-# returns a list containing the parts of the target hostname.
+# @brief Gets the hostname of the target via get_host_name() and
+#        if no IPv4/IPv6 address was returned by this function it
+#        returns a list containing the parts of the target hostname.
 #
-# For example a hostname of www.example.com returns a list containing
-# the following:
-# 1 -> www
-# 2 -> example
-# 3 -> com
-# 4 -> www.example
-# 5 -> www.example.com
-# 6 -> example.com
-# 7 -> com.example
-# 8 -> com.example.www
+#        For example a hostname of www.example.com returns a list containing
+#        the following:
+#        1 -> www
+#        2 -> example
+#        3 -> com
+#        4 -> www.example
+#        5 -> www.example.com
+#        6 -> example.com
+#        7 -> com.example
+#        8 -> com.example.www
 #
-# TODO: We currently can't catch a example.com from www.sub.example.com
+# @todo We currently can't catch a example.com from www.sub.example.com
+#
+# @return a list containing the parts of the target hostname, an empty list
+#         if get_host_name() returned an IPv4/IPv6 address.
+#
 function create_hostname_parts_list( ) {
 
   local_var list, hn, hnp, hnl, p, parts, i;
 
   list = make_list();
   hn   = get_host_name();
-  hn = "www.example.com";
 
   # nb: We don't want to add an IPv4/IPv6 address here...
   if( ":" >!< hn && ! ereg( string:hn, pattern:"^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$" ) ) {

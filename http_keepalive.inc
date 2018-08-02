@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Include File
-# $Id: http_keepalive.inc 10271 2018-06-20 12:45:27Z cfischer $
+# $Id: http_keepalive.inc 10707 2018-08-01 10:58:06Z cfischer $
 #
 # Methods to support http keep alive handling
 #
@@ -23,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# $Revision: 10271 $
+# $Revision: 10707 $
 #
 ###############################################################################
 
@@ -67,11 +67,11 @@ function enable_keepalive( port ) {
   __ka_socket  = http_open_socket( port );
 }
 
-# @brief This function determines if the remote web server is keep-alive-enabled or not.
+# @brief Determine if the remote web server is keep-alive-enabled or not.
 #
 # @param port the HTTP port of the target
 #
-# @return 1 if keep alive is enabled, 0 otherwise and -2 if no port was passed or no socket could be openend to the target host
+# @return 1 if keep alive is enabled, 0 otherwise and -2 if no port was passed or no socket could be opened to the target host
 #
 function http_keepalive_enabled( port ) {
 
@@ -92,7 +92,7 @@ function http_keepalive_enabled( port ) {
   }
 
   # nb: Always keep http_host_name() before http_open_socket() as the first
-  # could fork with multiple vhosts and the childs would share the same
+  # could fork with multiple vhosts and the child's would share the same
   # socket causing race conditions and similar.
   host = http_host_name( port:port );
 
@@ -369,8 +369,8 @@ function check_win_dir_trav_ka( port, url ) {
   return( 0 );
 }
 
-# @brief This function creates a HTTP GET request with enabled Keep-Alive Connection
-#        for a specified item (e.g. a script), sends the request to the target and checks
+# @brief Creates a HTTP GET request with enabled Keep-Alive Connection for a
+#        specified item (e.g. a script), sends the request to the target and checks
 #        if the requested item is available.
 #
 # @param port the HTTP port of the target
@@ -437,8 +437,8 @@ function is_cgi_installed_ka( item, port ) {
   return FALSE;
 }
 
-# @brief This function creates a HTTP GET request with enabled Keep-Alive Connection
-#        for a specified item (e.g. a script), sends the request to the target and
+# @brief Creates a HTTP GET request with enabled Keep-Alive Connection for a
+#        specified item (e.g. a script), sends the request to the target and
 #        returns the response. It will also follow up to 32 times a received redirect.
 #
 # @param port          the HTTP port of the target
@@ -503,12 +503,13 @@ function get_http_page( port, url, max_redirects ) {
   return NULL;
 }
 
-# @brief This function creates a HTTP GET request for the specified URL,
-#        sends the request to the target and receives the response.
+# @brief Creates a HTTP GET request for the specified URL, sends
+#        the request to the target and receives the response.
 #        If a response was received it is saved into the knowledge base.
 #        If an URL was requested which was requested previously the cached
 #        response will be returned instead of doing a new request.
-#        nb: The global_var __ka_last_request can be used to access the "req"
+#
+# @note  The global_var __ka_last_request can be used to access the "req"
 #        crafted by this function.
 #
 # @param port the HTTP port of the target
@@ -562,13 +563,13 @@ function http_get_cache( port, item ) {
   return res;
 }
 
-# @brief This function creates a HTTP GET request with enabled Keep-Alive Connection for
-#        a specified item (e.g. a script), sends the request to the target and checks
+# @brief Creates a HTTP GET request with enabled Keep-Alive Connection for a
+#        specified item (e.g. a script), sends the request to the target and checks
 #        if one or more specific patterns are included in the response. If the pattern
 #        was found a security_message() is reported and the script exit afterwards.
 #
 # @param default_port  the default HTTP port to assume if no open ports was found on the target host
-# @param extra_dirs    additional directories to check which are added to the found directories of cgi_dirs(). If empty only cgi_dirs() is used.
+# @param extra_dirs    additional directories to check which are added to the found directories of @ref cgi_dirs. If empty only @ref cgi_dirs is used.
 # @param unique_dir    the directory which should be checked, if this parameter is passed extra_dirs will be ignored.
 # @param check_request the request / item to sent in the HTTP GET request
 # @param extra_check   a pattern to check additionally to the check_result in form of a regex
@@ -869,8 +870,8 @@ function http_get_req( port, url, add_headers, accept_header, user_agent, host_h
   return req;
 }
 
-# @brief This function creates a HTTP GET request for the specified URL,
-#        sends the request to the target and receives the response.
+# @brief Creates a HTTP GET request for the specified URL, sends
+#        the request to the target and receives the response.
 #
 # @param port     the HTTP port of the target
 # @param url      the URL to request

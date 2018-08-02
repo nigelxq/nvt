@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_WMI_EventLogPolSet.nasl 9365 2018-04-06 07:34:21Z cfischer $
+# $Id: GSHB_WMI_EventLogPolSet.nasl 10699 2018-08-01 07:31:54Z cfischer $
 #
 # Read all EventLog Config Policy(ELCP) Settings (Windows)
 #
@@ -9,9 +9,6 @@
 #
 # Copyright:
 # Copyright (c) 2010 Greenbone Networks GmbH, http://www.greenbone.net
-#
-# Set in an Workgroup Environment under Vista with enabled UAC this DWORD to access WMI:
-# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system\LocalAccountTokenFilterPolicy to 1
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -27,40 +24,37 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "The script read all, Vista and above, EventLog Config Policy Settings.";
-
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.96050");
-  script_version("$Revision: 9365 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:34:21 +0200 (Fri, 06 Apr 2018) $");
+  script_version("$Revision: 10699 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-01 09:31:54 +0200 (Wed, 01 Aug 2018) $");
   script_tag(name:"creation_date", value:"2010-04-27 10:02:59 +0200 (Tue, 27 Apr 2010)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"qod_type", value:"registry");  
+  script_tag(name:"qod_type", value:"registry");
   script_name("Read all EventLog Config Policy(ELCP) Settings (Windows)");
-
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
   script_family("IT-Grundschutz");
-  script_mandatory_keys("Compliance/Launch/GSHB");
-  script_mandatory_keys("Tools/Present/wmi");
-   
-#  script_require_ports(139, 445);
-  script_dependencies("secpod_reg_enum.nasl", "GSHB_WMI_OSInfo.nasl");
+  script_mandatory_keys("Compliance/Launch/GSHB", "Tools/Present/wmi");
+  script_dependencies("smb_reg_service_pack.nasl", "GSHB_WMI_OSInfo.nasl");
 
-  script_tag(name : "summary" , value : tag_summary);
+  script_tag(name:"summary", value:"The script read all, Vista and above, EventLog Config Policy Settings.");
+
   exit(0);
 }
 
+include("smb_nt.inc");
+
 host    = get_host_ip();
-usrname = get_kb_item("SMB/login");
-domain  = get_kb_item("SMB/domain");
+usrname = kb_smb_login();
+domain  = kb_smb_domain();
 if (domain){
   usrname = domain + '\\' + usrname;
 }
-passwd  = get_kb_item("SMB/password");
+passwd = kb_smb_password();
+
 OSVER = get_kb_item("WMI/WMI_OSVER");
 
 if(!OSVER || OSVER >< "none"){
@@ -77,7 +71,7 @@ if (OSVER < '6.0'){
 handlereg = wmi_connect_reg(host:host, username:usrname, password:passwd);
 
 if(!handlereg){
-  log_message("wmi_connect: WMI Connect failed.");
+  log_message(port:0, data:"wmi_connect: WMI Connect failed.");
   set_kb_item(name:"WMI/ELCP/GENERAL", value:"error");
   set_kb_item(name:"WMI/ELCP/GENERAL/log", value:"wmi_connect: WMI Connect failed.");
   wmi_close(wmi_handle:handlereg);

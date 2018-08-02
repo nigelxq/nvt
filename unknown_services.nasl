@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: unknown_services.nasl 10160 2018-06-12 10:06:38Z cfischer $
+# $Id: unknown_services.nasl 10600 2018-07-25 08:04:18Z cfischer $
 #
 # Collect banner of unknown services
 #
@@ -8,7 +8,7 @@
 # Michel Arboi <arboi@alussinan.org>
 #
 # Copyright:
-# Copyright (C) 2002 Michel Arboi
+# Copyright (C) 2005 Michel Arboi
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2,
@@ -27,14 +27,14 @@
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.11154");
-  script_version("$Revision: 10160 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-06-12 12:06:38 +0200 (Tue, 12 Jun 2018) $");
+  script_version("$Revision: 10600 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-25 10:04:18 +0200 (Wed, 25 Jul 2018) $");
   script_tag(name:"creation_date", value:"2005-11-03 14:08:04 +0100 (Thu, 03 Nov 2005)");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
   script_tag(name:"cvss_base", value:"0.0");
   script_name("Collect banner of unknown services");
   script_category(ACT_GATHER_INFO);
-  script_copyright("This script is Copyright (C) 2002 Michel Arboi");
+  script_copyright("This script is Copyright (C) 2005 Michel Arboi");
   script_family("Service detection");
   # IMPORTANT: Don't add telnet.nasl or os_detection.nasl in here which have (indirect-)
   # dependencies to this NVT. Adding this dependency would cause a dependency cycle...
@@ -49,7 +49,7 @@ if(description)
                       "famd_detect.nasl", "find_service6.nasl",
                       "gb_ab_ethernet_detect.nasl", "gb_aerospike_telnet_detect.nasl",
                       "gb_aerospike_xdr_detect.nasl", "gb_amqp_detect.nasl",
-                      "gb_apache_cassandra_detect.nasl",
+                      "gb_android_adb_detect.nasl", "gb_apache_cassandra_detect.nasl",
                       "gb_apache_derby_detect.nasl", "gb_apache_jserv_detect.nasl",
                       "gb_arkeia_virtual_appliance_detect_617.nasl", "gb_backupexec_detect.nasl",
                       "gb_check_mk_agent_detect.nasl", "gb_codesys_detect.nasl",
@@ -81,7 +81,8 @@ if(description)
                       "nessus_detect.nasl", "nntpserver_detect.nasl",
                       "ntp_open.nasl", "oracle_tnslsnr_version.nasl",
                       "ossim_server_detect.nasl", "PC_anywhere_tcp.nasl",
-                      "perforce_detect.nasl", "postgresql_detect.nasl",
+                      "perforce_detect.nasl", "pjl_detect.nasl",
+                      "postgresql_detect.nasl",
                       "pptp_detect.nasl", "qmtp_detect.nasl",
                       "radmin_detect.nasl", "remote-detect-filemaker.nasl",
                       "remote-detect-firebird.nasl", "rpcinfo.nasl",

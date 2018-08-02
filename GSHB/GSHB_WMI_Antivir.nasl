@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_WMI_Antivir.nasl 9365 2018-04-06 07:34:21Z cfischer $
+# $Id: GSHB_WMI_Antivir.nasl 10699 2018-08-01 07:31:54Z cfischer $
 #
 # WMI AntiVirus Test
 #
@@ -9,10 +9,6 @@
 #
 # Copyright:
 # Copyright (c) 2009 Greenbone Networks GmbH, http://www.greenbone.net
-#
-# Set in an Workgroup Environment under Vista with enabled UAC this DWORD to access WMI:
-# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system\LocalAccountTokenFilterPolicy to 1
-#
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -28,38 +24,37 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "Tests WMI AntiVirus Status.";
-
 if(description)
 {
   script_oid("1.3.6.1.4.1.25623.1.0.96011");
-  script_version("$Revision: 9365 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:34:21 +0200 (Fri, 06 Apr 2018) $");
+  script_version("$Revision: 10699 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-08-01 09:31:54 +0200 (Wed, 01 Aug 2018) $");
   script_tag(name:"creation_date", value:"2009-10-23 12:32:24 +0200 (Fri, 23 Oct 2009)");
   script_tag(name:"cvss_base", value:"0.0");
   script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"qod_type", value:"registry");  
+  script_tag(name:"qod_type", value:"registry");
   script_name("WMI Antivirus Status (win)");
-
-
   script_category(ACT_GATHER_INFO);
   script_copyright("Copyright (c) 2009 Greenbone Networks GmbH");
   script_family("IT-Grundschutz");
-  script_mandatory_keys("Compliance/Launch/GSHB");
-  script_mandatory_keys("Tools/Present/wmi");
-   
+  script_mandatory_keys("Compliance/Launch/GSHB", "Tools/Present/wmi");
   script_dependencies("toolcheck.nasl", "smb_login.nasl", "GSHB_WMI_OSInfo.nasl");
-  script_tag(name : "summary" , value : tag_summary);
+
+  script_tag(name:"summary", value:"Tests WMI AntiVirus Status.");
+
   exit(0);
 }
 
+include("smb_nt.inc");
+
 host    = get_host_ip();
-usrname = get_kb_item("SMB/login");
-domain  = get_kb_item("SMB/domain");
+usrname = kb_smb_login();
+domain  = kb_smb_domain();
 if (domain){
   usrname = domain + '\\' + usrname;
 }
-passwd  = get_kb_item("SMB/password");
+passwd = kb_smb_password();
+
 
 OSVER = get_kb_item("WMI/WMI_OSVER");
 OSSP = get_kb_item("WMI/WMI_OSSP");
@@ -96,7 +91,7 @@ if(OSVER == '5.1' || (OSVER == '5.2' && OSNAME >< 'Microsoft(R) Windows(R) XP Pr
 
 
       if(!handle){
-          log_message("wmi_connect: WMI Connect failed.");
+          log_message(port:0, data:"wmi_connect: WMI Connect failed.");
           set_kb_item(name:"WMI/Antivir", value:"error");
       exit(0);
       }
@@ -123,7 +118,7 @@ if((OSVER == '6.0' || OSVER == '6.1' || OSVER == '6.2' || OSVER == '6.3' || OSVE
     handle = wmi_connect(host:host, username:usrname, password:passwd, ns:ns);
 
     if(!handle){
-        log_message("wmi_connect: WMI Connect failed.");
+        log_message(port:0, data:"wmi_connect: WMI Connect failed.");
         set_kb_item(name:"WMI/Antivir", value:"error");
         exit(0);
     }

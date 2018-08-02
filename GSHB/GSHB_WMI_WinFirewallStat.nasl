@@ -1,6 +1,6 @@
 ###############################################################################
 # OpenVAS Vulnerability Test
-# $Id: GSHB_WMI_WinFirewallStat.nasl 9365 2018-04-06 07:34:21Z cfischer $
+# $Id: GSHB_WMI_WinFirewallStat.nasl 10628 2018-07-25 15:52:40Z cfischer $
 #
 # Get Windows Firewall Profile Status over WMI (win)
 #
@@ -8,11 +8,7 @@
 # Thomas Rotter <T.Rotter@dn-systems.de>
 #
 # Copyright:
-# Copyright (c) 2009 Greenbone Networks GmbH, http://www.greenbone.net
-#
-# Set in an Workgroup Environment under Vista with enabled UAC this DWORD to access WMI:
-# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system\LocalAccountTokenFilterPolicy to 1
-#
+# Copyright (c) 2010 Greenbone Networks GmbH, http://www.greenbone.net
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2
@@ -28,48 +24,45 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-tag_summary = "Get Windows Firewall Profile Status over WMI.
+if(description)
+{
+  script_oid("1.3.6.1.4.1.25623.1.0.96017");
+  script_version("$Revision: 10628 $");
+  script_tag(name:"last_modification", value:"$Date: 2018-07-25 17:52:40 +0200 (Wed, 25 Jul 2018) $");
+  script_tag(name:"creation_date", value:"2010-04-27 10:02:59 +0200 (Tue, 27 Apr 2010)");
+  script_tag(name:"cvss_base", value:"0.0");
+  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
+  script_tag(name:"qod_type", value:"registry");
+  script_name("Get Windows Firewall Profile Status over WMI (win)");
+  script_category(ACT_GATHER_INFO);
+  script_copyright("Copyright (c) 2010 Greenbone Networks GmbH");
+  script_family("IT-Grundschutz");
+  script_mandatory_keys("Compliance/Launch/GSHB", "Tools/Present/wmi");
+  script_dependencies("toolcheck.nasl", "smb_login.nasl", "GSHB_WMI_OSInfo.nasl");
+
+  script_tag(name:"summary", value:"Get Windows Firewall Profile Status over WMI.
   In this Test is currently only an Registry Test for the Microsoft Firewall
   realized.
 
   Later we will test over WMI the Namespace SecurityCenter\FirewallProduct and
   SecurityCenter2\FirewallProduct for third party Firewall Products. The WMI
-  test can only used for Microsoft Client and not for Server Systems.";
+  test can only used for Microsoft Client and not for Server Systems.");
 
-if(description)
-{
-  script_oid("1.3.6.1.4.1.25623.1.0.96017");
-  script_version("$Revision: 9365 $");
-  script_tag(name:"last_modification", value:"$Date: 2018-04-06 09:34:21 +0200 (Fri, 06 Apr 2018) $");
-  script_tag(name:"creation_date", value:"2010-04-27 10:02:59 +0200 (Tue, 27 Apr 2010)");
-  script_tag(name:"cvss_base", value:"0.0");
-  script_tag(name:"cvss_base_vector", value:"AV:N/AC:L/Au:N/C:N/I:N/A:N");
-  script_tag(name:"qod_type", value:"registry");  
-  script_name("Get Windows Firewall Profile Status over WMI (win)");
-
-
-  script_category(ACT_GATHER_INFO);
-  script_copyright("Copyright (c) 2009 Greenbone Networks GmbH");
-  script_family("IT-Grundschutz");
-  script_mandatory_keys("Compliance/Launch/GSHB");
-  script_mandatory_keys("Tools/Present/wmi");
-
-#  script_require_ports(139, 445);
-  script_dependencies("toolcheck.nasl", "smb_login.nasl", "GSHB_WMI_OSInfo.nasl");
-  script_tag(name : "summary" , value : tag_summary);
   exit(0);
 }
 
 include("wmi_svc.inc");
 include("wmi_os.inc");
+include("smb_nt.inc");
 
 host    = get_host_ip();
-usrname = get_kb_item("SMB/login");
-domain  = get_kb_item("SMB/domain");
+usrname = kb_smb_login();
+domain  = kb_smb_domain();
 if (domain){
   usrname = domain + '\\' + usrname;
 }
-passwd  = get_kb_item("SMB/password");
+passwd = kb_smb_password();
+
 
 
 OSVER = get_kb_item("WMI/WMI_OSVER");
@@ -157,11 +150,11 @@ if (OSVER == '5.2' && OSNAME >!< 'Microsoft(R) Windows(R) XP Professional x64 Ed
     set_kb_item(name:"WMI/WinFirewall/Firewall_Name", value:"inapplicable");
     set_kb_item(name:"WMI/WinFirewall/Firewall_State", value:"inapplicable");
     exit(0);
-  }  
+  }
   else{
       IPFilterquery = 'select Caption, IPFilterSecurityEnabled from Win32_NetworkAdapterConfiguration WHERE IPFilterSecurityEnabled = False OR IPFilterSecurityEnabled = True';
       IPFilter = wmi_query(wmi_handle:handle, query:IPFilterquery);
-      if(!IPFilter) IPFilter = "None";    
+      if(!IPFilter) IPFilter = "None";
       set_kb_item(name:"WMI/WinFirewall", value:"inapplicable");
       set_kb_item(name:"WMI/WinFirewall/IPFilter", value:IPFilter);
       set_kb_item(name:"WMI/WinFirewall/STD", value:"inapplicable");
@@ -186,7 +179,7 @@ if(FWOSVER == "none"){
   set_kb_item(name:"WMI/WinFirewall/Firewall_Name", value:"inapplicable");
   set_kb_item(name:"WMI/WinFirewall/Firewall_State", value:"inapplicable");
   exit(0);
-}  
+}
 
 if (OSVER >= '6.0'){
   FirewallSTD = wmi_reg_get_dword_val(wmi_handle:handlereg, key:"SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile", val_name:"EnableFirewall");
@@ -206,7 +199,7 @@ if(!FirewallPUB) FirewallPUB = "off";
 set_kb_item(name:"WMI/WinFirewall/STD", value:FirewallSTD);
 set_kb_item(name:"WMI/WinFirewall/DOM", value:FirewallDOM);
 set_kb_item(name:"WMI/WinFirewall/PUB", value:FirewallPUB);
-set_kb_item(name:"WMI/WinFirewall", value:"inapplicable");    
+set_kb_item(name:"WMI/WinFirewall", value:"inapplicable");
 set_kb_item(name:"WMI/WinFirewall/IPFilter", value:"inapplicable");
 if (OSTYPE != 1){
   set_kb_item(name:"WMI/WinFirewall/Firewall_Name", value:"inapplicable");
@@ -222,16 +215,16 @@ if (OSVER >= '6.0' && OSTYPE == 1){
 
   Firewall_Name = wmi_query(wmi_handle:handlefw, query:fwquery1);
   Firewall_State = wmi_query(wmi_handle:handlefw, query:fwquery2);
-    
+
   if(!Firewall_Name) Firewall_Name = "none";
   if(!Firewall_State) Firewall_State = "none";
-    
+
   set_kb_item(name:"WMI/WinFirewall/Firewall_Name", value:Firewall_Name);
   set_kb_item(name:"WMI/WinFirewall/Firewall_State", value:Firewall_State);
-  
-  wmi_close(wmi_handle:handlefw);    
+
+  wmi_close(wmi_handle:handlefw);
 }
 
-    
+
 
 exit(0);
